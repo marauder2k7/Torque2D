@@ -56,7 +56,7 @@ void renderBorderedRect(RectI &bounds, GuiControlProfile *profile, GuiControlSta
 		S32 fillHeight = innerRect.extent.y + ((topProfile && topProfile->mUnderfill) ? topSize : 0) + ((bottomProfile && bottomProfile->mUnderfill) ? bottomSize : 0);
 		RectI fillRect = RectI((leftProfile && leftProfile->mUnderfill) ? bounds.point.x : innerRect.point.x,
 			(topProfile && topProfile->mUnderfill) ? bounds.point.y : innerRect.point.y, fillWidth, fillHeight);
-		dglDrawRectFill(fillRect, fillColor);
+      DGL->dglDrawRectFill(fillRect, fillColor);
 	}
 	
 	//Draw the borders
@@ -74,19 +74,19 @@ void renderBorderedRect(RectI &bounds, GuiControlProfile *profile, GuiControlSta
 
 	if (leftSize > 0)
 	{
-		dglDrawQuadFill(p1, p2, p6, p5, leftColor);
+      DGL->dglDrawQuadFill(p1, p2, p6, p5, leftColor);
 	}
 	if (rightSize > 0)
 	{
-		dglDrawQuadFill(p8, p7, p3, p4, rightColor);
+      DGL->dglDrawQuadFill(p8, p7, p3, p4, rightColor);
 	}
 	if (topSize > 0)
 	{
-		dglDrawQuadFill(p1, p5, p8, p4, topColor);
+      DGL->dglDrawQuadFill(p1, p5, p8, p4, topColor);
 	}
 	if (bottomSize > 0)
 	{
-		dglDrawQuadFill(p6, p2, p3, p7, bottomColor);
+      DGL->dglDrawQuadFill(p6, p2, p3, p7, bottomColor);
 	}
 }
 
@@ -104,11 +104,11 @@ void renderBorderedCircle(Point2I &center, S32 radius, GuiControlProfile *profil
 	if (profile->mOpaque)
 	{
 		S32 fillRadius = (profile->mBorderDefault && profile->mBorderDefault->mUnderfill) ? radius : radius - borderSize;
-		dglDrawCircleFill(center, (F32)fillRadius, fillColor);
+      DGL->dglDrawCircleFill(center, (F32)fillRadius, fillColor);
 	}
 
 	//Draw the border
-	dglDrawCircle(center, (F32)radius, borderColor, (F32)borderSize);
+   DGL->dglDrawCircle(center, (F32)radius, borderColor, (F32)borderSize);
 }
 
 // DAW: Render out the sizable bitmap borders based on a multiplier into the bitmap array
@@ -138,7 +138,7 @@ void renderSizableBitmapBordersFilledIndex(RectI &bounds, S32 startIndex, GuiCon
    S32 BorderBottom =      7 + BorderTopLeft;
    S32 BorderBottomRight = 8 + BorderTopLeft;
 
-   dglClearBitmapModulation();
+   DGL->dglClearBitmapModulation();
    if (profile->mBitmapArrayRects.size() >= (NumBitmaps + startIndex))
    {
 	   RectI destRect;
@@ -148,14 +148,14 @@ void renderSizableBitmapBordersFilledIndex(RectI &bounds, S32 startIndex, GuiCon
 	   // Draw all corners first.
 
 	   //top left border
-	   dglDrawBitmapSR(profile->mTextureHandle, Point2I(bounds.point.x, bounds.point.y), mBitmapBounds[BorderTopLeft]);
+      DGL->dglDrawBitmapSR(profile->mTextureHandle, Point2I(bounds.point.x, bounds.point.y), mBitmapBounds[BorderTopLeft]);
 	   //top right border
-	   dglDrawBitmapSR(profile->mTextureHandle, Point2I(bounds.point.x + bounds.extent.x - mBitmapBounds[BorderTopRight].extent.x, bounds.point.y), mBitmapBounds[BorderTopRight]);
+      DGL->dglDrawBitmapSR(profile->mTextureHandle, Point2I(bounds.point.x + bounds.extent.x - mBitmapBounds[BorderTopRight].extent.x, bounds.point.y), mBitmapBounds[BorderTopRight]);
 
 	   //bottom left border
-	   dglDrawBitmapSR(profile->mTextureHandle, Point2I(bounds.point.x, bounds.point.y + bounds.extent.y - mBitmapBounds[BorderBottomLeft].extent.y), mBitmapBounds[BorderBottomLeft]);
+      DGL->dglDrawBitmapSR(profile->mTextureHandle, Point2I(bounds.point.x, bounds.point.y + bounds.extent.y - mBitmapBounds[BorderBottomLeft].extent.y), mBitmapBounds[BorderBottomLeft]);
 	   //bottom right border
-	   dglDrawBitmapSR(profile->mTextureHandle, Point2I(
+      DGL->dglDrawBitmapSR(profile->mTextureHandle, Point2I(
 		   bounds.point.x + bounds.extent.x - mBitmapBounds[BorderBottomRight].extent.x,
 		   bounds.point.y + bounds.extent.y - mBitmapBounds[BorderBottomRight].extent.y),
 		   mBitmapBounds[BorderBottomRight]);
@@ -173,7 +173,7 @@ void renderSizableBitmapBordersFilledIndex(RectI &bounds, S32 startIndex, GuiCon
 	   stretchRect = mBitmapBounds[BorderTop];
 	   stretchRect.inset(1, 0);
 	   //draw it
-	   dglDrawBitmapStretchSR(profile->mTextureHandle, destRect, stretchRect);
+      DGL->dglDrawBitmapStretchSR(profile->mTextureHandle, destRect, stretchRect);
 	   //bottom line stretch
 	   destRect.point.x = bounds.point.x + mBitmapBounds[BorderBottomLeft].extent.x;
 	   destRect.extent.x = bounds.extent.x - mBitmapBounds[BorderBottomRight].extent.x - mBitmapBounds[BorderBottomLeft].extent.x;
@@ -183,7 +183,7 @@ void renderSizableBitmapBordersFilledIndex(RectI &bounds, S32 startIndex, GuiCon
 	   stretchRect = mBitmapBounds[BorderBottom];
 	   stretchRect.inset(1, 0);
 	   //draw it
-	   dglDrawBitmapStretchSR(profile->mTextureHandle, destRect, stretchRect);
+      DGL->dglDrawBitmapStretchSR(profile->mTextureHandle, destRect, stretchRect);
 	   //left line stretch
 	   destRect.point.x = bounds.point.x;
 	   destRect.extent.x = mBitmapBounds[BorderLeft].extent.x;
@@ -193,7 +193,7 @@ void renderSizableBitmapBordersFilledIndex(RectI &bounds, S32 startIndex, GuiCon
 	   stretchRect = mBitmapBounds[BorderLeft];
 	   stretchRect.inset(0, 1);
 	   //draw it
-	   dglDrawBitmapStretchSR(profile->mTextureHandle, destRect, stretchRect);
+      DGL->dglDrawBitmapStretchSR(profile->mTextureHandle, destRect, stretchRect);
 	   //right line stretch
 	   destRect.point.x = bounds.point.x + bounds.extent.x - mBitmapBounds[BorderRight].extent.x;
 	   destRect.extent.x = mBitmapBounds[BorderRight].extent.x;
@@ -203,7 +203,7 @@ void renderSizableBitmapBordersFilledIndex(RectI &bounds, S32 startIndex, GuiCon
 	   stretchRect = mBitmapBounds[BorderRight];
 	   stretchRect.inset(0, 1);
 	   //draw it
-	   dglDrawBitmapStretchSR(profile->mTextureHandle, destRect, stretchRect);
+      DGL->dglDrawBitmapStretchSR(profile->mTextureHandle, destRect, stretchRect);
 	   //fill stretch
 	   destRect.point.x = bounds.point.x + mBitmapBounds[BorderLeft].extent.x;
 	   destRect.extent.x = (bounds.extent.x) - mBitmapBounds[BorderLeft].extent.x - mBitmapBounds[BorderRight].extent.x;
@@ -213,7 +213,7 @@ void renderSizableBitmapBordersFilledIndex(RectI &bounds, S32 startIndex, GuiCon
 	   stretchRect = mBitmapBounds[Fill];
 	   stretchRect.inset(1, 1);
 	   //draw it
-	   dglDrawBitmapStretchSR(profile->mTextureHandle, destRect, stretchRect);
+      DGL->dglDrawBitmapStretchSR(profile->mTextureHandle, destRect, stretchRect);
 
 	   // End drawing sides and top stretched borders
    }
@@ -232,7 +232,7 @@ void renderFixedBitmapBordersFilled(RectI &bounds, S32 baseMultiplier, GuiContro
    S32 Fill =              1 + BorderLeft;
    S32 BorderRight =       2 + BorderLeft;
 
-   dglClearBitmapModulation();
+   DGL->dglClearBitmapModulation();
    if(profile->mBitmapArrayRects.size() >= (NumBitmaps * baseMultiplier))
    {
       RectI destRect;
@@ -242,9 +242,9 @@ void renderFixedBitmapBordersFilled(RectI &bounds, S32 baseMultiplier, GuiContro
       // Draw all corners first.
 
       //left border
-      dglDrawBitmapSR(profile->mTextureHandle,Point2I(bounds.point.x,bounds.point.y),mBitmapBounds[BorderLeft]);
+      DGL->dglDrawBitmapSR(profile->mTextureHandle,Point2I(bounds.point.x,bounds.point.y),mBitmapBounds[BorderLeft]);
       //right border
-      dglDrawBitmapSR(profile->mTextureHandle,Point2I(bounds.point.x + bounds.extent.x - mBitmapBounds[BorderRight].extent.x,bounds.point.y),mBitmapBounds[BorderRight]);
+      DGL->dglDrawBitmapSR(profile->mTextureHandle,Point2I(bounds.point.x + bounds.extent.x - mBitmapBounds[BorderRight].extent.x,bounds.point.y),mBitmapBounds[BorderRight]);
 
       // End drawing corners
 
@@ -259,7 +259,7 @@ void renderFixedBitmapBordersFilled(RectI &bounds, S32 baseMultiplier, GuiContro
       stretchRect = mBitmapBounds[Fill];
       stretchRect.inset(1,0);
       //draw it
-      dglDrawBitmapStretchSR(profile->mTextureHandle,destRect,stretchRect);
+      DGL->dglDrawBitmapStretchSR(profile->mTextureHandle,destRect,stretchRect);
 
       // End drawing fill
    }
@@ -276,7 +276,7 @@ void renderFixedBitmapBordersFilledIndex(RectI &bounds, S32 startIndex, GuiContr
    S32 Fill =              1 + startIndex;
    S32 BorderRight =       2 + startIndex;
 
-   dglClearBitmapModulation();
+   DGL->dglClearBitmapModulation();
    if(profile->mBitmapArrayRects.size() >= (startIndex + NumBitmaps))
    {
       RectI destRect;
@@ -286,9 +286,9 @@ void renderFixedBitmapBordersFilledIndex(RectI &bounds, S32 startIndex, GuiContr
       // Draw all corners first.
 
       //left border
-      dglDrawBitmapSR(profile->mTextureHandle,Point2I(bounds.point.x,bounds.point.y),mBitmapBounds[BorderLeft]);
+      DGL->dglDrawBitmapSR(profile->mTextureHandle,Point2I(bounds.point.x,bounds.point.y),mBitmapBounds[BorderLeft]);
       //right border
-      dglDrawBitmapSR(profile->mTextureHandle,Point2I(bounds.point.x + bounds.extent.x - mBitmapBounds[BorderRight].extent.x,bounds.point.y),mBitmapBounds[BorderRight]);
+      DGL->dglDrawBitmapSR(profile->mTextureHandle,Point2I(bounds.point.x + bounds.extent.x - mBitmapBounds[BorderRight].extent.x,bounds.point.y),mBitmapBounds[BorderRight]);
 
       // End drawing corners
 
@@ -303,7 +303,7 @@ void renderFixedBitmapBordersFilledIndex(RectI &bounds, S32 startIndex, GuiContr
       stretchRect = mBitmapBounds[Fill];
       stretchRect.inset(1,0);
       //draw it
-      dglDrawBitmapStretchSR(profile->mTextureHandle,destRect,stretchRect);
+      DGL->dglDrawBitmapStretchSR(profile->mTextureHandle,destRect,stretchRect);
 
       // End drawing fill
    }
@@ -320,7 +320,7 @@ void renderFixedBitmapBordersStretchYFilled(RectI &bounds, S32 baseMultiplier, G
    S32 Fill =              1 + BorderLeft;
    S32 BorderRight =       2 + BorderLeft;
 
-   dglClearBitmapModulation();
+   DGL->dglClearBitmapModulation();
    if(profile->mBitmapArrayRects.size() >= (NumBitmaps * baseMultiplier))
    {
       RectI destRect;
@@ -330,9 +330,9 @@ void renderFixedBitmapBordersStretchYFilled(RectI &bounds, S32 baseMultiplier, G
       // Draw all corners first.
 
       //left border
-      dglDrawBitmapStretchSR(profile->mTextureHandle, RectI( bounds.point.x, bounds.point.y, mBitmapBounds[BorderLeft].extent.x, bounds.extent.y ), mBitmapBounds[BorderLeft] );
+      DGL->dglDrawBitmapStretchSR(profile->mTextureHandle, RectI( bounds.point.x, bounds.point.y, mBitmapBounds[BorderLeft].extent.x, bounds.extent.y ), mBitmapBounds[BorderLeft] );
       //right border
-      dglDrawBitmapStretchSR(profile->mTextureHandle, RectI(bounds.point.x + bounds.extent.x - mBitmapBounds[BorderRight].extent.x, bounds.point.y, mBitmapBounds[BorderRight].extent.x, bounds.extent.y ), mBitmapBounds[BorderRight] );
+      DGL->dglDrawBitmapStretchSR(profile->mTextureHandle, RectI(bounds.point.x + bounds.extent.x - mBitmapBounds[BorderRight].extent.x, bounds.point.y, mBitmapBounds[BorderRight].extent.x, bounds.extent.y ), mBitmapBounds[BorderRight] );
 
       // End drawing corners
 
@@ -347,7 +347,7 @@ void renderFixedBitmapBordersStretchYFilled(RectI &bounds, S32 baseMultiplier, G
       stretchRect = mBitmapBounds[Fill];
       stretchRect.inset(1,0);
       //draw it
-      dglDrawBitmapStretchSR(profile->mTextureHandle, destRect, stretchRect);
+      DGL->dglDrawBitmapStretchSR(profile->mTextureHandle, destRect, stretchRect);
 
       // End drawing fill
    }

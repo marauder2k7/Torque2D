@@ -337,13 +337,13 @@ void GuiTextListCtrl::onRenderCell(Point2I offset, Point2I cell, bool selected, 
          highlightRect.inset( 0, -1 );
 		 //renderBody(highlightRect, mProfile, mProfile->mFillColorHL);
          //renderBorder( highlightRect, mProfile->mBorderColorHL, mProfile->mBorderSize);
-         dglSetBitmapModulation(mProfile->mFontColorHL);
+         DGL->dglSetBitmapModulation(mProfile->mFontColorHL);
       }
       else
-         dglSetBitmapModulation(mouseOver ? mProfile->mFontColorHL : mProfile->mFontColor);
+         DGL->dglSetBitmapModulation(mouseOver ? mProfile->mFontColorHL : mProfile->mFontColor);
    }
    else
-      dglSetBitmapModulation( mProfile->mFontColorNA );
+      DGL->dglSetBitmapModulation( mProfile->mFontColorNA );
 
    const char *text = mList[cell.y].text;
    for(U32 index = 0; index < (U32)mColumnOffsets.size(); index++)
@@ -364,20 +364,20 @@ void GuiTextListCtrl::onRenderCell(Point2I offset, Point2I cell, bool selected, 
 
          if(mClipColumnText && (index != (mColumnOffsets.size() - 1)))
          {
-            saveClipRect = dglGetClipRect();
+            saveClipRect = DGL->dglGetClipRect();
 
             RectI clipRect(pos, Point2I(mColumnOffsets[index+1] - mColumnOffsets[index] - 4, mCellSize.y));
             if(clipRect.intersect(saveClipRect))
             {
                clipped = true;
-               dglSetClipRect(clipRect);
+               DGL->dglSetClipRect(clipRect);
             }
          }
 
-         dglDrawTextN(mFont, pos, text, slen, mProfile->mFontColors);
+         DGL->dglDrawTextN(mFont, pos, text, slen, mProfile->mFontColors);
 
          if(clipped)
-            dglSetClipRect(saveClipRect);
+            DGL->dglSetClipRect(saveClipRect);
       }
       if(!nextCol)
          break;

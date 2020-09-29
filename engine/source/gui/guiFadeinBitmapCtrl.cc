@@ -96,7 +96,7 @@ public:
          done = true;
       }
       ColorI color(0,0,0,alpha);
-      dglDrawRectFill(offset, mBounds.extent + offset, color);
+      DGL->dglDrawRectFill(offset, mBounds.extent + offset, color);
    }
    static void initPersistFields()
    {

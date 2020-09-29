@@ -24,7 +24,7 @@
 #include "graphics/dgl.h"
 #include "console/console.h"
 
-void dglLoadMatrix(const MatrixF *m)
+void DGLDevice::dglLoadMatrix(const MatrixF *m)
 {
    //F32 mat[16];
    //m->transposeTo(mat);
@@ -33,17 +33,17 @@ void dglLoadMatrix(const MatrixF *m)
    const_cast<MatrixF*>(m)->transpose();
 }
 
-void dglSetModelViewMatrix()
+void DGLDevice::dglSetModelViewMatrix()
 {
    glMatrixMode(GL_MODELVIEW);
 }
 
-void dglSetProjMatrix()
+void DGLDevice::dglSetProjMatrix()
 {
    glMatrixMode(GL_PROJECTION);
 }
 
-void dglMultMatrix(const MatrixF *m)
+void DGLDevice::dglMultMatrix(const MatrixF *m)
 {
    //F32 mat[16];
    //m->transposeTo(mat);
@@ -72,13 +72,13 @@ void dglMultMatrix(const MatrixF *m)
    const_cast<MatrixF*>(m)->transpose();
 }
 
-void dglGetModelview(MatrixF *m)
+void DGLDevice::dglGetModelview(MatrixF *m)
 {
    glGetFloatv(GL_MODELVIEW_MATRIX, *m);
    m->transpose();
 }
 
-void dglGetProjection(MatrixF *m)
+void DGLDevice::dglGetProjection(MatrixF *m)
 {
    glGetFloatv(GL_PROJECTION_MATRIX, *m);
    m->transpose();
@@ -90,7 +90,7 @@ static F32 pixelScale;
 static F32 worldToScreenScale;
 static bool isOrtho;
 
-void dglSetFrustum(F64 left, F64 right, F64 bottom, F64 top, F64 nearPlane, F64 farPlane, bool ortho)
+void DGLDevice::dglSetFrustum(F64 left, F64 right, F64 bottom, F64 top, F64 nearPlane, F64 farPlane, bool ortho)
 {
    // this converts from a coord system looking down the pos-y axis
    // to ogl's down neg z axis.
@@ -124,7 +124,7 @@ void dglSetFrustum(F64 left, F64 right, F64 bottom, F64 top, F64 nearPlane, F64 
    glMultMatrixf(darkToOGLCoord);
 }
 
-void dglGetFrustum(F64 *left, F64 *right, F64 *bottom, F64 *top, F64 *nearPlane, F64 *farPlane)
+void DGLDevice::dglGetFrustum(F64 *left, F64 *right, F64 *bottom, F64 *top, F64 *nearPlane, F64 *farPlane)
 {
    *left = frustLeft;
    *right = frustRight;
@@ -134,12 +134,12 @@ void dglGetFrustum(F64 *left, F64 *right, F64 *bottom, F64 *top, F64 *nearPlane,
    *farPlane = frustFar;
 }
 
-bool dglIsOrtho()
+bool DGLDevice::dglIsOrtho()
 {
    return isOrtho;
 }
 
-void dglSetViewport(const RectI &aViewPort)
+void DGLDevice::dglSetViewport(const RectI &aViewPort)
 {
    viewPort = aViewPort;
    U32 screenHeight = Platform::getWindowSize().y;
@@ -152,23 +152,23 @@ void dglSetViewport(const RectI &aViewPort)
    worldToScreenScale = F32((frustNear * viewPort.extent.x) / (frustRight - frustLeft));
 }
 
-void dglGetViewport(RectI* outViewport)
+void DGLDevice::dglGetViewport(RectI* outViewport)
 {
    AssertFatal(outViewport != NULL, "Error, bad point in GetViewport");
    *outViewport = viewPort;
 }
 
-F32 dglGetPixelScale()
+F32 DGLDevice::dglGetPixelScale()
 {
    return pixelScale;
 }
 
-F32 dglGetWorldToScreenScale()
+F32 DGLDevice::dglGetWorldToScreenScale()
 {
    return worldToScreenScale;
 }
 
-F32 dglProjectRadius(F32 dist, F32 radius)
+F32 DGLDevice::dglProjectRadius(F32 dist, F32 radius)
 {
    return (radius / dist) * worldToScreenScale;
 }

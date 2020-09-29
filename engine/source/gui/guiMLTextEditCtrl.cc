@@ -389,7 +389,7 @@ void GuiMLTextEditCtrl::onRender(Point2I offset, const RectI& updateRect)
       Point2I top, bottom;
       ColorI color;
       getCursorPositionAndColor(top, bottom, color);
-      dglDrawLine(top + offset, bottom + offset, mProfile->mCursorColor);
+      DGL->dglDrawLine(top + offset, bottom + offset, mProfile->mCursorColor);
    }
 }
 

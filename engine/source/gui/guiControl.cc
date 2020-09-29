@@ -462,7 +462,7 @@ void GuiControl::onRender(Point2I offset, const RectI &updateRect)
     renderBorderedRect(ctrlRect, mProfile, NormalState);
 
 	//Render Text
-	dglSetBitmapModulation(mProfile->mFontColor);
+    DGL->dglSetBitmapModulation(mProfile->mFontColor);
 	RectI fillRect = applyBorders(ctrlRect.point, ctrlRect.extent, NormalState, mProfile);
 	RectI contentRect = applyPadding(fillRect.point, fillRect.extent, NormalState, mProfile);
 
@@ -684,25 +684,25 @@ bool GuiControl::renderTooltip(Point2I cursorPos, const char* tipText )
         offset.y = screensize.y - textBounds.y;
 
     // Fetch the old clip.
-    RectI oldClip = dglGetClipRect();
+    RectI oldClip = DGL->dglGetClipRect();
 
     // Set rectangle for the box, and set the clip rectangle.
     RectI rect(offset, textBounds);
-    dglSetClipRect(rect);
+    DGL->dglSetClipRect(rect);
 
     // Draw body and border of the tool tip
 	renderBorderedRect(rect, mTooltipProfile, NormalState);
 
     // Draw the text centered in the tool tip box
-    dglSetBitmapModulation( mTooltipProfile->mFontColor );
+   DGL->dglSetBitmapModulation( mTooltipProfile->mFontColor );
     Point2I start( tooltipGutterSize, tooltipGutterSize );
     for ( S32 lineIndex = 0; lineIndex < tooltipLineCount; lineIndex++ )
     {
-        dglDrawText( font, start + offset, tooltipLines[lineIndex].getPtr8(), mProfile->mFontColors );
+       DGL->dglDrawText( font, start + offset, tooltipLines[lineIndex].getPtr8(), mProfile->mFontColors );
         offset.y += tooltipLineStride;
     }
 
-    dglSetClipRect( oldClip );
+    DGL->dglSetClipRect( oldClip );
 #endif
     return true;
 }
@@ -713,7 +713,7 @@ void GuiControl::renderChildControls(Point2I offset, RectI content, const RectI 
    // updateRect is the area that this control was allowed to draw in. It should almost always be the same as the value in onRender.
    // content is the area that child controls are allowed to draw in.
    RectI clipRect = content;
-   if(clipRect.intersect(dglGetClipRect()))
+   if(clipRect.intersect(DGL->dglGetClipRect()))
    {
 	   S32 size = objectList.size();
 	   S32 size_cpy = size;
@@ -735,7 +735,7 @@ void GuiControl::renderChildControls(Point2I offset, RectI content, const RectI 
 
 			 if (childClip.intersect(clipRect))
 			 {
-				dglSetClipRect(clipRect);
+            DGL->dglSetClipRect(clipRect);
 				glDisable(GL_CULL_FACE);
 				ctrl->onRender(childPosition, RectI(childPosition, ctrl->getExtent()));
 			 }
@@ -1665,7 +1665,7 @@ void GuiControl::renderText(Point2I offset, Point2I extent, const char *text, Gu
 		rotation = -90.0f;
 	}
 
-	dglDrawText( font, start + offset + profile->mTextOffset, text, profile->mFontColors, 9, rotation );
+   DGL->dglDrawText( font, start + offset + profile->mTextOffset, text, profile->mFontColors, 9, rotation );
 }
 
 void GuiControl::getCursor(GuiCursor *&cursor, bool &showCursor, const GuiEvent &lastGuiEvent)

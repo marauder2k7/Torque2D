@@ -269,9 +269,9 @@ void GuiImageButtonCtrl::renderButton( ImageAsset* pImageAsset, const U32 frame,
         RectI destinationRegion(offset, mBounds.extent);
 
         // Render image.
-        dglSetBitmapModulation( mProfile->mFillColor );
-        dglDrawBitmapStretchSR( pImageAsset->getImageTexture(), destinationRegion, sourceRegion );
-        dglClearBitmapModulation();
+        DGL->dglSetBitmapModulation( mProfile->mFillColor );
+        DGL->dglDrawBitmapStretchSR( pImageAsset->getImageTexture(), destinationRegion, sourceRegion );
+        DGL->dglClearBitmapModulation();
         renderChildControls( offset, mBounds, updateRect);
     }
     else

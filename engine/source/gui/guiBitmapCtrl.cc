@@ -173,7 +173,7 @@ void GuiBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
 {
    if (mTextureHandle)
    {
-      dglClearBitmapModulation();
+      DGL->dglClearBitmapModulation();
         if(mWrap)
         {
          // We manually draw each repeat because non power of two textures will 
@@ -204,7 +204,7 @@ void GuiBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
                                       ((texture->getBitmapHeight()*y)+offset.y)-yshift,
                                       texture->getBitmapWidth(),	
                                       texture->getBitmapHeight());
-                dglDrawBitmapStretchSR(texture,dstRegion, srcRegion, false);
+                DGL->dglDrawBitmapStretchSR(texture,dstRegion, srcRegion, false);
                 }
         }
         else
@@ -216,11 +216,11 @@ void GuiBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
          {
             RectI srcRegion;
             srcRegion = mSourceRect;
-            dglDrawBitmapStretchSR(mTextureHandle,rect, srcRegion, false);
+            DGL->dglDrawBitmapStretchSR(mTextureHandle,rect, srcRegion, false);
         }
         else
         {
-            dglDrawBitmapStretch(mTextureHandle, rect);
+            DGL->dglDrawBitmapStretch(mTextureHandle, rect);
         }
       }
    }
@@ -228,7 +228,7 @@ void GuiBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
    if (mProfile->mBorderDefault && *mProfile->mBorderDefault->mBorder > 0 && !mTextureHandle)
    {
       RectI rect(offset.x, offset.y, mBounds.extent.x, mBounds.extent.y);
-      dglDrawRect(rect, mProfile->mBorderDefault->mBorderColor[0]);
+      DGL->dglDrawRect(rect, mProfile->mBorderDefault->mBorderColor[0]);
    }
 
    renderChildControls(offset, mBounds, updateRect);

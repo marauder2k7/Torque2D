@@ -47,13 +47,25 @@ namespace {
 ColorI sg_bitmapModulation(255, 255, 255, 255);
 ColorI sg_textAnchorColor(255, 255, 255, 255);
 ColorI sg_stackColor(255, 255, 255, 255);
+ColorF colorAlphaW(1.0f, 1.0f, 1.0f, 0.0f);
 RectI sgCurrentClipRect;
 
 } // namespace {}
 
+DGLDevice * DGLDevice::smDGL = NULL;
+
+DGLDevice::DGLDevice()
+{
+   smDGL = this;
+}
+
+void DGLDevice::init()
+{
+
+}
 
 //--------------------------------------------------------------------------
-void dglSetBitmapModulation(const ColorF& in_rColor)
+void DGLDevice::dglSetBitmapModulation(const ColorF& in_rColor)
 {
    ColorF c = in_rColor;
    c.clamp();
@@ -61,31 +73,220 @@ void dglSetBitmapModulation(const ColorF& in_rColor)
    sg_textAnchorColor = sg_bitmapModulation;
 }
 
-void dglGetBitmapModulation(ColorF* color)
+void DGLDevice::dglGetBitmapModulation(ColorF* color)
 {
    *color = sg_bitmapModulation;
 }
 
-void dglGetBitmapModulation(ColorI* color)
+void DGLDevice::dglGetBitmapModulation(ColorI* color)
 {
    *color = sg_bitmapModulation;
 }
 
-void dglClearBitmapModulation()
+void DGLDevice::dglClearBitmapModulation()
 {
    sg_bitmapModulation.set(255, 255, 255, 255);
 }
 
-void dglSetTextAnchorColor(const ColorF& in_rColor)
+void DGLDevice::dglSetTextAnchorColor(const ColorF& in_rColor)
 {
    ColorF c = in_rColor;
    c.clamp();
    sg_textAnchorColor = c;
 }
 
+void DGLDevice::dglDrawBlendBox(RectI &bounds, ColorF &c1, ColorF &c2, ColorF &c3, ColorF &c4)
+{
+   F32 l = (F32)(bounds.point.x + 1);
+   F32 r = (F32)(bounds.point.x + bounds.extent.x - 2);
+   F32 t = (F32)(bounds.point.y + 1);
+   F32 b = (F32)(bounds.point.y + bounds.extent.y - 2);
+
+   glEnable(GL_BLEND);
+   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+   glDisable(GL_TEXTURE_2D);
+
+   glBegin(GL_QUADS);
+
+   // Color
+   glColor4fv(c2.address());
+   glVertex2f(l, t);
+   glColor4fv(c2.address());
+   glVertex2f(r, t);
+   glColor4fv(c2.address());
+   glVertex2f(r, b);
+   glColor4fv(c2.address());
+   glVertex2f(l, b);
+
+   // White
+   glColor4fv(c1.address());
+   glVertex2f(l, t);
+   glColor4fv(colorAlphaW.address());
+   glVertex2f(r, t);
+   glColor4fv(colorAlphaW.address());
+   glVertex2f(r, b);
+   glColor4fv(c1.address());
+   glVertex2f(l, b);
+
+   // Black
+   glColor4fv(c3.address());
+   glVertex2f(l, t);
+   glColor4fv(c3.address());
+   glVertex2f(r, t);
+   glColor4fv(c4.address());
+   glVertex2f(r, b);
+   glColor4fv(c4.address());
+   glVertex2f(l, b);
+
+   // Top right
+   glColor4fv(c2.address());
+   glVertex2f(r, t);
+   glColor4fv(c2.address());
+   glVertex2f(r, t + 1);
+   glColor4fv(c2.address());
+   glVertex2f(r - 1, t + 1);
+   glColor4fv(c2.address());
+   glVertex2f(r - 1, t);
+
+   // Top-Right Corner
+   glColor4fv(c2.address());
+   glVertex2f(r, t);
+   glColor4fv(c2.address());
+   glVertex2f(r, t - 1);
+   glColor4fv(c2.address());
+   glVertex2f(r + 1, t - 1);
+   glColor4fv(c2.address());
+   glVertex2f(r + 1, t);
+
+   // Top-Right Corner
+   glColor4fv(c1.address());
+   glVertex2f(l, t);
+   glColor4fv(c1.address());
+   glVertex2f(l, t - 1);
+   glColor4fv(c1.address());
+   glVertex2f(l - 1, t - 1);
+   glColor4fv(c1.address());
+   glVertex2f(l - 1, t);
+
+   // Top row
+   glColor4fv(c1.address());
+   glVertex2f(l, t);
+   glColor4fv(c1.address());
+   glVertex2f(l, t - 1);
+   glColor4fv(c2.address());
+   glVertex2f(r, t - 1);
+   glColor4fv(c2.address());
+   glVertex2f(r, t);
+
+
+   // Right side
+   glColor4fv(c2.address());
+   glVertex2f(r, t);
+   glColor4fv(c2.address());
+   glVertex2f(r + 1, t);
+   glColor4fv(c4.address());
+   glVertex2f(r + 1, b);
+   glColor4fv(c4.address());
+   glVertex2f(r, b);
+
+   // Left side
+   glColor4fv(c1.address());
+   glVertex2f(l, t);
+   glColor4fv(c1.address());
+   glVertex2f(l - 1, t);
+   glColor4fv(c4.address());
+   glVertex2f(l - 1, b);
+   glColor4fv(c4.address());
+   glVertex2f(l, b);
+
+   // Bottom row
+   glColor4fv(c4.address());
+   glVertex2f(l - 1, b);
+   glColor4fv(c4.address());
+   glVertex2f(l - 1, b + 1);
+   glColor4fv(c4.address());
+   glVertex2f(r + 1, b + 1);
+   glColor4fv(c4.address());
+   glVertex2f(r + 1, b);
+
+   glEnd();
+}
+
+/// Function to draw a set of boxes blending throughout an array of colors
+void DGLDevice::dglDrawBlendRangeBox(RectI &bounds, bool vertical, U8 numColors, ColorI *colors)
+{
+   F32 l = (F32)bounds.point.x;
+   F32 r = (F32)(bounds.point.x + bounds.extent.x - 1);
+   F32 t = (F32)bounds.point.y + 1;
+   F32 b = (F32)(bounds.point.y + bounds.extent.y - 2);
+
+   // Calculate increment value
+   F32 x_inc = F32((r - l) / (numColors - 1));
+   F32 y_inc = F32((b - t) / (numColors - 1));
+
+   glEnable(GL_BLEND);
+   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+   glDisable(GL_TEXTURE_2D);
+
+   glBegin(GL_QUADS);
+   if (!vertical)  // Horizontal (+x)
+   {
+      glColor4ub(colors[0].red, colors[0].green, colors[0].blue, colors[0].alpha);
+      glVertex2f(l, t);
+      glVertex2f(l, b);
+      glVertex2f(l - 1, b);
+      glVertex2f(l - 1, t);
+      glVertex2f(r, t);
+      glVertex2f(r, b);
+      glVertex2f(r + 1, b);
+      glVertex2f(r + 1, t);
+   }
+   else   // Vertical (+y)
+   {
+      glColor4ub(colors[0].red, colors[0].green, colors[0].blue, colors[0].alpha);
+      glVertex2f(l, t);
+      glVertex2f(r, t);
+      glVertex2f(r, t - 1);
+      glVertex2f(l, t - 1);
+      glVertex2f(l, b);
+      glVertex2f(r, b);
+      glVertex2f(r, b + 1);
+      glVertex2f(l, b + 1);
+   }
+
+   for (U16 i = 0; i < numColors - 1; i++)
+   {
+      if (!vertical)  // Horizontal (+x)
+      {
+         // First color
+         glColor4ub(colors[i].red, colors[i].green, colors[i].blue, colors[i].alpha);
+         glVertex2f(l, t);
+         glVertex2f(l, b);
+         // Second color
+         glColor4ub(colors[i + 1].red, colors[i + 1].green, colors[i + 1].blue, colors[i + 1].alpha);
+         glVertex2f(l + x_inc, b);
+         glVertex2f(l + x_inc, t);
+         l += x_inc;
+      }
+      else  // Vertical (+y)
+      {
+         // First color
+         glColor4ub(colors[i].red, colors[i].green, colors[i].blue, colors[i].alpha);
+         glVertex2f(l, t);
+         glVertex2f(r, t);
+         // Second color
+         glColor4ub(colors[i + 1].red, colors[i + 1].green, colors[i + 1].blue, colors[i + 1].alpha);
+         glVertex2f(r, t + y_inc);
+         glVertex2f(l, t + y_inc);
+         t += y_inc;
+      }
+   }
+   glEnd();
+}
+
 
 //--------------------------------------------------------------------------
-void dglDrawBitmapStretchSR(TextureObject* texture,
+void DGLDevice::dglDrawBitmapStretchSR(TextureObject* texture,
                        const RectI&   dstRect,
                        const RectI&   srcRect,
                        const U32   in_flip,
@@ -231,7 +432,7 @@ void dglDrawBitmapStretchSR(TextureObject* texture,
    glDisable(GL_TEXTURE_2D);
 }
 
-void dglDrawBitmap(TextureObject* texture, const Point2I& in_rAt, const U32 in_flip)
+void DGLDevice::dglDrawBitmap(TextureObject* texture, const Point2I& in_rAt, const U32 in_flip)
 {
    AssertFatal(texture != NULL, "GSurface::drawBitmap: NULL Handle");
 
@@ -249,7 +450,7 @@ void dglDrawBitmap(TextureObject* texture, const Point2I& in_rAt, const U32 in_f
                           in_flip);
 }
 
-void dglDrawBitmapTile(TextureObject* texture, const RectI& dstRect, const U32 in_flip, F32 fSpin, bool bSilhouette)
+void DGLDevice::dglDrawBitmapTile(TextureObject* texture, const RectI& dstRect, const U32 in_flip, F32 fSpin, bool bSilhouette)
 {
    AssertFatal(texture != NULL, "GSurface::drawBitmapTile: NULL Handle");
    // since the texture coords are calculated from the texture sub-rect we pass in,
@@ -259,7 +460,7 @@ void dglDrawBitmapTile(TextureObject* texture, const RectI& dstRect, const U32 i
    dglDrawBitmapStretchSR(texture, dstRect, subregion, in_flip, fSpin, bSilhouette);
 }
 
-void dglDrawBitmapStretch(TextureObject* texture, const RectI& dstRect, const U32 in_flip, F32 fSpin, bool bSilhouette)
+void DGLDevice::dglDrawBitmapStretch(TextureObject* texture, const RectI& dstRect, const U32 in_flip, F32 fSpin, bool bSilhouette)
 {
    AssertFatal(texture != NULL, "GSurface::drawBitmapStretch: NULL Handle");
    AssertFatal(dstRect.isValidRect() == true,
@@ -276,7 +477,7 @@ void dglDrawBitmapStretch(TextureObject* texture, const RectI& dstRect, const U3
                           bSilhouette);
 }
 
-void dglDrawBitmapSR(TextureObject *texture, const Point2I& in_rAt, const RectI& srcRect, const U32 in_flip)
+void DGLDevice::dglDrawBitmapSR(TextureObject *texture, const Point2I& in_rAt, const RectI& srcRect, const U32 in_flip)
 {
    AssertFatal(texture != NULL, "GSurface::drawBitmapSR: NULL Handle");
    AssertFatal(srcRect.isValidRect() == true,
@@ -291,7 +492,7 @@ void dglDrawBitmapSR(TextureObject *texture, const Point2I& in_rAt, const RectI&
                           in_flip);
 }
 
-U32 dglDrawText(GFont*   font,
+U32 DGLDevice::dglDrawText(GFont*   font,
           const Point2I& ptDraw,
           const UTF16*    in_string,
           const ColorI*  colorTable,
@@ -301,7 +502,7 @@ U32 dglDrawText(GFont*   font,
    return dglDrawTextN(font, ptDraw, in_string, dStrlen(in_string), colorTable, maxColorIndex, rot);
 }
 
-U32 dglDrawText(GFont*   font,
+U32 DGLDevice::dglDrawText(GFont*   font,
           const Point2I& ptDraw,
           const UTF8*    in_string,
           const ColorI*  colorTable,
@@ -332,7 +533,7 @@ struct TextVertex
 
 //------------------------------------------------------------------------------
 
-U32 dglDrawTextN(GFont*          font,
+U32 DGLDevice::dglDrawTextN(GFont*          font,
                  const Point2I&  ptDraw,
                  const UTF8*     in_string,
                  U32             n,
@@ -355,7 +556,7 @@ U32 dglDrawTextN(GFont*          font,
 //-----------------------------------------------------------------------------
 
 #if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
-U32 dglDrawTextN(GFont*          font,
+U32 DGLDevice::dglDrawTextN(GFont*          font,
                  const Point2I&  ptDraw,
                  const UTF16*    in_string,
                  U32             n,
@@ -570,7 +771,7 @@ U32 dglDrawTextN(GFont*          font,
 
 #else
 
-U32 dglDrawTextN(GFont*          font,
+U32 DGLDevice::dglDrawTextN(GFont*          font,
                  const Point2I&  ptDraw,
                  const UTF16*    in_string,
                  U32             n,
@@ -779,7 +980,7 @@ U32 dglDrawTextN(GFont*          font,
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- //
 // Drawing primitives
 
-void dglDrawLine(S32 x1, S32 y1, S32 x2, S32 y2, const ColorI &color)
+void DGLDevice::dglDrawLine(S32 x1, S32 y1, S32 x2, S32 y2, const ColorI &color)
 {
    glEnable(GL_BLEND);
    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -806,12 +1007,12 @@ void dglDrawLine(S32 x1, S32 y1, S32 x2, S32 y2, const ColorI &color)
 #endif
 }
 
-void dglDrawLine(const Point2I &startPt, const Point2I &endPt, const ColorI &color)
+void DGLDevice::dglDrawLine(const Point2I &startPt, const Point2I &endPt, const ColorI &color)
 {
     dglDrawLine(startPt.x, startPt.y, endPt.x, endPt.y, color);
 }
 
-void dglDrawTriangleFill(const Point2I &pt1, const Point2I &pt2, const Point2I &pt3, const ColorI &color)
+void DGLDevice::dglDrawTriangleFill(const Point2I &pt1, const Point2I &pt2, const Point2I &pt3, const ColorI &color)
 {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -838,7 +1039,7 @@ void dglDrawTriangleFill(const Point2I &pt1, const Point2I &pt2, const Point2I &
 #endif
 }
 
-void dglDrawRect(const Point2I &upperL, const Point2I &lowerR, const ColorI &color, const float &lineWidth)
+void DGLDevice::dglDrawRect(const Point2I &upperL, const Point2I &lowerR, const ColorI &color, const float &lineWidth)
 {
    glEnable(GL_BLEND);
    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -870,7 +1071,7 @@ void dglDrawRect(const Point2I &upperL, const Point2I &lowerR, const ColorI &col
 // the fill convention for lined rects is that they outline the rectangle border of the
 // filled region specified.
 
-void dglDrawRect(const RectI &rect, const ColorI &color, const float &lineWidth)
+void DGLDevice::dglDrawRect(const RectI &rect, const ColorI &color, const float &lineWidth)
 {
    Point2I lowerR(rect.point.x + rect.extent.x - 1, rect.point.y + rect.extent.y - 1);
    dglDrawRect(rect.point, lowerR, color, lineWidth);
@@ -879,7 +1080,7 @@ void dglDrawRect(const RectI &rect, const ColorI &color, const float &lineWidth)
 // the fill convention says that pixel at upperL will be filled and
 // that pixel at lowerR will NOT be filled.
 
-void dglDrawRectFill(const Point2I &upperL, const Point2I &lowerR, const ColorI &color)
+void DGLDevice::dglDrawRectFill(const Point2I &upperL, const Point2I &lowerR, const ColorI &color)
 {
    glEnable(GL_BLEND);
    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -902,13 +1103,13 @@ void dglDrawRectFill(const Point2I &upperL, const Point2I &lowerR, const ColorI 
    glRecti((S32)upperL.x, (S32)upperL.y, (S32)lowerR.x, (S32)lowerR.y);
 #endif
 }
-void dglDrawRectFill(const RectI &rect, const ColorI &color)
+void DGLDevice::dglDrawRectFill(const RectI &rect, const ColorI &color)
 {
    Point2I lowerR(rect.point.x + rect.extent.x, rect.point.y + rect.extent.y);
    dglDrawRectFill(rect.point, lowerR, color);
 }
 
-void dglDrawQuadFill(const Point2I &point1, const Point2I &point2, const Point2I &point3, const Point2I &point4, const ColorI &color)
+void DGLDevice::dglDrawQuadFill(const Point2I &point1, const Point2I &point2, const Point2I &point3, const Point2I &point4, const ColorI &color)
 {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -930,7 +1131,7 @@ void dglDrawQuadFill(const Point2I &point1, const Point2I &point2, const Point2I
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
-void dglDraw2DSquare( const Point2F &screenPoint, F32 width, F32 spinAngle )
+void DGLDevice::dglDraw2DSquare( const Point2F &screenPoint, F32 width, F32 spinAngle )
 {
    width *= 0.5;
 
@@ -990,7 +1191,7 @@ void dglDraw2DSquare( const Point2F &screenPoint, F32 width, F32 spinAngle )
 #endif
 }
 
-void dglDrawBillboard( const Point3F &position, F32 width, F32 spinAngle )
+void DGLDevice::dglDrawBillboard( const Point3F &position, F32 width, F32 spinAngle )
 {
    MatrixF modelview;
    dglGetModelview( &modelview );
@@ -1055,7 +1256,7 @@ void dglDrawBillboard( const Point3F &position, F32 width, F32 spinAngle )
 #endif
 }
 
-void dglWireCube(const Point3F & extent, const Point3F & center)
+void DGLDevice::dglWireCube(const Point3F & extent, const Point3F & center)
 {
    static Point3F cubePoints[8] =
    {
@@ -1112,7 +1313,7 @@ void dglWireCube(const Point3F & extent, const Point3F & center)
 }
 
 
-void dglSolidCube(const Point3F & extent, const Point3F & center)
+void DGLDevice::dglSolidCube(const Point3F & extent, const Point3F & center)
 {
    static Point3F cubePoints[8] =
    {
@@ -1169,7 +1370,7 @@ void dglSolidCube(const Point3F & extent, const Point3F & center)
 //Draws an unfilled circle with line segments.
 //Circle drawing code was modified from this source with gratitude. It is in the public domain.
 //http://slabode.exofire.net/circle_draw.shtml
-void dglDrawCircle(const Point2I &center, const F32 radius, const ColorI &color, const F32 &lineWidth)
+void DGLDevice::dglDrawCircle(const Point2I &center, const F32 radius, const ColorI &color, const F32 &lineWidth)
 {
 	F32 adjustedRadius = radius - (lineWidth/2);
 	const S32 num_segments = (const S32)round(10 * sqrtf(adjustedRadius));
@@ -1209,7 +1410,7 @@ void dglDrawCircle(const Point2I &center, const F32 radius, const ColorI &color,
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-void dglDrawCircleFill(const Point2I &center, const F32 radius, const ColorI &color)
+void DGLDevice::dglDrawCircleFill(const Point2I &center, const F32 radius, const ColorI &color)
 {
 	const S32 num_segments = (const S32)round(10 * sqrtf(radius));
 	F32 theta = 2 * 3.1415926f / F32(num_segments);
@@ -1248,7 +1449,7 @@ void dglDrawCircleFill(const Point2I &center, const F32 radius, const ColorI &co
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-void dglSetClipRect(const RectI &clipRect)
+void DGLDevice::dglSetClipRect(const RectI &clipRect)
 {
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
@@ -1277,12 +1478,12 @@ void dglSetClipRect(const RectI &clipRect)
    sgCurrentClipRect = clipRect;
 }
 
-const RectI& dglGetClipRect()
+const RectI& DGLDevice::dglGetClipRect()
 {
    return sgCurrentClipRect;
 }
 
-bool dglPointToScreen( Point3F &point3D, Point3F &screenPoint )
+bool DGLDevice::dglPointToScreen( Point3F &point3D, Point3F &screenPoint )
 {
 #if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
    GLfloat       glMV[16];
@@ -1351,7 +1552,7 @@ bool dglPointToScreen( Point3F &point3D, Point3F &screenPoint )
 
 
 
-bool dglIsInCanonicalState()
+bool DGLDevice::dglIsInCanonicalState()
 {
    bool ret = true;
 
@@ -1436,7 +1637,7 @@ bool dglIsInCanonicalState()
 }
 
 
-void dglSetCanonicalState()
+void DGLDevice::dglSetCanonicalState()
 {
 #if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
 // PUAP -Mat removed unsupported textureARB and Fog stuff
@@ -1488,7 +1689,7 @@ void dglSetCanonicalState()
 #endif
 }
 
-void dglGetTransformState(S32* mvDepth,
+void DGLDevice::dglGetTransformState(S32* mvDepth,
                           S32* pDepth,
                           S32* t0Depth,
                           F32* t0Matrix,
@@ -1532,7 +1733,7 @@ void dglGetTransformState(S32* mvDepth,
 }
 
 
-bool dglCheckState(const S32 mvDepth, const S32 pDepth,
+bool DGLDevice::dglCheckState(const S32 mvDepth, const S32 pDepth,
                    const S32 t0Depth, const F32* t0Matrix,
                    const S32 t1Depth, const F32* t1Matrix,
                    const S32* vp)
@@ -1588,14 +1789,3 @@ GLfloat gVertexFloats[8];
 GLfloat gTextureVerts[8];
 #endif
 
-DGLDevice * DGLDevice::smDGL = NULL;
-
-DGLDevice::DGLDevice()
-{
-   smDGL = this;
-}
-
-void DGLDevice::init()
-{
-
-}

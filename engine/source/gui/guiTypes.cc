@@ -87,8 +87,8 @@ void GuiCursor::render(const Point2I &pos)
    renderPos.x -= (S32)( texWidth  * mRenderOffset.x );
    renderPos.y -= (S32)( texHeight * mRenderOffset.y );
    
-   dglClearBitmapModulation();
-   dglDrawBitmap(mTextureHandle, renderPos);
+   DGL->dglClearBitmapModulation();
+   DGL->dglDrawBitmap(mTextureHandle, renderPos);
 }
 
 //------------------------------------------------------------------------------

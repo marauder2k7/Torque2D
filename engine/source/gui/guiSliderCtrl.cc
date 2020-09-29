@@ -319,12 +319,12 @@ void GuiSliderCtrl::onRender(Point2I offset, const RectI &updateRect)
         S32 index = SliderButtonNormal;
         if (mMouseOver)
             index = SliderButtonHighlight;
-        dglClearBitmapModulation();
+        DGL->dglClearBitmapModulation();
 
         //left border
-        dglDrawBitmapSR(mProfile->mTextureHandle, Point2I(offset.x, offset.y + (mBounds.extent.y / 4)), mBitmapBounds[SliderLineLeft]);
+        DGL->dglDrawBitmapSR(mProfile->mTextureHandle, Point2I(offset.x, offset.y + (mBounds.extent.y / 4)), mBitmapBounds[SliderLineLeft]);
         //right border
-        dglDrawBitmapSR(mProfile->mTextureHandle, Point2I(offset.x + mBounds.extent.x - mBitmapBounds[SliderLineRight].extent.x, offset.y + (mBounds.extent.y / 4)), mBitmapBounds[SliderLineRight]);
+        DGL->dglDrawBitmapSR(mProfile->mTextureHandle, Point2I(offset.x + mBounds.extent.x - mBitmapBounds[SliderLineRight].extent.x, offset.y + (mBounds.extent.y / 4)), mBitmapBounds[SliderLineRight]);
 
 
         //draw our center piece to our slider control's border and stretch it
@@ -338,11 +338,11 @@ void GuiSliderCtrl::onRender(Point2I offset, const RectI &updateRect)
         stretchRect = mBitmapBounds[SliderLineCenter];
         stretchRect.inset(1, 0);
 
-        dglDrawBitmapStretchSR(mProfile->mTextureHandle, destRect, stretchRect);
+        DGL->dglDrawBitmapStretchSR(mProfile->mTextureHandle, destRect, stretchRect);
 
         //draw our control slider button
         thumb.point += pos;
-        dglDrawBitmapSR(mProfile->mTextureHandle, Point2I(thumb.point.x, offset.y), mBitmapBounds[index]);
+        DGL->dglDrawBitmapSR(mProfile->mTextureHandle, Point2I(thumb.point.x, offset.y), mBitmapBounds[index]);
     }
     else
     {
@@ -460,8 +460,8 @@ void GuiSliderCtrl::onRender(Point2I offset, const RectI &updateRect)
         else if (textStart.x + txt_w > offset.x + mBounds.extent.x)
             textStart.x -= ((textStart.x + txt_w) - (offset.x + mBounds.extent.x));
 
-        dglSetBitmapModulation(mProfile->mFontColor);
-        dglDrawText(mProfile->mFont, textStart, buf, mProfile->mFontColors);
+        DGL->dglSetBitmapModulation(mProfile->mFontColor);
+        DGL->dglDrawText(mProfile->mFont, textStart, buf, mProfile->mFontColors);
     }
     renderChildControls(offset, mBounds, updateRect);
 }

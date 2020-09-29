@@ -629,20 +629,20 @@ void GuiMessageVectorCtrl::onRender(Point2I      offset,
 
                U32 strWidth;
                if (walkAcross->specialReference == -1) {
-                  dglSetBitmapModulation(lastColor);
-                  dglSetTextAnchorColor(mProfile->mFontColor);
-                  strWidth = dglDrawTextN(mProfile->mFont, globalStart, &mMessageVector->getLine(i).message[walkAcross->start],
+                  DGL->dglSetBitmapModulation(lastColor);
+                  DGL->dglSetTextAnchorColor(mProfile->mFontColor);
+                  strWidth = DGL->dglDrawTextN(mProfile->mFont, globalStart, &mMessageVector->getLine(i).message[walkAcross->start],
                                           walkAcross->end - walkAcross->start + 1, mProfile->mFontColors, mMaxColorIndex);
-                  dglGetBitmapModulation(&lastColor);
+                  DGL->dglGetBitmapModulation(&lastColor);
                } else {
-                  dglGetBitmapModulation(&lastColor);
-                  dglSetBitmapModulation(mSpecialColor);
-                  dglSetTextAnchorColor(mProfile->mFontColor);
-                  strWidth = dglDrawTextN(mProfile->mFont, globalStart, &mMessageVector->getLine(i).message[walkAcross->start],
+                  DGL->dglGetBitmapModulation(&lastColor);
+                  DGL->dglSetBitmapModulation(mSpecialColor);
+                  DGL->dglSetTextAnchorColor(mProfile->mFontColor);
+                  strWidth = DGL->dglDrawTextN(mProfile->mFont, globalStart, &mMessageVector->getLine(i).message[walkAcross->start],
                                           walkAcross->end - walkAcross->start + 1);
 
                   // in case we have 2 in a row...
-                  dglSetBitmapModulation(lastColor);
+                  DGL->dglSetBitmapModulation(lastColor);
                }
 
                if (walkAcross->specialReference != -1) {
@@ -652,7 +652,7 @@ void GuiMessageVectorCtrl::onRender(Point2I      offset,
                   lineEnd.x += strWidth;
                   lineEnd.y += mProfile->mFont->getBaseline() + 1;
 
-                  dglDrawLine(localToGlobalCoord(lineStart),
+                  DGL->dglDrawLine(localToGlobalCoord(lineStart),
                               localToGlobalCoord(lineEnd),
                               mSpecialColor);
                }
@@ -665,7 +665,7 @@ void GuiMessageVectorCtrl::onRender(Point2I      offset,
             pElement = pElement->nextPhysicalLine;
          }
       }
-      dglClearBitmapModulation();
+      DGL->dglClearBitmapModulation();
    }
 }
 

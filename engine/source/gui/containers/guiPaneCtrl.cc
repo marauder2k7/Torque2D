@@ -139,8 +139,8 @@ void GuiPaneControl::onRender(Point2I offset, const RectI &updateRect)
    {
       S32 idx = mCollapsed ? 0 : 1;
 
-      dglClearBitmapModulation();
-      dglDrawBitmapStretchSR(
+      DGL->dglClearBitmapModulation();
+      DGL->dglDrawBitmapStretchSR(
          mProfile->mTextureHandle,
          RectI(offset, mProfile->mBitmapArrayRects[idx].extent),
          mProfile->mBitmapArrayRects[idx]
@@ -152,8 +152,8 @@ void GuiPaneControl::onRender(Point2I offset, const RectI &updateRect)
 
    if(!mBarBehindText)
    {
-      dglSetBitmapModulation((mMouseOver ? mProfile->mFontColorHL : mProfile->mFontColor));
-      textWidth = dglDrawText(
+      DGL->dglSetBitmapModulation((mMouseOver ? mProfile->mFontColorHL : mProfile->mFontColor));
+      textWidth = DGL->dglDrawText(
             mFont,
             Point2I(mThumbSize.x, 0) + offset,
             mCaption,
@@ -165,7 +165,7 @@ void GuiPaneControl::onRender(Point2I offset, const RectI &updateRect)
    // Draw our little bar, too
    if(mProfile->mBitmapArrayRects.size() >= 5)
    {
-      dglClearBitmapModulation();
+      DGL->dglClearBitmapModulation();
 
       S32 barStart = mThumbSize.x + offset.x + textWidth;
       S32 barTop   = mThumbSize.y/2 + offset.y - mProfile->mBitmapArrayRects[3].extent.y /2;
@@ -173,7 +173,7 @@ void GuiPaneControl::onRender(Point2I offset, const RectI &updateRect)
       Point2I barOffset(barStart, barTop);
 
       // Draw the start of the bar...
-      dglDrawBitmapStretchSR(
+      DGL->dglDrawBitmapStretchSR(
          mProfile->mTextureHandle,
          RectI(barOffset, mProfile->mBitmapArrayRects[2].extent),
          mProfile->mBitmapArrayRects[2]
@@ -190,7 +190,7 @@ void GuiPaneControl::onRender(Point2I offset, const RectI &updateRect)
          RectI foo = mProfile->mBitmapArrayRects[3];
          foo.inset(1,0);
 
-         dglDrawBitmapStretchSR(
+         DGL->dglDrawBitmapStretchSR(
             mProfile->mTextureHandle,
             RectI(barOffset, Point2I(barMiddleSize, mProfile->mBitmapArrayRects[3].extent.y)),
             foo
@@ -200,7 +200,7 @@ void GuiPaneControl::onRender(Point2I offset, const RectI &updateRect)
       // And the end
       barOffset.x += barMiddleSize;
 
-      dglDrawBitmapStretchSR(
+      DGL->dglDrawBitmapStretchSR(
          mProfile->mTextureHandle,
          RectI(barOffset, mProfile->mBitmapArrayRects[4].extent),
          mProfile->mBitmapArrayRects[4]
@@ -209,8 +209,8 @@ void GuiPaneControl::onRender(Point2I offset, const RectI &updateRect)
 
    if(mBarBehindText)
    {
-      dglSetBitmapModulation((mMouseOver ? mProfile->mFontColorHL : mProfile->mFontColor));
-      dglDrawText(
+      DGL->dglSetBitmapModulation((mMouseOver ? mProfile->mFontColorHL : mProfile->mFontColor));
+      DGL->dglDrawText(
             mFont,
             Point2I(mThumbSize.x, 0) + offset,
             mCaption,

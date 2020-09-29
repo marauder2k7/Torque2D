@@ -77,12 +77,12 @@ void GuiProgressCtrl::onRender(Point2I offset, const RectI &updateRect)
    {
       RectI progressRect = ctrlRect;
       progressRect.extent.x = width;
-      dglDrawRectFill(progressRect, mProfile->mFillColor);
+      DGL->dglDrawRectFill(progressRect, mProfile->mFillColor);
    }
 
    //now draw the border
    if (mProfile->mBorderDefault && *mProfile->mBorderDefault->mBorder > 0)
-      dglDrawRect(ctrlRect, mProfile->mBorderDefault->mBorderColor[0]);
+      DGL->dglDrawRect(ctrlRect, mProfile->mBorderDefault->mBorderColor[0]);
 
    Parent::onRender( offset, updateRect );
 

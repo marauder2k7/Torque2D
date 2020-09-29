@@ -337,9 +337,9 @@ void ImageFrameProviderCore::renderGui( GuiControl& owner, Point2I offset, const
         RectI destinationRegion(offset, owner.mBounds.extent);
 
         // Render image.
-        dglSetBitmapModulation( owner.mProfile->mFillColor );
-        dglDrawBitmapStretchSR( getProviderTexture(), destinationRegion, sourceRegion );
-        dglClearBitmapModulation();
+        DGL->dglSetBitmapModulation( owner.mProfile->mFillColor );
+        DGL->dglDrawBitmapStretchSR( getProviderTexture(), destinationRegion, sourceRegion );
+        DGL->dglClearBitmapModulation();
     }
 
     // Render child controls.

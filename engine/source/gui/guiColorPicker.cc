@@ -272,196 +272,6 @@ void GuiColorPickerCtrl::renderColorBox(RectI &bounds)
 
 #else
 
-void dglDrawBlendBox(RectI &bounds, ColorF &c1, ColorF &c2, ColorF &c3, ColorF &c4)
-{
-   F32 l = (F32)(bounds.point.x + 1);
-   F32 r =(F32)(bounds.point.x + bounds.extent.x - 2);
-   F32 t = (F32)(bounds.point.y + 1);
-   F32 b = (F32)(bounds.point.y + bounds.extent.y - 2);
-   
-   glEnable(GL_BLEND);
-   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-   glDisable(GL_TEXTURE_2D);
-
-   glBegin(GL_QUADS);
-
-      // Color
-      glColor4fv(c2.address());
-      glVertex2f(l, t);
-      glColor4fv(c2.address());
-      glVertex2f(r, t);
-      glColor4fv(c2.address());
-      glVertex2f(r, b);
-      glColor4fv(c2.address());
-      glVertex2f(l, b);
-
-      // White
-      glColor4fv(c1.address());
-      glVertex2f(l, t);
-      glColor4fv(colorAlphaW.address());
-      glVertex2f(r, t);
-      glColor4fv(colorAlphaW.address());
-      glVertex2f(r, b);
-      glColor4fv(c1.address());
-      glVertex2f(l, b);
-
-      // Black
-      glColor4fv(c3.address());
-      glVertex2f(l, t);
-      glColor4fv(c3.address());
-      glVertex2f(r, t);
-      glColor4fv(c4.address());
-      glVertex2f(r, b);
-      glColor4fv(c4.address());
-      glVertex2f(l, b);
-
-      // Top right
-      glColor4fv(c2.address());
-      glVertex2f(r, t);
-      glColor4fv(c2.address());
-      glVertex2f(r, t+1);
-      glColor4fv(c2.address());
-      glVertex2f(r-1, t+1);
-      glColor4fv(c2.address());
-      glVertex2f(r-1, t);
-      
-      // Top-Right Corner
-      glColor4fv(c2.address());
-      glVertex2f(r, t);
-      glColor4fv(c2.address());
-      glVertex2f(r, t-1);
-      glColor4fv(c2.address());
-      glVertex2f(r+1, t-1);
-      glColor4fv(c2.address());
-      glVertex2f(r+1, t);
-
-      // Top-Right Corner
-      glColor4fv(c1.address());
-      glVertex2f(l, t);
-      glColor4fv(c1.address());
-      glVertex2f(l, t-1);
-      glColor4fv(c1.address());
-      glVertex2f(l-1, t-1);
-      glColor4fv(c1.address());
-      glVertex2f(l-1, t);
-
-      // Top row
-      glColor4fv(c1.address());
-      glVertex2f(l, t);
-      glColor4fv(c1.address());
-      glVertex2f(l, t-1);
-      glColor4fv(c2.address());
-      glVertex2f(r, t-1);
-      glColor4fv(c2.address());
-      glVertex2f(r, t);
-      
-
-      // Right side
-      glColor4fv(c2.address());
-      glVertex2f(r, t);
-      glColor4fv(c2.address());
-      glVertex2f(r+1, t);
-      glColor4fv(c4.address());
-      glVertex2f(r+1, b);
-      glColor4fv(c4.address());
-      glVertex2f(r, b);
-
-      // Left side
-      glColor4fv(c1.address());
-      glVertex2f(l, t);
-      glColor4fv(c1.address());
-      glVertex2f(l-1, t);
-      glColor4fv(c4.address());
-      glVertex2f(l-1, b);
-      glColor4fv(c4.address());
-      glVertex2f(l, b);
-
-      // Bottom row
-      glColor4fv(c4.address());
-      glVertex2f(l-1, b);
-      glColor4fv(c4.address());
-      glVertex2f(l-1, b+1);
-      glColor4fv(c4.address());
-      glVertex2f(r+1, b+1);
-      glColor4fv(c4.address());
-      glVertex2f(r+1, b);
-
-   glEnd();
-}
-
-//--------------------------------------------------------------------------
-/// Function to draw a set of boxes blending throughout an array of colors
-void dglDrawBlendRangeBox(RectI &bounds, bool vertical, U8 numColors, ColorI *colors)
-{
-   F32 l = (F32)bounds.point.x;
-   F32 r = (F32)(bounds.point.x + bounds.extent.x - 1);
-   F32 t = (F32)bounds.point.y + 1;
-   F32 b = (F32)(bounds.point.y + bounds.extent.y - 2);
-   
-   // Calculate increment value
-   F32 x_inc = F32((r - l) / (numColors-1));
-   F32 y_inc = F32((b - t) / (numColors-1));
-   
-   glEnable(GL_BLEND);
-   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-   glDisable(GL_TEXTURE_2D);
-
-   glBegin(GL_QUADS);
-      if (!vertical)  // Horizontal (+x)
-      {
-            glColor4ub(colors[0].red, colors[0].green, colors[0].blue, colors[0].alpha);
-            glVertex2f(l, t);
-            glVertex2f(l, b);
-            glVertex2f(l-1, b);
-            glVertex2f(l-1, t);
-            glVertex2f(r, t);
-            glVertex2f(r, b);
-            glVertex2f(r+1, b);
-            glVertex2f(r+1, t);
-      }
-      else   // Vertical (+y)
-      {
-            glColor4ub(colors[0].red, colors[0].green, colors[0].blue, colors[0].alpha);
-            glVertex2f(l, t);
-            glVertex2f(r, t);
-            glVertex2f(r, t-1);
-            glVertex2f(l, t-1);
-            glVertex2f(l, b);
-            glVertex2f(r, b);
-            glVertex2f(r, b+1);
-            glVertex2f(l, b+1);
-      }
-
-      for (U16 i=0;i<numColors-1;i++) 
-      {
-         if (!vertical)  // Horizontal (+x)
-         {
-            // First color
-            glColor4ub(colors[i].red, colors[i].green, colors[i].blue, colors[i].alpha);
-            glVertex2f(l, t);
-            glVertex2f(l, b);
-            // Second color
-            glColor4ub(colors[i+1].red, colors[i+1].green, colors[i+1].blue, colors[i+1].alpha);
-            glVertex2f(l+x_inc, b);
-            glVertex2f(l+x_inc, t);
-            l += x_inc;
-         }
-         else  // Vertical (+y)
-         {
-            // First color
-            glColor4ub(colors[i].red, colors[i].green, colors[i].blue, colors[i].alpha);
-            glVertex2f(l, t);
-            glVertex2f(r, t);
-            // Second color
-            glColor4ub(colors[i+1].red, colors[i+1].green, colors[i+1].blue, colors[i+1].alpha);
-            glVertex2f(r, t+y_inc);
-            glVertex2f(l, t+y_inc);
-            t += y_inc;
-        }
-     }
-   glEnd();
-}
-
 //--------------------------------------------------------------------------
 /// Function to invoke calls to draw the picker box and selector
 void GuiColorPickerCtrl::renderColorBox(RectI &bounds)
@@ -473,7 +283,7 @@ void GuiColorPickerCtrl::renderColorBox(RectI &bounds)
    pickerBounds.extent.y = bounds.extent.y-1;
    
    if (mProfile->mBorderDefault && mProfile->mBorderDefault->mBorder > 0)
-      dglDrawRect(bounds, mProfile->mBorderDefault->mBorderColor[0]);
+      DGL->dglDrawRect(bounds, mProfile->mBorderDefault->mBorderColor[0]);
       
    Point2I selectorPos = Point2I(bounds.point.x+mSelectorPos.x+1, bounds.point.y+mSelectorPos.y+1);
 
@@ -482,43 +292,43 @@ void GuiColorPickerCtrl::renderColorBox(RectI &bounds)
    switch (mDisplayMode)
    {
    case pHorizColorRange:
-      dglDrawBlendRangeBox( pickerBounds, false, 7, mColorRange + 1);
+      DGL->dglDrawBlendRangeBox( pickerBounds, false, 7, mColorRange + 1);
       drawSelector( pickerBounds, selectorPos, sVertical );
    break;
    case pVertColorRange:
-      dglDrawBlendRangeBox( pickerBounds, true, 7, mColorRange + 1);
+      DGL->dglDrawBlendRangeBox( pickerBounds, true, 7, mColorRange + 1);
       drawSelector( pickerBounds, selectorPos, sHorizontal );
    break;
    case pHorizColorBrightnessRange:
       blendRect = pickerBounds;
       blendRect.point.y++;
       blendRect.extent.y -= 2;
-      dglDrawBlendRangeBox( pickerBounds, false, 9, mColorRange);
+      DGL->dglDrawBlendRangeBox( pickerBounds, false, 9, mColorRange);
       // This is being drawn slightly offset from the larger rect so as to insure 255 and 0
       // can both be selected for every color.
-      dglDrawBlendBox( blendRect, colorAlpha, colorAlpha, colorBlack, colorBlack );
+      DGL->dglDrawBlendBox( blendRect, colorAlpha, colorAlpha, colorBlack, colorBlack );
       blendRect.point.y += blendRect.extent.y - 1;
       blendRect.extent.y = 2;
-      dglDrawRect( blendRect, colorBlack);
+      DGL->dglDrawRect( blendRect, colorBlack);
       drawSelector( pickerBounds, selectorPos, sHorizontal );
       drawSelector( pickerBounds, selectorPos, sVertical );
    break;
    case pVertColorBrightnessRange:
-      dglDrawBlendRangeBox( pickerBounds, true, 9, mColorRange);
-      dglDrawBlendBox( pickerBounds, colorAlpha, colorBlack, colorBlack, colorAlpha );
+      DGL->dglDrawBlendRangeBox( pickerBounds, true, 9, mColorRange);
+      DGL->dglDrawBlendBox( pickerBounds, colorAlpha, colorBlack, colorBlack, colorAlpha );
       drawSelector( pickerBounds, selectorPos, sHorizontal );
       drawSelector( pickerBounds, selectorPos, sVertical );
    break;
    case pHorizAlphaRange:
-      dglDrawBlendBox( pickerBounds, colorBlack, colorWhite, colorWhite, colorBlack );
+      DGL->dglDrawBlendBox( pickerBounds, colorBlack, colorWhite, colorWhite, colorBlack );
       drawSelector( pickerBounds, selectorPos, sVertical );
    break;
    case pVertAlphaRange:
-      dglDrawBlendBox( pickerBounds, colorBlack, colorBlack, colorWhite, colorWhite );
+      DGL->dglDrawBlendBox( pickerBounds, colorBlack, colorBlack, colorWhite, colorWhite );
       drawSelector( pickerBounds, selectorPos, sHorizontal ); 
    break;
    case pBlendColorRange:
-      dglDrawBlendBox( pickerBounds, colorWhite, mBaseColor, colorAlpha, colorBlack );
+      DGL->dglDrawBlendBox( pickerBounds, colorWhite, mBaseColor, colorAlpha, colorBlack );
       drawSelector( pickerBounds, selectorPos, sHorizontal );      
       drawSelector( pickerBounds, selectorPos, sVertical );
    break;
@@ -526,7 +336,7 @@ void GuiColorPickerCtrl::renderColorBox(RectI &bounds)
    break;
    case pPallet:
    default:
-      dglDrawRectFill( pickerBounds, mBaseColor );
+      DGL->dglDrawRectFill( pickerBounds, mBaseColor );
    break;
    }
 }
@@ -544,19 +354,19 @@ void GuiColorPickerCtrl::drawSelector(RectI &bounds, Point2I &selectorPos, Selec
             // Now draw the vertical selector
             // Up -> Pos
             if (selectorPos.y != bounds.point.y+1)
-                dglDrawLine(selectorPos.x, bounds.point.y, selectorPos.x, selectorPos.y-sMax-1, colorWhiteBlend);
+               DGL->dglDrawLine(selectorPos.x, bounds.point.y, selectorPos.x, selectorPos.y-sMax-1, colorWhiteBlend);
             // Down -> Pos
             if (selectorPos.y != bounds.point.y+bounds.extent.y) 
-                dglDrawLine(selectorPos.x,	selectorPos.y + sMax, selectorPos.x, bounds.point.y + bounds.extent.y, colorWhiteBlend);
+               DGL->dglDrawLine(selectorPos.x,	selectorPos.y + sMax, selectorPos.x, bounds.point.y + bounds.extent.y, colorWhiteBlend);
         break;
         case sHorizontal:
             // Now draw the horizontal selector
             // Left -> Pos
             if (selectorPos.x != bounds.point.x) 
-            dglDrawLine(bounds.point.x, selectorPos.y-1, selectorPos.x-sMax, selectorPos.y-1, colorWhiteBlend);
+               DGL->dglDrawLine(bounds.point.x, selectorPos.y-1, selectorPos.x-sMax, selectorPos.y-1, colorWhiteBlend);
             // Right -> Pos
             if (selectorPos.x != bounds.point.x) 
-            dglDrawLine(bounds.point.x+mSelectorPos.x+sMax, selectorPos.y-1, bounds.point.x + bounds.extent.x, selectorPos.y-1, colorWhiteBlend);
+               DGL->dglDrawLine(bounds.point.x+mSelectorPos.x+sMax, selectorPos.y-1, bounds.point.x + bounds.extent.x, selectorPos.y-1, colorWhiteBlend);
         break;
     }
 }

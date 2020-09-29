@@ -129,7 +129,7 @@ void ShapeVector::sceneRender( const SceneRenderState* pSceneRenderState, const 
 
     // Save Model-view.
     //glMatrixMode(GL_MODELVIEW);
-    dglSetModelViewMatrix();
+    DGL->dglSetModelViewMatrix();
     glPushMatrix();
 
     // Fetch Position/Rotation.
