@@ -1131,7 +1131,7 @@ void GuiTextEditCtrl::onRender(Point2I offset, const RectI & updateRect)
 	renderBorderedRect(ctrlRect, mProfile, currentState);
 
 	//Render Text
-   DGL->dglSetBitmapModulation(mProfile->mFontColor);
+   DGL->SetBitmapModulation(mProfile->mFontColor);
 	RectI fillRect = applyBorders(ctrlRect.point, ctrlRect.extent, NormalState, mProfile);
 	RectI contentRect = applyPadding(fillRect.point, fillRect.extent, NormalState, mProfile);
 
@@ -1307,10 +1307,10 @@ void GuiTextEditCtrl::drawText( const RectI &drawRect, GuiControlState currentSt
    //draw the portion before the highlight
    if ( mBlockStart > 0 )
    {
-      DGL->dglSetBitmapModulation( fontColor );
+      DGL->SetBitmapModulation( fontColor );
 
       const UTF16* preString2 = textBuffer.getPtr();
-      DGL->dglDrawTextN( mFont, tempOffset, preString2, mBlockStart, mProfile->mFontColors);
+      DGL->DrawTextN( mFont, tempOffset, preString2, mBlockStart, mProfile->mFontColors);
       tempOffset.x += mFont->getStrNWidth(preString2, mBlockStart);
    }
 
@@ -1322,12 +1322,12 @@ void GuiTextEditCtrl::drawText( const RectI &drawRect, GuiControlState currentSt
 
       S32 highlightWidth = mFont->getStrNWidth(highlightBuff, highlightBuffLen);
 
-      DGL->dglDrawRectFill( Point2I( tempOffset.x, drawRect.point.y + 1 ),
+      DGL->DrawRectFill( Point2I( tempOffset.x, drawRect.point.y + 1 ),
          Point2I( tempOffset.x + highlightWidth, drawRect.point.y + drawRect.extent.y - 1),
          mProfile->mFillColorHL );
 
-      DGL->dglSetBitmapModulation( mProfile->mFontColorHL );
-      DGL->dglDrawTextN( mFont, tempOffset, highlightBuff, highlightBuffLen, mProfile->mFontColors );
+      DGL->SetBitmapModulation( mProfile->mFontColorHL );
+      DGL->DrawTextN( mFont, tempOffset, highlightBuff, highlightBuffLen, mProfile->mFontColors );
       tempOffset.x += highlightWidth;
    }
 
@@ -1343,22 +1343,22 @@ void GuiTextEditCtrl::drawText( const RectI &drawRect, GuiControlState currentSt
           const UTF16* truncatedBufferPtr = truncatedBuffer.getPtr();
           U32 finalBuffLen = truncatedBuffer.length();
 
-          DGL->dglSetBitmapModulation( fontColor );
-          DGL->dglDrawTextN( mFont, tempOffset, truncatedBufferPtr, finalBuffLen, mProfile->mFontColors );
+          DGL->SetBitmapModulation( fontColor );
+          DGL->DrawTextN( mFont, tempOffset, truncatedBufferPtr, finalBuffLen, mProfile->mFontColors );
        }
        else
        {
           const UTF16* finalBuff = textBuffer.getPtr() + mBlockEnd;
           U32 finalBuffLen = mTextBuffer.length() - mBlockEnd;
 
-          DGL->dglSetBitmapModulation( fontColor );
-          DGL->dglDrawTextN( mFont, tempOffset, finalBuff, finalBuffLen, mProfile->mFontColors );
+          DGL->SetBitmapModulation( fontColor );
+          DGL->DrawTextN( mFont, tempOffset, finalBuff, finalBuffLen, mProfile->mFontColors );
        }
    }
 
    //draw the cursor
    if (currentState == SelectedState && mCursorOn )
-      DGL->dglDrawLine( cursorStart, cursorEnd, mProfile->mCursorColor );
+      DGL->DrawLine( cursorStart, cursorEnd, mProfile->mCursorColor );
 }
 
 bool GuiTextEditCtrl::hasText()

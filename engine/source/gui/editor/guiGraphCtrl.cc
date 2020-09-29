@@ -80,7 +80,7 @@ void GuiGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
 	glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);
 	glEnable(GL_BLEND);
 	ColorF color(1.0, 1.0, 1.0, 0.5);
-   DGL->dglDrawRectFill(updateRect, color);
+   DGL->DrawRectFill(updateRect, color);
 	glDisable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ZERO);
 

@@ -220,12 +220,12 @@ void GuiTextCtrl::onRender(Point2I offset, const RectI &updateRect)
         StringBuffer truncatedBuffer = truncate(textBuffer, terminationString, width);
         const UTF8* truncatedBufferPtr = truncatedBuffer.getPtr8();
         
-        DGL->dglSetBitmapModulation(fontColor);
+        DGL->SetBitmapModulation(fontColor);
 		renderText(offset, mBounds.extent, (char*)truncatedBufferPtr, mProfile);
     }
     else
     {
-      DGL->dglSetBitmapModulation(fontColor);
+      DGL->SetBitmapModulation(fontColor);
 		renderText(offset, mBounds.extent, (char*)mText, mProfile);
 	}
 

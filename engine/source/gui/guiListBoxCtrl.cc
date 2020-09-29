@@ -737,15 +737,15 @@ void GuiListBoxCtrl::onRender( Point2I offset, const RectI &updateRect )
       onRenderItem( itemRect, mItems[i] );
    }
 
-   DGL->dglSetClipRect( oldClipRect );
+   DGL->SetClipRect( oldClipRect );
 }
 
 void GuiListBoxCtrl::onRenderItem( RectI itemRect, LBItem *item )
 {
    if( item->isSelected )
-      DGL->dglDrawRectFill( itemRect, mProfile->mFillColor );
+      DGL->DrawRectFill( itemRect, mProfile->mFillColor );
 
-   DGL->dglSetBitmapModulation(mProfile->mFontColor);
+   DGL->SetBitmapModulation(mProfile->mFontColor);
    renderText(itemRect.point + Point2I( 2, 0 ), itemRect.extent, item->itemText, mProfile);
 }
 
@@ -753,9 +753,9 @@ void GuiListBoxCtrl::drawBox(const Point2I &box, S32 size, ColorI &outlineColor,
 {
    RectI r(box.x - size, box.y - size, 2 * size + 1, 2 * size + 1);
    r.inset(1, 1);
-   DGL->dglDrawRectFill(r, boxColor);
+   DGL->DrawRectFill(r, boxColor);
    r.inset(-1, -1);
-   DGL->dglDrawRect(r, outlineColor);
+   DGL->DrawRect(r, outlineColor);
 }
 
 //////////////////////////////////////////////////////////////////////////

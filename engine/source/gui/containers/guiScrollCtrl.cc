@@ -912,7 +912,7 @@ void GuiScrollCtrl::renderBorderedRectWithArrow(RectI& bounds, GuiControlProfile
 				break;
 		}
 		
-      DGL->dglDrawTriangleFill(p1, p2, p3, profile->getFontColor(state));
+      DGL->DrawTriangleFill(p1, p2, p3, profile->getFontColor(state));
 	}
 }
 
@@ -984,7 +984,7 @@ void GuiScrollCtrl::renderChildControls(Point2I offset, RectI content, const Rec
 	// updateRect is the area that this control was allowed to draw in. It should almost always be the same as the value in onRender.
 	// content is the area that child controls are allowed to draw in.
 	RectI clipRect = content;
-	if (clipRect.intersect(DGL->dglGetClipRect()))
+	if (clipRect.intersect(DGL->GetClipRect()))
 	{
 		S32 size = objectList.size();
 		S32 size_cpy = size;
@@ -1014,7 +1014,7 @@ void GuiScrollCtrl::renderChildControls(Point2I offset, RectI content, const Rec
 
 				if (childClip.intersect(clipRect))
 				{
-               DGL->dglSetClipRect(clipRect);
+               DGL->SetClipRect(clipRect);
 					glDisable(GL_CULL_FACE);
 					ctrl->onRender(childPosition, RectI(childPosition, ctrl->getExtent()));
 				}
@@ -1035,8 +1035,8 @@ void GuiScrollCtrl::drawVScrollBar(const Point2I &offset)
    S32 bitmap = (mVBarEnabled ? ((curHitRegion == UpArrow && mDepressed) ?
          BmpStates * BmpUp + BmpHilite : BmpStates * BmpUp) : BmpStates * BmpUp + BmpDisabled);
 
-   DGL->dglClearBitmapModulation();
-   DGL->dglDrawBitmapSR(mTextureHandle, pos, mBitmapBounds[bitmap]);
+   DGL->ClearBitmapModulation();
+   DGL->DrawBitmapSR(mTextureHandle, pos, mBitmapBounds[bitmap]);
 
    pos.y += mScrollBarThickness;
    S32 end;
@@ -1050,8 +1050,8 @@ void GuiScrollCtrl::drawVScrollBar(const Point2I &offset)
 
    if (end > pos.y)
    {
-      DGL->dglClearBitmapModulation();
-      DGL->dglDrawBitmapStretchSR(mTextureHandle, RectI(pos, Point2I(mBitmapBounds[bitmap].extent.x, end - pos.y)), mBitmapBounds[bitmap]);
+      DGL->ClearBitmapModulation();
+      DGL->DrawBitmapStretchSR(mTextureHandle, RectI(pos, Point2I(mBitmapBounds[bitmap].extent.x, end - pos.y)), mBitmapBounds[bitmap]);
    }
 
    pos.y = end;
@@ -1063,28 +1063,28 @@ void GuiScrollCtrl::drawVScrollBar(const Point2I &offset)
       S32 tbot = (thumbSelected ? BmpStates * BmpVThumbBottomCap + BmpHilite : BmpStates * BmpVThumbBottomCap);
 
       // draw the thumb
-      DGL->dglClearBitmapModulation();
-      DGL->dglDrawBitmapSR(mTextureHandle, pos, mBitmapBounds[ttop]);
+      DGL->ClearBitmapModulation();
+      DGL->DrawBitmapSR(mTextureHandle, pos, mBitmapBounds[ttop]);
       pos.y += mBitmapBounds[ttop].extent.y;
       end = (mVThumbPos + mChildArea.point.y + mDownArrowRect.extent.y) + mVThumbSize - mBitmapBounds[tbot].extent.y;
 
       if (end > pos.y)
       {
-         DGL->dglClearBitmapModulation();
-         DGL->dglDrawBitmapStretchSR(mTextureHandle, RectI(pos, Point2I(mBitmapBounds[tmid].extent.x, end - pos.y)), mBitmapBounds[tmid]);
+         DGL->ClearBitmapModulation();
+         DGL->DrawBitmapStretchSR(mTextureHandle, RectI(pos, Point2I(mBitmapBounds[tmid].extent.x, end - pos.y)), mBitmapBounds[tmid]);
       }
 
       pos.y = end;
-      DGL->dglClearBitmapModulation();
-      DGL->dglDrawBitmapSR(mTextureHandle, pos, mBitmapBounds[tbot]);
+      DGL->ClearBitmapModulation();
+      DGL->DrawBitmapSR(mTextureHandle, pos, mBitmapBounds[tbot]);
       pos.y += mBitmapBounds[tbot].extent.y;
       end = mVTrackRect.point.y + mVTrackRect.extent.y - 1 + offset.y;
 
       bitmap = (curHitRegion == DownPage && mDepressed) ? BmpStates * BmpVPage + BmpHilite : BmpStates * BmpVPage;
       if (end > pos.y)
       {
-         DGL->dglClearBitmapModulation();
-         DGL->dglDrawBitmapStretchSR(mTextureHandle, RectI(pos, Point2I(mBitmapBounds[bitmap].extent.x, end - pos.y)), mBitmapBounds[bitmap]);
+         DGL->ClearBitmapModulation();
+         DGL->DrawBitmapStretchSR(mTextureHandle, RectI(pos, Point2I(mBitmapBounds[bitmap].extent.x, end - pos.y)), mBitmapBounds[bitmap]);
       }
 
       pos.y = end;
@@ -1093,8 +1093,8 @@ void GuiScrollCtrl::drawVScrollBar(const Point2I &offset)
    bitmap = (mVBarEnabled ? ((curHitRegion == DownArrow && mDepressed ) ?
          BmpStates * BmpDown + BmpHilite : BmpStates * BmpDown) : BmpStates * BmpDown + BmpDisabled);
 
-   DGL->dglClearBitmapModulation();
-   DGL->dglDrawBitmapSR(mTextureHandle, pos, mBitmapBounds[bitmap]);
+   DGL->ClearBitmapModulation();
+   DGL->DrawBitmapSR(mTextureHandle, pos, mBitmapBounds[bitmap]);
 }
 
 void GuiScrollCtrl::drawHScrollBar(const Point2I &offset)
@@ -1108,8 +1108,8 @@ void GuiScrollCtrl::drawHScrollBar(const Point2I &offset)
    Point2I pos = offset;
    pos += mLeftArrowRect.point;
 
-   DGL->dglClearBitmapModulation();
-   DGL->dglDrawBitmapSR(mTextureHandle, pos, mBitmapBounds[bitmap]);
+   DGL->ClearBitmapModulation();
+   DGL->DrawBitmapSR(mTextureHandle, pos, mBitmapBounds[bitmap]);
 
    pos.x += mLeftArrowRect.extent.x;
 
@@ -1125,8 +1125,8 @@ void GuiScrollCtrl::drawHScrollBar(const Point2I &offset)
 
    if (end > pos.x)
    {
-      DGL->dglClearBitmapModulation();
-      DGL->dglDrawBitmapStretchSR(mTextureHandle, RectI(pos, Point2I(end - pos.x, mBitmapBounds[bitmap].extent.y)), mBitmapBounds[bitmap]);
+      DGL->ClearBitmapModulation();
+      DGL->DrawBitmapStretchSR(mTextureHandle, RectI(pos, Point2I(end - pos.x, mBitmapBounds[bitmap].extent.y)), mBitmapBounds[bitmap]);
    }
    pos.x = end;
 
@@ -1139,19 +1139,19 @@ void GuiScrollCtrl::drawHScrollBar(const Point2I &offset)
       S32 tbot = (thumbSelected ? BmpStates * BmpHThumbRightCap + BmpHilite : BmpStates * BmpHThumbRightCap);
 
       // draw the thumb
-      DGL->dglClearBitmapModulation();
-      DGL->dglDrawBitmapSR(mTextureHandle, pos, mBitmapBounds[ttop]);
+      DGL->ClearBitmapModulation();
+      DGL->DrawBitmapSR(mTextureHandle, pos, mBitmapBounds[ttop]);
       pos.x += mBitmapBounds[ttop].extent.x;
       end = (mHThumbPos + mChildArea.point.x + mDownArrowRect.extent.x) + mHThumbSize - mBitmapBounds[tbot].extent.x;
       if (end > pos.x)
       {
-         DGL->dglClearBitmapModulation();
-         DGL->dglDrawBitmapStretchSR(mTextureHandle, RectI(pos, Point2I(end - pos.x, mBitmapBounds[tmid].extent.y)), mBitmapBounds[tmid]);
+         DGL->ClearBitmapModulation();
+         DGL->DrawBitmapStretchSR(mTextureHandle, RectI(pos, Point2I(end - pos.x, mBitmapBounds[tmid].extent.y)), mBitmapBounds[tmid]);
       }
 
       pos.x = end;
-      DGL->dglClearBitmapModulation();
-      DGL->dglDrawBitmapSR(mTextureHandle, pos, mBitmapBounds[tbot]);
+      DGL->ClearBitmapModulation();
+      DGL->DrawBitmapSR(mTextureHandle, pos, mBitmapBounds[tbot]);
       pos.x += mBitmapBounds[tbot].extent.x;
       end = mHTrackRect.point.x + mHTrackRect.extent.x - 1 + offset.x;
 
@@ -1159,8 +1159,8 @@ void GuiScrollCtrl::drawHScrollBar(const Point2I &offset)
 
       if (end > pos.x)
       {
-         DGL->dglClearBitmapModulation();
-         DGL->dglDrawBitmapStretchSR(mTextureHandle, RectI(pos, Point2I(end - pos.x, mBitmapBounds[bitmap].extent.y)), mBitmapBounds[bitmap]);
+         DGL->ClearBitmapModulation();
+         DGL->DrawBitmapStretchSR(mTextureHandle, RectI(pos, Point2I(end - pos.x, mBitmapBounds[bitmap].extent.y)), mBitmapBounds[bitmap]);
       }
 
       pos.x = end;
@@ -1168,8 +1168,8 @@ void GuiScrollCtrl::drawHScrollBar(const Point2I &offset)
    bitmap = (mHBarEnabled ? ((curHitRegion == RightArrow && mDepressed) ?
             BmpStates * BmpRight + BmpHilite : BmpStates * BmpRight) : BmpStates * BmpRight + BmpDisabled);
 
-   DGL->dglClearBitmapModulation();
-   DGL->dglDrawBitmapSR(mTextureHandle, pos, mBitmapBounds[bitmap]);
+   DGL->ClearBitmapModulation();
+   DGL->DrawBitmapSR(mTextureHandle, pos, mBitmapBounds[bitmap]);
 }
 
 void GuiScrollCtrl::drawScrollCorner(const Point2I &offset)
@@ -1177,8 +1177,8 @@ void GuiScrollCtrl::drawScrollCorner(const Point2I &offset)
    Point2I pos = offset;
    pos.x += mRightArrowRect.point.x + mRightArrowRect.extent.x;
    pos.y += mRightArrowRect.point.y;
-   DGL->dglClearBitmapModulation();
-   DGL->dglDrawBitmapSR(mTextureHandle, pos, mBitmapBounds[BmpStates * BmpResize]);
+   DGL->ClearBitmapModulation();
+   DGL->DrawBitmapSR(mTextureHandle, pos, mBitmapBounds[BmpStates * BmpResize]);
 }
 #pragma endregion
 

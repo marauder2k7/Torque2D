@@ -231,21 +231,21 @@ void GuiSceneObjectCtrl::onRender(Point2I offset, const RectI& updateRect)
          if( mHasTexture )
             renderSizableBitmapBordersFilled( ctrlRect, 3, mProfile );
          else
-            DGL->dglDrawRectFill( ctrlRect, mProfile->mFillColorHL );
+            DGL->DrawRectFill( ctrlRect, mProfile->mFillColorHL );
       }
       else if ( mMouseOver )
       {
          if( mHasTexture )
             renderSizableBitmapBordersFilled( ctrlRect, 2, mProfile );
          else
-            DGL->dglDrawRectFill( ctrlRect, mProfile->mFillColorHL );
+            DGL->DrawRectFill( ctrlRect, mProfile->mFillColorHL );
       }
       else
       {
          if( mHasTexture )
             renderSizableBitmapBordersFilled( ctrlRect, 1, mProfile );
          else
-            DGL->dglDrawRectFill( ctrlRect, mProfile->mFillColor );
+            DGL->DrawRectFill( ctrlRect, mProfile->mFillColor );
       }
    }
 
@@ -268,7 +268,7 @@ void GuiSceneObjectCtrl::onRender(Point2I offset, const RectI& updateRect)
          if( mHasTexture )
             renderSizableBitmapBordersFilled( objRect, 4, mProfile );
          else
-            DGL->dglDrawRectFill( objRect, mProfile->mFillColorNA );
+            DGL->DrawRectFill( objRect, mProfile->mFillColorNA );
       }
 
       // Yes, so fetch object clip boundary.
@@ -388,7 +388,7 @@ void GuiSceneObjectCtrl::onRender(Point2I offset, const RectI& updateRect)
       glPushMatrix();
       glLoadIdentity();
       RectI viewport;
-      DGL->dglGetViewport(&viewport);
+      DGL->GetViewport(&viewport);
 
       if (x1 > x2)
       {
@@ -410,11 +410,11 @@ void GuiSceneObjectCtrl::onRender(Point2I offset, const RectI& updateRect)
       glOrtho( x1, x2, y1, y2, 0.0f, MAX_LAYERS_SUPPORTED );
 #endif
       // Setup new viewport.
-      DGL->dglSetViewport(objRect);
+      DGL->SetViewport(objRect);
 
       // Set ModelView.
       //glMatrixMode(GL_MODELVIEW);
-      DGL->dglSetModelViewMatrix();
+      DGL->SetModelViewMatrix();
       glPushMatrix();
       glLoadIdentity();
 
@@ -452,7 +452,7 @@ void GuiSceneObjectCtrl::onRender(Point2I offset, const RectI& updateRect)
 
       // Restore Matrices.
       //glMatrixMode(GL_MODELVIEW);
-      DGL->dglSetModelViewMatrix();
+      DGL->SetModelViewMatrix();
       glPopMatrix();
       glMatrixMode(GL_PROJECTION);
       glPopMatrix();
@@ -469,10 +469,10 @@ void GuiSceneObjectCtrl::onRender(Point2I offset, const RectI& updateRect)
 
 
    captionRect.inset(1, 1);
-   DGL->dglSetBitmapModulation( ColorI(0,0,0,255) );
+   DGL->SetBitmapModulation( ColorI(0,0,0,255) );
    renderText(captionRect.point, captionRect.extent, mCaption, mProfile);
    captionRect.inset(1, 1);   
-   DGL->dglSetBitmapModulation( mProfile->mFontColor );
+   DGL->SetBitmapModulation( mProfile->mFontColor );
    renderText(captionRect.point, captionRect.extent, mCaption, mProfile);
 
    

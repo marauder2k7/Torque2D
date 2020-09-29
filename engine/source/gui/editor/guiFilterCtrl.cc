@@ -154,8 +154,8 @@ void GuiFilterCtrl::onRender(Point2I offset, const RectI &updateRect)
    Point2I ext = mBounds.extent;
 
    RectI r(pos, ext);
-   DGL->dglDrawRectFill(r, ColorI(255,255,255));
-   DGL->dglDrawRect(r, ColorI(0,0,0));
+   DGL->DrawRectFill(r, ColorI(255,255,255));
+   DGL->DrawRect(r, ColorI(0,0,0));
 
    // shrink by 2 pixels
    pos.x += 2;
@@ -165,7 +165,7 @@ void GuiFilterCtrl::onRender(Point2I offset, const RectI &updateRect)
 
 #if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
 	//this was the same drawing as dglDrawLine		<Mat>
-   DGL->dglDrawLine( (pos.x), (pos.y+ext.y), (pos.x+ext.x), (pos.y), ColorI(255 *0.9, 255 *0.9, 255 *0.9, 255 *1) );
+   DGL->DrawLine( (pos.x), (pos.y+ext.y), (pos.x+ext.x), (pos.y), ColorI(255 *0.9, 255 *0.9, 255 *0.9, 255 *1) );
 
    // draw the curv
    glColor4f(0.4f, 0.4f, 0.4f, 1.0f);
@@ -228,7 +228,7 @@ void GuiFilterCtrl::onRender(Point2I offset, const RectI &updateRect)
       r.point += pos + Point2I(-2,-2);
       r.extent = Point2I(5,5);
 
-      DGL->dglDrawRectFill(r, ColorI(255,0,0));
+      DGL->DrawRectFill(r, ColorI(255,0,0));
    }
 
    renderChildControls(offset, mBounds, updateRect);

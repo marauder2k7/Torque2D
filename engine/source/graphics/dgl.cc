@@ -65,7 +65,7 @@ void DGLDevice::init()
 }
 
 //--------------------------------------------------------------------------
-void DGLDevice::dglSetBitmapModulation(const ColorF& in_rColor)
+void DGLDevice::SetBitmapModulation(const ColorF& in_rColor)
 {
    ColorF c = in_rColor;
    c.clamp();
@@ -73,29 +73,29 @@ void DGLDevice::dglSetBitmapModulation(const ColorF& in_rColor)
    sg_textAnchorColor = sg_bitmapModulation;
 }
 
-void DGLDevice::dglGetBitmapModulation(ColorF* color)
+void DGLDevice::GetBitmapModulation(ColorF* color)
 {
    *color = sg_bitmapModulation;
 }
 
-void DGLDevice::dglGetBitmapModulation(ColorI* color)
+void DGLDevice::GetBitmapModulation(ColorI* color)
 {
    *color = sg_bitmapModulation;
 }
 
-void DGLDevice::dglClearBitmapModulation()
+void DGLDevice::ClearBitmapModulation()
 {
    sg_bitmapModulation.set(255, 255, 255, 255);
 }
 
-void DGLDevice::dglSetTextAnchorColor(const ColorF& in_rColor)
+void DGLDevice::SetTextAnchorColor(const ColorF& in_rColor)
 {
    ColorF c = in_rColor;
    c.clamp();
    sg_textAnchorColor = c;
 }
 
-void DGLDevice::dglDrawBlendBox(RectI &bounds, ColorF &c1, ColorF &c2, ColorF &c3, ColorF &c4)
+void DGLDevice::DrawBlendBox(RectI &bounds, ColorF &c1, ColorF &c2, ColorF &c3, ColorF &c4)
 {
    F32 l = (F32)(bounds.point.x + 1);
    F32 r = (F32)(bounds.point.x + bounds.extent.x - 2);
@@ -213,7 +213,7 @@ void DGLDevice::dglDrawBlendBox(RectI &bounds, ColorF &c1, ColorF &c2, ColorF &c
 }
 
 /// Function to draw a set of boxes blending throughout an array of colors
-void DGLDevice::dglDrawBlendRangeBox(RectI &bounds, bool vertical, U8 numColors, ColorI *colors)
+void DGLDevice::DrawBlendRangeBox(RectI &bounds, bool vertical, U8 numColors, ColorI *colors)
 {
    F32 l = (F32)bounds.point.x;
    F32 r = (F32)(bounds.point.x + bounds.extent.x - 1);
@@ -286,7 +286,7 @@ void DGLDevice::dglDrawBlendRangeBox(RectI &bounds, bool vertical, U8 numColors,
 
 
 //--------------------------------------------------------------------------
-void DGLDevice::dglDrawBitmapStretchSR(TextureObject* texture,
+void DGLDevice::DrawBitmapStretchSR(TextureObject* texture,
                        const RectI&   dstRect,
                        const RectI&   srcRect,
                        const U32   in_flip,
@@ -310,7 +310,7 @@ void DGLDevice::dglDrawBitmapStretchSR(TextureObject* texture,
       glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
    
       ColorF kModulationColor;
-      dglGetBitmapModulation(&kModulationColor);
+      GetBitmapModulation(&kModulationColor);
       glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, kModulationColor.address());
    }
    else
@@ -432,7 +432,7 @@ void DGLDevice::dglDrawBitmapStretchSR(TextureObject* texture,
    glDisable(GL_TEXTURE_2D);
 }
 
-void DGLDevice::dglDrawBitmap(TextureObject* texture, const Point2I& in_rAt, const U32 in_flip)
+void DGLDevice::DrawBitmap(TextureObject* texture, const Point2I& in_rAt, const U32 in_flip)
 {
    AssertFatal(texture != NULL, "GSurface::drawBitmap: NULL Handle");
 
@@ -444,23 +444,23 @@ void DGLDevice::dglDrawBitmap(TextureObject* texture, const Point2I& in_rAt, con
    RectI stretch(in_rAt.x, in_rAt.y,
                    texture->getBitmapWidth(),
                    texture->getBitmapHeight());
-   dglDrawBitmapStretchSR(texture,
+   DrawBitmapStretchSR(texture,
                           stretch,
                           subRegion,
                           in_flip);
 }
 
-void DGLDevice::dglDrawBitmapTile(TextureObject* texture, const RectI& dstRect, const U32 in_flip, F32 fSpin, bool bSilhouette)
+void DGLDevice::DrawBitmapTile(TextureObject* texture, const RectI& dstRect, const U32 in_flip, F32 fSpin, bool bSilhouette)
 {
    AssertFatal(texture != NULL, "GSurface::drawBitmapTile: NULL Handle");
    // since the texture coords are calculated from the texture sub-rect we pass in,
    // but no actual indexing of that sub-rect happens, we can pass any texture coords
    // that we like to dglDrawBitmapSR(). We use this to force tiling.
    RectI subregion(0,0, dstRect.extent.x, dstRect.extent.y);
-   dglDrawBitmapStretchSR(texture, dstRect, subregion, in_flip, fSpin, bSilhouette);
+   DrawBitmapStretchSR(texture, dstRect, subregion, in_flip, fSpin, bSilhouette);
 }
 
-void DGLDevice::dglDrawBitmapStretch(TextureObject* texture, const RectI& dstRect, const U32 in_flip, F32 fSpin, bool bSilhouette)
+void DGLDevice::DrawBitmapStretch(TextureObject* texture, const RectI& dstRect, const U32 in_flip, F32 fSpin, bool bSilhouette)
 {
    AssertFatal(texture != NULL, "GSurface::drawBitmapStretch: NULL Handle");
    AssertFatal(dstRect.isValidRect() == true,
@@ -469,7 +469,7 @@ void DGLDevice::dglDrawBitmapStretch(TextureObject* texture, const RectI& dstRec
    RectI subRegion(0, 0,
                    texture->getBitmapWidth(),
                    texture->getBitmapHeight());
-   dglDrawBitmapStretchSR(texture,
+   DrawBitmapStretchSR(texture,
                           dstRect,
                           subRegion,
                           in_flip,
@@ -477,7 +477,7 @@ void DGLDevice::dglDrawBitmapStretch(TextureObject* texture, const RectI& dstRec
                           bSilhouette);
 }
 
-void DGLDevice::dglDrawBitmapSR(TextureObject *texture, const Point2I& in_rAt, const RectI& srcRect, const U32 in_flip)
+void DGLDevice::DrawBitmapSR(TextureObject *texture, const Point2I& in_rAt, const RectI& srcRect, const U32 in_flip)
 {
    AssertFatal(texture != NULL, "GSurface::drawBitmapSR: NULL Handle");
    AssertFatal(srcRect.isValidRect() == true,
@@ -486,23 +486,23 @@ void DGLDevice::dglDrawBitmapSR(TextureObject *texture, const Point2I& in_rAt, c
    RectI stretch(in_rAt.x, in_rAt.y,
                  srcRect.len_x(),
                  srcRect.len_y());
-   dglDrawBitmapStretchSR(texture,
+   DrawBitmapStretchSR(texture,
                           stretch,
                           srcRect,
                           in_flip);
 }
 
-U32 DGLDevice::dglDrawText(GFont*   font,
+U32 DGLDevice::DrawText(GFont*   font,
           const Point2I& ptDraw,
           const UTF16*    in_string,
           const ColorI*  colorTable,
           const U32      maxColorIndex,
           F32            rot)
 {
-   return dglDrawTextN(font, ptDraw, in_string, dStrlen(in_string), colorTable, maxColorIndex, rot);
+   return DrawTextN(font, ptDraw, in_string, dStrlen(in_string), colorTable, maxColorIndex, rot);
 }
 
-U32 DGLDevice::dglDrawText(GFont*   font,
+U32 DGLDevice::DrawText(GFont*   font,
           const Point2I& ptDraw,
           const UTF8*    in_string,
           const ColorI*  colorTable,
@@ -512,7 +512,7 @@ U32 DGLDevice::dglDrawText(GFont*   font,
    // Just a note - dStrlen(utf8) isn't strictly correct but it's guaranteed to be
    // as long or longer than the real length. dglDrawTextN fails gracefully
    // if you specify overlong, so this is ok.
-   return dglDrawTextN(font, ptDraw, in_string, dStrlen((const UTF8 *) in_string), colorTable, maxColorIndex, rot);
+   return DrawTextN(font, ptDraw, in_string, dStrlen((const UTF8 *) in_string), colorTable, maxColorIndex, rot);
 }
 
 struct TextVertex
@@ -533,7 +533,7 @@ struct TextVertex
 
 //------------------------------------------------------------------------------
 
-U32 DGLDevice::dglDrawTextN(GFont*          font,
+U32 DGLDevice::DrawTextN(GFont*          font,
                  const Point2I&  ptDraw,
                  const UTF8*     in_string,
                  U32             n,
@@ -546,7 +546,7 @@ U32 DGLDevice::dglDrawTextN(GFont*          font,
    U32 len = dStrlen(in_string) + 1;
    FrameTemp<UTF16> ubuf(len);
    convertUTF8toUTF16(in_string, ubuf, len);
-   U32 tmp = dglDrawTextN(font, ptDraw, ubuf, n, colorTable, maxColorIndex, rot);
+   U32 tmp = DrawTextN(font, ptDraw, ubuf, n, colorTable, maxColorIndex, rot);
 
    PROFILE_END();
 
@@ -556,7 +556,7 @@ U32 DGLDevice::dglDrawTextN(GFont*          font,
 //-----------------------------------------------------------------------------
 
 #if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
-U32 DGLDevice::dglDrawTextN(GFont*          font,
+U32 DGLDevice::DrawTextN(GFont*          font,
                  const Point2I&  ptDraw,
                  const UTF16*    in_string,
                  U32             n,
@@ -771,7 +771,7 @@ U32 DGLDevice::dglDrawTextN(GFont*          font,
 
 #else
 
-U32 DGLDevice::dglDrawTextN(GFont*          font,
+U32 DGLDevice::DrawTextN(GFont*          font,
                  const Point2I&  ptDraw,
                  const UTF16*    in_string,
                  U32             n,
@@ -980,7 +980,7 @@ U32 DGLDevice::dglDrawTextN(GFont*          font,
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- //
 // Drawing primitives
 
-void DGLDevice::dglDrawLine(S32 x1, S32 y1, S32 x2, S32 y2, const ColorI &color)
+void DGLDevice::DrawLine(S32 x1, S32 y1, S32 x2, S32 y2, const ColorI &color)
 {
    glEnable(GL_BLEND);
    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1007,12 +1007,12 @@ void DGLDevice::dglDrawLine(S32 x1, S32 y1, S32 x2, S32 y2, const ColorI &color)
 #endif
 }
 
-void DGLDevice::dglDrawLine(const Point2I &startPt, const Point2I &endPt, const ColorI &color)
+void DGLDevice::DrawLine(const Point2I &startPt, const Point2I &endPt, const ColorI &color)
 {
-    dglDrawLine(startPt.x, startPt.y, endPt.x, endPt.y, color);
+    DrawLine(startPt.x, startPt.y, endPt.x, endPt.y, color);
 }
 
-void DGLDevice::dglDrawTriangleFill(const Point2I &pt1, const Point2I &pt2, const Point2I &pt3, const ColorI &color)
+void DGLDevice::DrawTriangleFill(const Point2I &pt1, const Point2I &pt2, const Point2I &pt3, const ColorI &color)
 {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1039,7 +1039,7 @@ void DGLDevice::dglDrawTriangleFill(const Point2I &pt1, const Point2I &pt2, cons
 #endif
 }
 
-void DGLDevice::dglDrawRect(const Point2I &upperL, const Point2I &lowerR, const ColorI &color, const float &lineWidth)
+void DGLDevice::DrawRect(const Point2I &upperL, const Point2I &lowerR, const ColorI &color, const float &lineWidth)
 {
    glEnable(GL_BLEND);
    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1071,16 +1071,16 @@ void DGLDevice::dglDrawRect(const Point2I &upperL, const Point2I &lowerR, const 
 // the fill convention for lined rects is that they outline the rectangle border of the
 // filled region specified.
 
-void DGLDevice::dglDrawRect(const RectI &rect, const ColorI &color, const float &lineWidth)
+void DGLDevice::DrawRect(const RectI &rect, const ColorI &color, const float &lineWidth)
 {
    Point2I lowerR(rect.point.x + rect.extent.x - 1, rect.point.y + rect.extent.y - 1);
-   dglDrawRect(rect.point, lowerR, color, lineWidth);
+   DrawRect(rect.point, lowerR, color, lineWidth);
 }
 
 // the fill convention says that pixel at upperL will be filled and
 // that pixel at lowerR will NOT be filled.
 
-void DGLDevice::dglDrawRectFill(const Point2I &upperL, const Point2I &lowerR, const ColorI &color)
+void DGLDevice::DrawRectFill(const Point2I &upperL, const Point2I &lowerR, const ColorI &color)
 {
    glEnable(GL_BLEND);
    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1103,13 +1103,13 @@ void DGLDevice::dglDrawRectFill(const Point2I &upperL, const Point2I &lowerR, co
    glRecti((S32)upperL.x, (S32)upperL.y, (S32)lowerR.x, (S32)lowerR.y);
 #endif
 }
-void DGLDevice::dglDrawRectFill(const RectI &rect, const ColorI &color)
+void DGLDevice::DrawRectFill(const RectI &rect, const ColorI &color)
 {
    Point2I lowerR(rect.point.x + rect.extent.x, rect.point.y + rect.extent.y);
-   dglDrawRectFill(rect.point, lowerR, color);
+   DrawRectFill(rect.point, lowerR, color);
 }
 
-void DGLDevice::dglDrawQuadFill(const Point2I &point1, const Point2I &point2, const Point2I &point3, const Point2I &point4, const ColorI &color)
+void DGLDevice::DrawQuadFill(const Point2I &point1, const Point2I &point2, const Point2I &point3, const Point2I &point4, const ColorI &color)
 {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1131,7 +1131,7 @@ void DGLDevice::dglDrawQuadFill(const Point2I &point1, const Point2I &point2, co
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
-void DGLDevice::dglDraw2DSquare( const Point2F &screenPoint, F32 width, F32 spinAngle )
+void DGLDevice::Draw2DSquare( const Point2F &screenPoint, F32 width, F32 spinAngle )
 {
    width *= 0.5;
 
@@ -1191,10 +1191,10 @@ void DGLDevice::dglDraw2DSquare( const Point2F &screenPoint, F32 width, F32 spin
 #endif
 }
 
-void DGLDevice::dglDrawBillboard( const Point3F &position, F32 width, F32 spinAngle )
+void DGLDevice::DrawBillboard( const Point3F &position, F32 width, F32 spinAngle )
 {
    MatrixF modelview;
-   dglGetModelview( &modelview );
+   GetModelview( &modelview );
    modelview.transpose();
 
 
@@ -1256,7 +1256,7 @@ void DGLDevice::dglDrawBillboard( const Point3F &position, F32 width, F32 spinAn
 #endif
 }
 
-void DGLDevice::dglWireCube(const Point3F & extent, const Point3F & center)
+void DGLDevice::WireCube(const Point3F & extent, const Point3F & center)
 {
    static Point3F cubePoints[8] =
    {
@@ -1313,7 +1313,7 @@ void DGLDevice::dglWireCube(const Point3F & extent, const Point3F & center)
 }
 
 
-void DGLDevice::dglSolidCube(const Point3F & extent, const Point3F & center)
+void DGLDevice::SolidCube(const Point3F & extent, const Point3F & center)
 {
    static Point3F cubePoints[8] =
    {
@@ -1370,7 +1370,7 @@ void DGLDevice::dglSolidCube(const Point3F & extent, const Point3F & center)
 //Draws an unfilled circle with line segments.
 //Circle drawing code was modified from this source with gratitude. It is in the public domain.
 //http://slabode.exofire.net/circle_draw.shtml
-void DGLDevice::dglDrawCircle(const Point2I &center, const F32 radius, const ColorI &color, const F32 &lineWidth)
+void DGLDevice::DrawCircle(const Point2I &center, const F32 radius, const ColorI &color, const F32 &lineWidth)
 {
 	F32 adjustedRadius = radius - (lineWidth/2);
 	const S32 num_segments = (const S32)round(10 * sqrtf(adjustedRadius));
@@ -1410,7 +1410,7 @@ void DGLDevice::dglDrawCircle(const Point2I &center, const F32 radius, const Col
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-void DGLDevice::dglDrawCircleFill(const Point2I &center, const F32 radius, const ColorI &color)
+void DGLDevice::DrawCircleFill(const Point2I &center, const F32 radius, const ColorI &color)
 {
 	const S32 num_segments = (const S32)round(10 * sqrtf(radius));
 	F32 theta = 2 * 3.1415926f / F32(num_segments);
@@ -1449,7 +1449,7 @@ void DGLDevice::dglDrawCircleFill(const Point2I &center, const F32 radius, const
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-void DGLDevice::dglSetClipRect(const RectI &clipRect)
+void DGLDevice::SetClipRect(const RectI &clipRect)
 {
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
@@ -1468,7 +1468,7 @@ void DGLDevice::dglSetClipRect(const RectI &clipRect)
 
    glTranslatef(0.0f, (F32)-clipRect.point.y, 0.0f);
 
-   dglSetModelViewMatrix();
+   SetModelViewMatrix();
    //glMatrixMode(GL_MODELVIEW);
    glLoadIdentity();
 
@@ -1478,12 +1478,12 @@ void DGLDevice::dglSetClipRect(const RectI &clipRect)
    sgCurrentClipRect = clipRect;
 }
 
-const RectI& DGLDevice::dglGetClipRect()
+const RectI& DGLDevice::GetClipRect()
 {
    return sgCurrentClipRect;
 }
 
-bool DGLDevice::dglPointToScreen( Point3F &point3D, Point3F &screenPoint )
+bool DGLDevice::PointToScreen( Point3F &point3D, Point3F &screenPoint )
 {
 #if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
    GLfloat       glMV[16];
@@ -1526,7 +1526,7 @@ bool DGLDevice::dglPointToScreen( Point3F &point3D, Point3F &screenPoint )
    glGetDoublev(GL_MODELVIEW_MATRIX, glMV);
 
    RectI viewport;
-   dglGetViewport(&viewport);
+   GetViewport(&viewport);
 
    glVP[0] = viewport.point.x;
    glVP[1] = viewport.point.y + viewport.extent.y;
@@ -1534,9 +1534,9 @@ bool DGLDevice::dglPointToScreen( Point3F &point3D, Point3F &screenPoint )
    glVP[3] = -viewport.extent.y;
 
    MatrixF mv;
-   dglGetModelview(&mv);
+   GetModelview(&mv);
    MatrixF pr;
-   dglGetProjection(&pr);
+   GetProjection(&pr);
 
    F64 x, y, z;
    int result = gluProject( (GLdouble)point3D.x, (GLdouble)point3D.y, (GLdouble)point3D.z, (const F64 *)&glMV, (const F64 *)&glPR, (const GLint *)&glVP, &x, &y, &z );
@@ -1552,7 +1552,7 @@ bool DGLDevice::dglPointToScreen( Point3F &point3D, Point3F &screenPoint )
 
 
 
-bool DGLDevice::dglIsInCanonicalState()
+bool DGLDevice::IsInCanonicalState()
 {
    bool ret = true;
 
@@ -1637,7 +1637,7 @@ bool DGLDevice::dglIsInCanonicalState()
 }
 
 
-void DGLDevice::dglSetCanonicalState()
+void DGLDevice::SetCanonicalState()
 {
 #if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
 // PUAP -Mat removed unsupported textureARB and Fog stuff
@@ -1689,7 +1689,7 @@ void DGLDevice::dglSetCanonicalState()
 #endif
 }
 
-void DGLDevice::dglGetTransformState(S32* mvDepth,
+void DGLDevice::GetTransformState(S32* mvDepth,
                           S32* pDepth,
                           S32* t0Depth,
                           F32* t0Matrix,
@@ -1725,7 +1725,7 @@ void DGLDevice::dglGetTransformState(S32* mvDepth,
    }
 
    RectI v;
-   dglGetViewport(&v);
+   GetViewport(&v);
    vp[0] = v.point.x;
    vp[1] = v.point.y;
    vp[2] = v.extent.x;
@@ -1733,7 +1733,7 @@ void DGLDevice::dglGetTransformState(S32* mvDepth,
 }
 
 
-bool DGLDevice::dglCheckState(const S32 mvDepth, const S32 pDepth,
+bool DGLDevice::CheckState(const S32 mvDepth, const S32 pDepth,
                    const S32 t0Depth, const F32* t0Matrix,
                    const S32 t1Depth, const F32* t1Matrix,
                    const S32* vp)
@@ -1770,7 +1770,7 @@ bool DGLDevice::dglCheckState(const S32 mvDepth, const S32 pDepth,
          t1m[i] = 0;
    }
 
-   dglGetViewport(&v);
+   GetViewport(&v);
 
    return ((md == mvDepth) &&
            (pd == pDepth) &&

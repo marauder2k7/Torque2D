@@ -553,9 +553,9 @@ void GuiWindowCtrl::drawWinRect(const RectI &myRect)
    Point2I tr;
    tr.x = myRect.point.x + myRect.extent.x - 1;
    tr.y = myRect.point.y + myRect.extent.y - 1;
-   DGL->dglDrawRectFill(myRect, mProfile->mFillColor);
-   DGL->dglDrawLine(Point2I(bl.x + 1, tr.y), Point2I(bl.x + 1, bl.y), ColorI(255, 255, 255));
-   DGL->dglDrawLine(Point2I(bl.x, tr.y + 1), Point2I(tr.x, tr.y + 1), ColorI(255, 255, 255));
+   DGL->DrawRectFill(myRect, mProfile->mFillColor);
+   DGL->DrawLine(Point2I(bl.x + 1, tr.y), Point2I(bl.x + 1, bl.y), ColorI(255, 255, 255));
+   DGL->DrawLine(Point2I(bl.x, tr.y + 1), Point2I(tr.x, tr.y + 1), ColorI(255, 255, 255));
    //dglDrawRect(myRect, ColorI(0, 0, 0)); // Taken out, this is controled via mProfile->mBorder
 }
 
@@ -580,11 +580,11 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
    winRect.extent.x -= mBitmapBounds[BorderLeft].extent.x + mBitmapBounds[BorderRight].extent.x;
    winRect.extent.y -= mBitmapBounds[topBase + 2].extent.y + mBitmapBounds[BorderBottom].extent.y;
 
-   DGL->dglDrawRectFill(winRect, mProfile->mFillColor);
+   DGL->DrawRectFill(winRect, mProfile->mFillColor);
 
-   DGL->dglClearBitmapModulation();
-   DGL->dglDrawBitmapSR(mTextureHandle, offset, mBitmapBounds[topBase]);
-   DGL->dglDrawBitmapSR(mTextureHandle, Point2I(offset.x + mBounds.extent.x - mBitmapBounds[topBase+1].extent.x, offset.y),
+   DGL->ClearBitmapModulation();
+   DGL->DrawBitmapSR(mTextureHandle, offset, mBitmapBounds[topBase]);
+   DGL->DrawBitmapSR(mTextureHandle, Point2I(offset.x + mBounds.extent.x - mBitmapBounds[topBase+1].extent.x, offset.y),
                    mBitmapBounds[topBase + 1]);
 
    RectI destRect;
@@ -594,7 +594,7 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
    destRect.extent.y = mBitmapBounds[topBase + 2].extent.y;
    RectI stretchRect = mBitmapBounds[topBase + 2];
    stretchRect.inset(1,0);
-   DGL->dglDrawBitmapStretchSR(mTextureHandle, destRect, stretchRect);
+   DGL->DrawBitmapStretchSR(mTextureHandle, destRect, stretchRect);
 
    destRect.point.x = offset.x;
    destRect.point.y = offset.y + mBitmapBounds[topBase].extent.y;
@@ -602,7 +602,7 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
    destRect.extent.y = mBounds.extent.y - mBitmapBounds[topBase].extent.y - mBitmapBounds[BorderBottomLeft].extent.y;
    stretchRect = mBitmapBounds[BorderLeft];
    stretchRect.inset(0,1);
-   DGL->dglDrawBitmapStretchSR(mTextureHandle, destRect, stretchRect);
+   DGL->DrawBitmapStretchSR(mTextureHandle, destRect, stretchRect);
 
    destRect.point.x = offset.x + mBounds.extent.x - mBitmapBounds[BorderRight].extent.x;
    destRect.extent.x = mBitmapBounds[BorderRight].extent.x;
@@ -611,10 +611,10 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
 
    stretchRect = mBitmapBounds[BorderRight];
    stretchRect.inset(0,1);
-   DGL->dglDrawBitmapStretchSR(mTextureHandle, destRect, stretchRect);
+   DGL->DrawBitmapStretchSR(mTextureHandle, destRect, stretchRect);
 
-   DGL->dglDrawBitmapSR(mTextureHandle, offset + Point2I(0, mBounds.extent.y - mBitmapBounds[BorderBottomLeft].extent.y), mBitmapBounds[BorderBottomLeft]);
-   DGL->dglDrawBitmapSR(mTextureHandle, offset + mBounds.extent - mBitmapBounds[BorderBottomRight].extent, mBitmapBounds[BorderBottomRight]);
+   DGL->DrawBitmapSR(mTextureHandle, offset + Point2I(0, mBounds.extent.y - mBitmapBounds[BorderBottomLeft].extent.y), mBitmapBounds[BorderBottomLeft]);
+   DGL->DrawBitmapSR(mTextureHandle, offset + mBounds.extent - mBitmapBounds[BorderBottomRight].extent, mBitmapBounds[BorderBottomRight]);
 
    destRect.point.x = offset.x + mBitmapBounds[BorderBottomLeft].extent.x;
    destRect.extent.x = mBounds.extent.x - mBitmapBounds[BorderBottomLeft].extent.x - mBitmapBounds[BorderBottomRight].extent.x;
@@ -624,13 +624,13 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
    stretchRect = mBitmapBounds[BorderBottom];
    stretchRect.inset(1,0);
 
-   DGL->dglDrawBitmapStretchSR(mTextureHandle, destRect, stretchRect);
+   DGL->DrawBitmapStretchSR(mTextureHandle, destRect, stretchRect);
 
    //draw the title
    // dhc addition: copied/modded from renderJustifiedText, since we enforce a
    // different color usage here. NOTE: it currently CAN overdraw the controls
    // if mis-positioned or 'scrunched' in a small width.
-   DGL->dglSetBitmapModulation(mProfile->mFontColor);
+   DGL->SetBitmapModulation(mProfile->mFontColor);
    S32 textWidth = mProfile->mFont->getStrWidth((const UTF8 *)mText);
    Point2I start(0,0);
    // align the horizontal
@@ -644,7 +644,7 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
    if( textWidth > winRect.extent.x ) start.set( 0, 0 );
    // center the vertical
 //   start.y = ( winRect.extent.y - ( font->getHeight() - 2 ) ) / 2;
-   DGL->dglDrawText(mFont, start + offset + mProfile->mTextOffset, mText);
+   DGL->DrawText(mFont, start + offset + mProfile->mTextOffset, mText);
 
    // deal with rendering the titlebar controls
    AssertFatal(root, "Unable to get the root Canvas.");
@@ -659,8 +659,8 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
       if( mCloseButton.pointInRect( localPoint ) && mPressClose )
          bmp += BmpHilite;
 
-      DGL->dglClearBitmapModulation();
-      DGL->dglDrawBitmapSR(mTextureHandle, offset + mCloseButton.point, mBitmapBounds[bmp]);
+      DGL->ClearBitmapModulation();
+      DGL->DrawBitmapSR(mTextureHandle, offset + mCloseButton.point, mBitmapBounds[bmp]);
    }
 
    //draw the maximize button
@@ -673,8 +673,8 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
       if( mMaximizeButton.pointInRect( localPoint ) && mPressMaximize )
          bmp += BmpHilite;
 
-      DGL->dglClearBitmapModulation();
-      DGL->dglDrawBitmapSR( mTextureHandle, offset + mMaximizeButton.point, mBitmapBounds[bmp] );
+      DGL->ClearBitmapModulation();
+      DGL->DrawBitmapSR( mTextureHandle, offset + mMaximizeButton.point, mBitmapBounds[bmp] );
    }
 
    //draw the minimize button
@@ -687,8 +687,8 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
       if( mMinimizeButton.pointInRect( localPoint ) && mPressMinimize )
          bmp += BmpHilite;
 
-      DGL->dglClearBitmapModulation();
-      DGL->dglDrawBitmapSR( mTextureHandle, offset + mMinimizeButton.point, mBitmapBounds[bmp] );
+      DGL->ClearBitmapModulation();
+      DGL->DrawBitmapSR( mTextureHandle, offset + mMinimizeButton.point, mBitmapBounds[bmp] );
    }
 
    if( !mMinimized )

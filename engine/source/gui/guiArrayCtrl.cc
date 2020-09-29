@@ -141,7 +141,7 @@ void GuiArrayCtrl::onRender(Point2I offset, const RectI &updateRect)
 
    S32 i, j;
    RectI headerClip;
-   RectI clipRect = DGL->dglGetClipRect();
+   RectI clipRect = DGL->GetClipRect();
 
    Point2I parentOffset = parent->localToGlobalCoord(Point2I(0, 0));
 
@@ -178,7 +178,7 @@ void GuiArrayCtrl::onRender(Point2I offset, const RectI &updateRect)
          if (cellClip.intersect(clipRect))
          {
             //set the clip rect
-            DGL->dglSetClipRect(cellClip);
+            DGL->SetClipRect(cellClip);
 
             //render the cell
             onRenderCell(Point2I(cellx, celly), Point2I(i, j),

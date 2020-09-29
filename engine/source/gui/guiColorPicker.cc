@@ -283,7 +283,7 @@ void GuiColorPickerCtrl::renderColorBox(RectI &bounds)
    pickerBounds.extent.y = bounds.extent.y-1;
    
    if (mProfile->mBorderDefault && mProfile->mBorderDefault->mBorder > 0)
-      DGL->dglDrawRect(bounds, mProfile->mBorderDefault->mBorderColor[0]);
+      DGL->DrawRect(bounds, mProfile->mBorderDefault->mBorderColor[0]);
       
    Point2I selectorPos = Point2I(bounds.point.x+mSelectorPos.x+1, bounds.point.y+mSelectorPos.y+1);
 
@@ -292,43 +292,43 @@ void GuiColorPickerCtrl::renderColorBox(RectI &bounds)
    switch (mDisplayMode)
    {
    case pHorizColorRange:
-      DGL->dglDrawBlendRangeBox( pickerBounds, false, 7, mColorRange + 1);
+      DGL->DrawBlendRangeBox( pickerBounds, false, 7, mColorRange + 1);
       drawSelector( pickerBounds, selectorPos, sVertical );
    break;
    case pVertColorRange:
-      DGL->dglDrawBlendRangeBox( pickerBounds, true, 7, mColorRange + 1);
+      DGL->DrawBlendRangeBox( pickerBounds, true, 7, mColorRange + 1);
       drawSelector( pickerBounds, selectorPos, sHorizontal );
    break;
    case pHorizColorBrightnessRange:
       blendRect = pickerBounds;
       blendRect.point.y++;
       blendRect.extent.y -= 2;
-      DGL->dglDrawBlendRangeBox( pickerBounds, false, 9, mColorRange);
+      DGL->DrawBlendRangeBox( pickerBounds, false, 9, mColorRange);
       // This is being drawn slightly offset from the larger rect so as to insure 255 and 0
       // can both be selected for every color.
-      DGL->dglDrawBlendBox( blendRect, colorAlpha, colorAlpha, colorBlack, colorBlack );
+      DGL->DrawBlendBox( blendRect, colorAlpha, colorAlpha, colorBlack, colorBlack );
       blendRect.point.y += blendRect.extent.y - 1;
       blendRect.extent.y = 2;
-      DGL->dglDrawRect( blendRect, colorBlack);
+      DGL->DrawRect( blendRect, colorBlack);
       drawSelector( pickerBounds, selectorPos, sHorizontal );
       drawSelector( pickerBounds, selectorPos, sVertical );
    break;
    case pVertColorBrightnessRange:
-      DGL->dglDrawBlendRangeBox( pickerBounds, true, 9, mColorRange);
-      DGL->dglDrawBlendBox( pickerBounds, colorAlpha, colorBlack, colorBlack, colorAlpha );
+      DGL->DrawBlendRangeBox( pickerBounds, true, 9, mColorRange);
+      DGL->DrawBlendBox( pickerBounds, colorAlpha, colorBlack, colorBlack, colorAlpha );
       drawSelector( pickerBounds, selectorPos, sHorizontal );
       drawSelector( pickerBounds, selectorPos, sVertical );
    break;
    case pHorizAlphaRange:
-      DGL->dglDrawBlendBox( pickerBounds, colorBlack, colorWhite, colorWhite, colorBlack );
+      DGL->DrawBlendBox( pickerBounds, colorBlack, colorWhite, colorWhite, colorBlack );
       drawSelector( pickerBounds, selectorPos, sVertical );
    break;
    case pVertAlphaRange:
-      DGL->dglDrawBlendBox( pickerBounds, colorBlack, colorBlack, colorWhite, colorWhite );
+      DGL->DrawBlendBox( pickerBounds, colorBlack, colorBlack, colorWhite, colorWhite );
       drawSelector( pickerBounds, selectorPos, sHorizontal ); 
    break;
    case pBlendColorRange:
-      DGL->dglDrawBlendBox( pickerBounds, colorWhite, mBaseColor, colorAlpha, colorBlack );
+      DGL->DrawBlendBox( pickerBounds, colorWhite, mBaseColor, colorAlpha, colorBlack );
       drawSelector( pickerBounds, selectorPos, sHorizontal );      
       drawSelector( pickerBounds, selectorPos, sVertical );
    break;
@@ -336,7 +336,7 @@ void GuiColorPickerCtrl::renderColorBox(RectI &bounds)
    break;
    case pPallet:
    default:
-      DGL->dglDrawRectFill( pickerBounds, mBaseColor );
+      DGL->DrawRectFill( pickerBounds, mBaseColor );
    break;
    }
 }
@@ -354,19 +354,19 @@ void GuiColorPickerCtrl::drawSelector(RectI &bounds, Point2I &selectorPos, Selec
             // Now draw the vertical selector
             // Up -> Pos
             if (selectorPos.y != bounds.point.y+1)
-               DGL->dglDrawLine(selectorPos.x, bounds.point.y, selectorPos.x, selectorPos.y-sMax-1, colorWhiteBlend);
+               DGL->DrawLine(selectorPos.x, bounds.point.y, selectorPos.x, selectorPos.y-sMax-1, colorWhiteBlend);
             // Down -> Pos
             if (selectorPos.y != bounds.point.y+bounds.extent.y) 
-               DGL->dglDrawLine(selectorPos.x,	selectorPos.y + sMax, selectorPos.x, bounds.point.y + bounds.extent.y, colorWhiteBlend);
+               DGL->DrawLine(selectorPos.x,	selectorPos.y + sMax, selectorPos.x, bounds.point.y + bounds.extent.y, colorWhiteBlend);
         break;
         case sHorizontal:
             // Now draw the horizontal selector
             // Left -> Pos
             if (selectorPos.x != bounds.point.x) 
-               DGL->dglDrawLine(bounds.point.x, selectorPos.y-1, selectorPos.x-sMax, selectorPos.y-1, colorWhiteBlend);
+               DGL->DrawLine(bounds.point.x, selectorPos.y-1, selectorPos.x-sMax, selectorPos.y-1, colorWhiteBlend);
             // Right -> Pos
             if (selectorPos.x != bounds.point.x) 
-               DGL->dglDrawLine(bounds.point.x+mSelectorPos.x+sMax, selectorPos.y-1, bounds.point.x + bounds.extent.x, selectorPos.y-1, colorWhiteBlend);
+               DGL->DrawLine(bounds.point.x+mSelectorPos.x+sMax, selectorPos.y-1, bounds.point.x + bounds.extent.x, selectorPos.y-1, colorWhiteBlend);
         break;
     }
 }

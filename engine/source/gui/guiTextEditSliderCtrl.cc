@@ -219,10 +219,10 @@ void GuiTextEditSliderCtrl::onRender(Point2I offset, const RectI &updateRect)
    Point2I start(offset.x + mBounds.extent.x - 14, offset.y);
    Point2I midPoint(start.x + 7, start.y + (mBounds.extent.y/2));
 
-   DGL->dglDrawRectFill(Point2I(start.x+1,start.y+1), Point2I(start.x+13,start.y+mBounds.extent.y-1) , mProfile->mFillColor);
+   DGL->DrawRectFill(Point2I(start.x+1,start.y+1), Point2I(start.x+13,start.y+mBounds.extent.y-1) , mProfile->mFillColor);
 
-   DGL->dglDrawLine(start, Point2I(start.x, start.y+mBounds.extent.y),mProfile->mFontColor);
-   DGL->dglDrawLine(Point2I(start.x,midPoint.y),
+   DGL->DrawLine(start, Point2I(start.x, start.y+mBounds.extent.y),mProfile->mFontColor);
+   DGL->DrawLine(Point2I(start.x,midPoint.y),
                Point2I(start.x+14,midPoint.y),
                mProfile->mFontColor);
 

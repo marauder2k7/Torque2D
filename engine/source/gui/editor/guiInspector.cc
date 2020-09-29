@@ -391,27 +391,27 @@ void GuiInspectorField::onRender(Point2I offset, const RectI &updateRect)
       // Calculate Y Offset to center vertically the caption
       U32 captionYOffset = (U32)mFloor( (F32)( captionRect.extent.y - mProfile->mFont->getHeight() ) / 2 );
 
-      RectI clipRect = DGL->dglGetClipRect();
+      RectI clipRect = DGL->GetClipRect();
 
       if( clipRect.intersect( captionRect ) )
       {
          // Backup Bitmap Modulation
          ColorI currColor;
-         DGL->dglGetBitmapModulation( &currColor );
+         DGL->GetBitmapModulation( &currColor );
 
-         DGL->dglSetBitmapModulation( mProfile->mFontColor );
+         DGL->SetBitmapModulation( mProfile->mFontColor );
 
-         DGL->dglSetClipRect( RectI( clipRect.point, Point2I( captionRect.extent.x, clipRect.extent.y ) ));
+         DGL->SetClipRect( RectI( clipRect.point, Point2I( captionRect.extent.x, clipRect.extent.y ) ));
          // Draw Caption ( Vertically Centered )
          U32 textY = captionRect.point.y + captionYOffset;
          U32 textX = captionRect.point.x + captionRect.extent.x - mProfile->mFont->getStrWidth(mCaption) - 6;
          Point2I textPT(textX, textY);
 
-         DGL->dglDrawText( mProfile->mFont, textPT, mCaption, &mProfile->mFontColor );
+         DGL->DrawText( mProfile->mFont, textPT, mCaption, &mProfile->mFontColor );
 
-         DGL->dglSetBitmapModulation( currColor );
+         DGL->SetBitmapModulation( currColor );
 
-         DGL->dglSetClipRect( clipRect );
+         DGL->SetClipRect( clipRect );
       }
    }
 

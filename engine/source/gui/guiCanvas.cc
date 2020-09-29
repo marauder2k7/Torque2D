@@ -1278,7 +1278,7 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
       for(i = begin(); i != end(); i++)
       {
          GuiControl *contentCtrl = static_cast<GuiControl*>(*i);
-         DGL->dglSetClipRect(updateUnion);
+         DGL->SetClipRect(updateUnion);
          glDisable( GL_CULL_FACE );
          contentCtrl->onRender(contentCtrl->getPosition(), updateUnion);
       }
@@ -1316,7 +1316,7 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
       }
       //end tooltip
 
-      DGL->dglSetClipRect(updateUnion);
+      DGL->SetClipRect(updateUnion);
 
       //temp draw the mouse
       if (cursorON && mShowCursor && !mouseCursor && Canvas->getUseNativeCursor())

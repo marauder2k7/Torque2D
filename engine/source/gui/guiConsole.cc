@@ -116,12 +116,12 @@ void GuiConsole::onRenderCell(Point2I offset, Point2I cell, bool selected, bool 
    ConsoleLogEntry &entry = log[cell.y];
    switch (entry.mLevel)
    {
-      case ConsoleLogEntry::Normal:   DGL->dglSetBitmapModulation(mProfile->mFontColor); break;
-      case ConsoleLogEntry::Warning:  DGL->dglSetBitmapModulation(mProfile->mFontColorHL); break;
-      case ConsoleLogEntry::Error:    DGL->dglSetBitmapModulation(mProfile->mFontColorNA); break;
+      case ConsoleLogEntry::Normal:   DGL->SetBitmapModulation(mProfile->mFontColor); break;
+      case ConsoleLogEntry::Warning:  DGL->SetBitmapModulation(mProfile->mFontColorHL); break;
+      case ConsoleLogEntry::Error:    DGL->SetBitmapModulation(mProfile->mFontColorNA); break;
       case ConsoleLogEntry::NUM_CLASS: Con::errorf("Unhandled case in GuiConsole::onRenderCell, NUM_CLASS");
    }
-   DGL->dglDrawText(mFont, Point2I(offset.x + 3, offset.y), entry.mString, mProfile->mFontColors);
+   DGL->DrawText(mFont, Point2I(offset.x + 3, offset.y), entry.mString, mProfile->mFontColors);
    
    Con::unlockLog();
 }

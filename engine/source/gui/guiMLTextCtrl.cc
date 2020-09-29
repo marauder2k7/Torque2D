@@ -224,21 +224,21 @@ void GuiMLTextCtrl::drawAtomText(bool sel, U32 start, U32 end, Atom *atom, Line 
       {
          ColorI shadowColor = atom->style->shadowColor;
          shadowColor.alpha = (U8)(shadowColor.alpha * mAlpha);
-         DGL->dglSetBitmapModulation(shadowColor);
+         DGL->SetBitmapModulation(shadowColor);
 
-         DGL->dglDrawTextN(font, drawPoint + atom->style->shadowOffset, tmp, tmpLen, mAllowColorChars ? mProfile->mFontColors : NULL);
+         DGL->DrawTextN(font, drawPoint + atom->style->shadowOffset, tmp, tmpLen, mAllowColorChars ? mProfile->mFontColors : NULL);
       }
 
       color.alpha = (U8)(color.alpha * mAlpha);
-      DGL->dglSetBitmapModulation(color);
-      DGL->dglDrawTextN(font, drawPoint, tmp, end-start, mAllowColorChars ? mProfile->mFontColors : NULL);
+      DGL->SetBitmapModulation(color);
+      DGL->DrawTextN(font, drawPoint, tmp, end-start, mAllowColorChars ? mProfile->mFontColors : NULL);
 
       //if the atom was "clipped", see if we need to draw a "..." at the end
       if (atom->isClipped)
       {
          Point2I p2 = drawPoint;
          p2.x += font->getStrNWidthPrecise(tmp, tmpLen);
-         DGL->dglDrawTextN(font, p2, "...", 3, mAllowColorChars ? mProfile->mFontColors : NULL);
+         DGL->DrawTextN(font, p2, "...", 3, mAllowColorChars ? mProfile->mFontColors : NULL);
       }
    }
    else
@@ -249,16 +249,16 @@ void GuiMLTextCtrl::drawAtomText(bool sel, U32 start, U32 end, Atom *atom, Line 
       rect.extent.x = font->getStrNWidth(tmp, tmpLen) + 1;
       rect.extent.y = line->height + 1;
       
-      DGL->dglDrawRectFill(rect, mProfile->mFillColorHL);
-      DGL->dglSetBitmapModulation( mProfile->mFontColorHL );  // over-ride atom color:
-      DGL->dglDrawTextN(font, drawPoint, tmp, tmpLen, mAllowColorChars ? mProfile->mFontColors : NULL);
+      DGL->DrawRectFill(rect, mProfile->mFillColorHL);
+      DGL->SetBitmapModulation( mProfile->mFontColorHL );  // over-ride atom color:
+      DGL->DrawTextN(font, drawPoint, tmp, tmpLen, mAllowColorChars ? mProfile->mFontColors : NULL);
 
       //if the atom was "clipped", see if we need to draw a "..." at the end
       if (atom->isClipped)
       {
          Point2I p2 = drawPoint;
          p2.x += font->getStrNWidthPrecise(tmp, end - atom->textStart);
-         DGL->dglDrawTextN(font, p2, "...", 3, mAllowColorChars ? mProfile->mFontColors : NULL);
+         DGL->DrawTextN(font, p2, "...", 3, mAllowColorChars ? mProfile->mFontColors : NULL);
       }
    }
 
@@ -267,7 +267,7 @@ void GuiMLTextCtrl::drawAtomText(bool sel, U32 start, U32 end, Atom *atom, Line 
       drawPoint.y += atom->baseLine + 2;
       Point2I p2 = drawPoint;
       p2.x += font->getStrNWidthPrecise(tmp, end - atom->textStart);
-      DGL->dglDrawLine(drawPoint, p2, color);
+      DGL->DrawLine(drawPoint, p2, color);
    }
 }
 
@@ -282,9 +282,9 @@ void GuiMLTextCtrl::onRender(Point2I offset, const RectI& updateRect)
       screenBounds.point += offset;
       if(!screenBounds.overlaps(updateRect))
          continue;
-      DGL->dglClearBitmapModulation();
-      DGL->dglDrawBitmap(walk->bitmap->bitmapHandle, screenBounds.point);
-      //DGL->dglDrawRectFill(screenBounds, mProfile->mFillColor);
+      DGL->ClearBitmapModulation();
+      DGL->DrawBitmap(walk->bitmap->bitmapHandle, screenBounds.point);
+      //DGL->DrawRectFill(screenBounds, mProfile->mFillColor);
    }
 
    // draw all the text and dividerStyles
@@ -296,7 +296,7 @@ void GuiMLTextCtrl::onRender(Point2I offset, const RectI& updateRect)
          continue;
 
       if(lwalk->divStyle)
-         DGL->dglDrawRectFill(lineRect, mProfile->mFillColorHL);
+         DGL->DrawRectFill(lineRect, mProfile->mFillColorHL);
 
       for(Atom *awalk = lwalk->atomList; awalk; awalk = awalk->next)
       {
@@ -319,7 +319,7 @@ void GuiMLTextCtrl::onRender(Point2I offset, const RectI& updateRect)
          }
       }
    }
-   DGL->dglClearBitmapModulation();
+   DGL->ClearBitmapModulation();
 }
 
 //--------------------------------------------------------------------------

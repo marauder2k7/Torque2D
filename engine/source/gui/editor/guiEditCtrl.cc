@@ -369,9 +369,9 @@ void GuiEditCtrl::drawNut(const Point2I &nut, ColorI &outlineColor, ColorI &nutC
 {
    RectI r(nut.x - NUT_SIZE, nut.y - NUT_SIZE, 2 * NUT_SIZE, 2 * NUT_SIZE);
    r.inset(1, 1);
-   DGL->dglDrawRectFill(r, nutColor);
+   DGL->DrawRectFill(r, nutColor);
    r.inset(-1, -1);
-   DGL->dglDrawRect(r, outlineColor);
+   DGL->DrawRect(r, outlineColor);
 }
 
 static inline bool inNut(const Point2I &pt, S32 x, S32 y)
@@ -423,26 +423,26 @@ void GuiEditCtrl::drawNuts(RectI &box, ColorI &outlineColor, ColorI &nutColor)
    ColorF lightGreenLine(0.0f, 1.0f, 0.0f, 0.3f);
    if(lx > 0 && ty > 0)
    {
-      DGL->dglDrawLine(0, ty, lx, ty, greenLine);
-      DGL->dglDrawLine(lx, 0, lx, ty, greenLine);
+      DGL->DrawLine(0, ty, lx, ty, greenLine);
+      DGL->DrawLine(lx, 0, lx, ty, greenLine);
    }
    if(lx > 0 && by > 0)
-      DGL->dglDrawLine(0, by, lx, by, greenLine);
+      DGL->DrawLine(0, by, lx, by, greenLine);
 
    if(rx > 0 && ty > 0)
-      DGL->dglDrawLine(rx, 0, rx, ty, greenLine);
+      DGL->DrawLine(rx, 0, rx, ty, greenLine);
 
    Point2I extent = localToGlobalCoord(mBounds.extent);
 
    if(lx < extent.x && by < extent.y)
-      DGL->dglDrawLine(lx, by, lx, extent.y, lightGreenLine);
+      DGL->DrawLine(lx, by, lx, extent.y, lightGreenLine);
    if(rx < extent.x && by < extent.y)
    {
-      DGL->dglDrawLine(rx, by, rx, extent.y, lightGreenLine);
-      DGL->dglDrawLine(rx, by, extent.x, by, lightGreenLine);
+      DGL->DrawLine(rx, by, rx, extent.y, lightGreenLine);
+      DGL->DrawLine(rx, by, extent.x, by, lightGreenLine);
    }
    if(rx < extent.x && ty < extent.y)
-      DGL->dglDrawLine(rx, ty, extent.x, ty, lightGreenLine);
+      DGL->DrawLine(rx, ty, extent.x, ty, lightGreenLine);
 
    // adjust nuts, so they dont straddle the controlslx -= NUT_SIZE;
    lx -= NUT_SIZE;
@@ -489,15 +489,15 @@ void GuiEditCtrl::onRender(Point2I offset, const RectI &updateRect)
          RectI box(ctOffset.x, ctOffset.y, cext.x, cext.y);
 
             box.inset(-5, -5);
-         DGL->dglDrawRect(box, ColorI(50, 101, 152,160));
+         DGL->DrawRect(box, ColorI(50, 101, 152,160));
             box.inset(1,1);
-         DGL->dglDrawRect(box, ColorI(50, 101, 152,170));
+         DGL->DrawRect(box, ColorI(50, 101, 152,170));
             box.inset(1,1);
-         DGL->dglDrawRect(box, ColorI(50, 101, 152,180));
+         DGL->DrawRect(box, ColorI(50, 101, 152,180));
             box.inset(1,1);
-         DGL->dglDrawRect(box, ColorI(50, 101, 152,190));
+         DGL->DrawRect(box, ColorI(50, 101, 152,190));
             box.inset(1,1);
-            DGL->dglDrawRect(box, ColorI(50, 101, 152,200));
+            DGL->DrawRect(box, ColorI(50, 101, 152,200));
       }
       Vector<GuiControl *>::iterator i;
       bool multisel = mSelectedControls.size() > 1;
@@ -519,7 +519,7 @@ void GuiEditCtrl::onRender(Point2I offset, const RectI &updateRect)
          RectI b;
          getDragRect(b);
          b.point += offset;
-         DGL->dglDrawRect(b, ColorI(255, 255, 255));
+         DGL->DrawRect(b, ColorI(255, 255, 255));
       }
    }
 
@@ -1435,7 +1435,7 @@ public:
    }
    void onRender(Point2I offset, const RectI &updateRect)
    {
-      DGL->dglDrawRectFill(updateRect, ColorF(1,1,1,1));
+      DGL->DrawRectFill(updateRect, ColorF(1,1,1,1));
       GuiScrollCtrl *ref;
       SimObject *o = Sim::findObject(refCtrl);
 
@@ -1458,7 +1458,7 @@ public:
                   start = 4;
                if(!(pos % 100))
                   start = 1;
-               DGL->dglDrawLine(x, offset.y + start, x, offset.y + 10, ColorF(0,0,0,1));
+               DGL->DrawLine(x, offset.y + start, x, offset.y + 10, ColorF(0,0,0,1));
             }
          }
       }
@@ -1476,7 +1476,7 @@ public:
                   start = 4;
                if(!(pos % 100))
                   start = 1;
-               DGL->dglDrawLine(offset.x + start, y, offset.x + 10, y, ColorF(0,0,0,1));
+               DGL->DrawLine(offset.x + start, y, offset.x + 10, y, ColorF(0,0,0,1));
             }
          }
       }

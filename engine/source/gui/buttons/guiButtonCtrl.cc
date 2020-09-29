@@ -274,7 +274,7 @@ void GuiButtonCtrl::onRender(Point2I offset, const RectI& updateRect)
 	}
 
 	//Render Text
-   DGL->dglSetBitmapModulation(mProfile->getFontColor(currentState));
+   DGL->SetBitmapModulation(mProfile->getFontColor(currentState));
 	RectI fillRect = applyBorders(ctrlRect.point, ctrlRect.extent, currentState, mProfile);
 	RectI contentRect = applyPadding(fillRect.point, fillRect.extent, currentState, mProfile);
 	renderText(contentRect.point, contentRect.extent, mText, mProfile);

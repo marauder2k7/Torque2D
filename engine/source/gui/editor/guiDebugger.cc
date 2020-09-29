@@ -673,21 +673,21 @@ void DbgFileView::onRenderCell(Point2I offset, Point2I cell, bool selected, bool
    //draw the break point marks
    if (mFileView[cell.y].breakOnLine)
    {
-      DGL->dglSetBitmapModulation(mProfile->mFontColorHL);
-      DGL->dglDrawText(mFont, cellOffset, "#");
+      DGL->SetBitmapModulation(mProfile->mFontColorHL);
+      DGL->DrawText(mFont, cellOffset, "#");
    }
    else if (mFileView[cell.y].breakPosition)
    {
-      DGL->dglSetBitmapModulation(mProfile->mFontColor);
-      DGL->dglDrawText(mFont, cellOffset, "-");
+      DGL->SetBitmapModulation(mProfile->mFontColor);
+      DGL->DrawText(mFont, cellOffset, "-");
    }
    cellOffset.x += 8;
 
    //draw in the "current line" indicator
    if (mFileName == mPCFileName && (cell.y + 1 == mPCCurrentLine))
    {
-      DGL->dglSetBitmapModulation(mProfile->mFontColorHL);
-      DGL->dglDrawText(mFont, cellOffset, "=>");
+      DGL->SetBitmapModulation(mProfile->mFontColorHL);
+      DGL->DrawText(mFont, cellOffset, "=>");
    }
 
 	//by this time, the cellOffset has been incremented by 44 - the value of gFileXOffset
@@ -698,7 +698,7 @@ void DbgFileView::onRenderCell(Point2I offset, Point2I cell, bool selected, bool
    {
       if (mBlockStart == -1)
       {
-         DGL->dglDrawRectFill(RectI(cellOffset.x - 2, cellOffset.y - 3,
+         DGL->DrawRectFill(RectI(cellOffset.x - 2, cellOffset.y - 3,
                                  mCellSize.x + 4, mCellSize.y + 6), mProfile->mFillColorHL);
       }
       else if (mBlockStart >= 0 && mBlockEnd > mBlockStart && mBlockEnd <= S32(dStrlen(mFileView[cell.y].text) + 1))
@@ -716,11 +716,11 @@ void DbgFileView::onRenderCell(Point2I offset, Point2I cell, bool selected, bool
          startPos = mFont->getStrWidth((const UTF8 *)tempBuf);
 
          //draw the hilite
-         DGL->dglDrawRectFill(RectI(cellOffset.x + startPos, cellOffset.y - 3, endPos - startPos + 2, mCellSize.y + 6), mProfile->mFillColorHL);
+         DGL->DrawRectFill(RectI(cellOffset.x + startPos, cellOffset.y - 3, endPos - startPos + 2, mCellSize.y + 6), mProfile->mFillColorHL);
       }
    }
 
    //draw the line of text
-   DGL->dglSetBitmapModulation(mFileView[cell.y].breakOnLine ? mProfile->mFontColorHL : mProfile->mFontColor);
-   DGL->dglDrawText(mFont, cellOffset, mFileView[cell.y].text);
+   DGL->SetBitmapModulation(mFileView[cell.y].breakOnLine ? mProfile->mFontColorHL : mProfile->mFontColor);
+   DGL->DrawText(mFont, cellOffset, mFileView[cell.y].text);
 }

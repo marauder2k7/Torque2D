@@ -956,7 +956,7 @@ void GuiMenuBar::onRender(Point2I offset, const RectI &updateRect)
 
    //if opaque, fill the update rect with the fill color
    if (mProfile->mOpaque)
-      DGL->dglDrawRectFill(RectI(offset, mBounds.extent), mProfile->mFillColor);
+      DGL->DrawRectFill(RectI(offset, mBounds.extent), mProfile->mFillColor);
 
    //if there's a border, draw the border
    //if (mProfile->mBorder)
@@ -1004,20 +1004,20 @@ void GuiMenuBar::onRender(Point2I offset, const RectI &updateRect)
          Point2I bitmapstart(start);
          bitmapstart.y = walk->bounds.point.y + ( walk->bounds.extent.y - rect.extent.y ) / 2;
 
-         DGL->dglClearBitmapModulation();
-         DGL->dglDrawBitmapSR(mProfile->mTextureHandle, offset + bitmapstart, rect);
+         DGL->ClearBitmapModulation();
+         DGL->DrawBitmapSR(mProfile->mTextureHandle, offset + bitmapstart, rect);
 
          // Should we also draw the text?
          if(!walk->drawBitmapOnly)
          {
             start.x += mBitmapMargin;
-            DGL->dglSetBitmapModulation( fontColor );
-            DGL->dglDrawText( mProfile->mFont, start + offset, walk->text, mProfile->mFontColors );
+            DGL->SetBitmapModulation( fontColor );
+            DGL->DrawText( mProfile->mFont, start + offset, walk->text, mProfile->mFontColors );
          }
       } else
       {
-         DGL->dglSetBitmapModulation( fontColor );
-         DGL->dglDrawText( mProfile->mFont, start + offset, walk->text, mProfile->mFontColors );
+         DGL->SetBitmapModulation( fontColor );
+         DGL->DrawText( mProfile->mFont, start + offset, walk->text, mProfile->mFontColors );
       }
    }
 
@@ -1122,8 +1122,8 @@ void GuiMenuTextListCtrl::onRenderCell(Point2I offset, Point2I cell, bool select
    else
    {
       S32 yp = offset.y + mCellSize.y / 2;
-      DGL->dglDrawLine(offset.x, yp, offset.x + mCellSize.x, yp, ColorI(128,128,128));
-      DGL->dglDrawLine(offset.x, yp+1, offset.x + mCellSize.x, yp+1, ColorI(255,255,255));
+      DGL->DrawLine(offset.x, yp, offset.x + mCellSize.x, yp, ColorI(128,128,128));
+      DGL->DrawLine(offset.x, yp+1, offset.x + mCellSize.x, yp+1, ColorI(255,255,255));
    }
    // now see if there's a bitmap...
    U8 idx = mList[cell.y].text[0];
@@ -1140,8 +1140,8 @@ void GuiMenuTextListCtrl::onRenderCell(Point2I offset, Point2I cell, bool select
       Point2I off = mMenuBarCtrl->maxBitmapSize - rect.extent;
       off /= 2;
 
-      DGL->dglClearBitmapModulation();
-      DGL->dglDrawBitmapSR(mProfile->mTextureHandle, offset + off, rect);
+      DGL->ClearBitmapModulation();
+      DGL->DrawBitmapSR(mProfile->mTextureHandle, offset + off, rect);
 
    } 
 

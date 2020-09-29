@@ -111,8 +111,8 @@ void GuiCheckBoxCtrl::onRender(Point2I offset, const RectI &updateRect)
 		}
 
 		RectI dest = RectI(offset + mBoxOffset, mBoxExtent);
-      DGL->dglClearBitmapModulation();
-      DGL->dglDrawBitmapStretchSR(mProfile->mTextureHandle, dest, mProfile->mBitmapArrayRects[index-1]);
+      DGL->ClearBitmapModulation();
+      DGL->DrawBitmapStretchSR(mProfile->mTextureHandle, dest, mProfile->mBitmapArrayRects[index-1]);
 	}
 	else
 	{
@@ -133,7 +133,7 @@ void GuiCheckBoxCtrl::onRender(Point2I offset, const RectI &updateRect)
 	}
 
 	//Render Text
-   DGL->dglSetBitmapModulation(mProfile->getFontColor(currentState));
+   DGL->SetBitmapModulation(mProfile->getFontColor(currentState));
 	renderText(textRect.point, textRect.extent, mText, mProfile);
 
 	//Render the childen

@@ -234,7 +234,7 @@ void GuiFormCtrl::onRender(Point2I offset, const RectI &updateRect)
 
    // draw the border of the form if specified
    if (mProfile->mOpaque)
-      DGL->dglDrawRectFill(boundsRect, mProfile->mFillColor);
+      DGL->DrawRectFill(boundsRect, mProfile->mFillColor);
 
    //if (mProfile->mBorder)
       //renderBorder(boundsRect, mProfile);
@@ -242,7 +242,7 @@ void GuiFormCtrl::onRender(Point2I offset, const RectI &updateRect)
    // If we don't have a child (other than the menu), put some text in the child area
    if(size() <= 1)
    {
-      DGL->dglSetBitmapModulation(ColorI(0,0,0));
+      DGL->SetBitmapModulation(ColorI(0,0,0));
       renderText(boundsRect.point, boundsRect.extent, "[none]", mProfile);
    }
 
@@ -251,7 +251,7 @@ void GuiFormCtrl::onRender(Point2I offset, const RectI &updateRect)
    // Draw our little bar, too
    if(mProfile->mBitmapArrayRects.size() >= 5)
    {
-      DGL->dglClearBitmapModulation();
+      DGL->ClearBitmapModulation();
 
       S32 barStart = 0;//(mHasMenu ? mThumbSize.x : 1 + mProfile->mBorderSize) + offset.x + textWidth;
       S32 barTop   = mThumbSize.y/2 + offset.y - mProfile->mBitmapArrayRects[3].extent.y /2;
@@ -259,7 +259,7 @@ void GuiFormCtrl::onRender(Point2I offset, const RectI &updateRect)
       Point2I barOffset(barStart, barTop);
 
       // Draw the start of the bar...
-      DGL->dglDrawBitmapStretchSR(mProfile->mTextureHandle,RectI(barOffset, mProfile->mBitmapArrayRects[2].extent), mProfile->mBitmapArrayRects[2] );
+      DGL->DrawBitmapStretchSR(mProfile->mTextureHandle,RectI(barOffset, mProfile->mBitmapArrayRects[2].extent), mProfile->mBitmapArrayRects[2] );
 
       // Now draw the middle...
       barOffset.x += mProfile->mBitmapArrayRects[2].extent.x;
@@ -272,7 +272,7 @@ void GuiFormCtrl::onRender(Point2I offset, const RectI &updateRect)
          RectI foo = mProfile->mBitmapArrayRects[3];
          foo.inset(1,0);
 
-         DGL->dglDrawBitmapStretchSR(
+         DGL->DrawBitmapStretchSR(
             mProfile->mTextureHandle,
             RectI(barOffset, Point2I(barMiddleSize, mProfile->mBitmapArrayRects[3].extent.y)),
             foo
@@ -282,10 +282,10 @@ void GuiFormCtrl::onRender(Point2I offset, const RectI &updateRect)
       // And the end
       barOffset.x += barMiddleSize;
 
-      DGL->dglDrawBitmapStretchSR( mProfile->mTextureHandle, RectI(barOffset, mProfile->mBitmapArrayRects[4].extent),
+      DGL->DrawBitmapStretchSR( mProfile->mTextureHandle, RectI(barOffset, mProfile->mBitmapArrayRects[4].extent),
          mProfile->mBitmapArrayRects[4]);
 
-      DGL->dglSetBitmapModulation((mMouseOver ? mProfile->mFontColorHL : mProfile->mFontColor));
+      DGL->SetBitmapModulation((mMouseOver ? mProfile->mFontColorHL : mProfile->mFontColor));
       renderText(Point2I(mThumbSize.x, 0) + offset, Point2I(mBounds.extent.x - mThumbSize.x - mProfile->mBitmapArrayRects[4].extent.x, mThumbSize.y), (mUseSmallCaption ? mSmallCaption : mCaption), mProfile);
 
    }
