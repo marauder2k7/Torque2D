@@ -413,7 +413,8 @@ void GuiSceneObjectCtrl::onRender(Point2I offset, const RectI& updateRect)
       dglSetViewport(objRect);
 
       // Set ModelView.
-      glMatrixMode(GL_MODELVIEW);
+      //glMatrixMode(GL_MODELVIEW);
+      dglSetModelViewMatrix();
       glPushMatrix();
       glLoadIdentity();
 
@@ -450,7 +451,8 @@ void GuiSceneObjectCtrl::onRender(Point2I offset, const RectI& updateRect)
       glDisable       ( GL_ALPHA_TEST );
 
       // Restore Matrices.
-      glMatrixMode(GL_MODELVIEW);
+      //glMatrixMode(GL_MODELVIEW);
+      dglSetModelViewMatrix();
       glPopMatrix();
       glMatrixMode(GL_PROJECTION);
       glPopMatrix();

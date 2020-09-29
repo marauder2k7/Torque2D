@@ -23,6 +23,9 @@
 #include "math/mPoint.h"
 #include "graphics/TextureManager.h"
 #include "graphics/dgl.h"
+
+#include "graphics/gl/dglglInit.h"
+
 #include "graphics/gColor.h"
 #include "math/mPoint.h"
 #include "math/mRect.h"
@@ -38,6 +41,7 @@
 
 #include <vector>
 
+DGL * DGL::smDGL = NULL;
 namespace {
 
 ColorI sg_bitmapModulation(255, 255, 255, 255);
@@ -1263,7 +1267,8 @@ void dglSetClipRect(const RectI &clipRect)
 
    glTranslatef(0.0f, (F32)-clipRect.point.y, 0.0f);
 
-   glMatrixMode(GL_MODELVIEW);
+   dglSetModelViewMatrix();
+   //glMatrixMode(GL_MODELVIEW);
    glLoadIdentity();
 
    glViewport(clipRect.point.x, screenHeight - (clipRect.point.y + clipRect.extent.y),
@@ -1582,3 +1587,13 @@ bool dglCheckState(const S32 mvDepth, const S32 pDepth,
 GLfloat gVertexFloats[8];
 GLfloat gTextureVerts[8];
 #endif
+
+DGL::DGL()
+{
+   smDGL = this;
+}
+
+void DGL::init()
+{
+
+}

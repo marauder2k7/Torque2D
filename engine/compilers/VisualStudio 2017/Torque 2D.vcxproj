@@ -54,11 +54,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../Link/VC2012.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     </LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'">../../../</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../Link/VC2012.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'">../../Link/VC2012.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
@@ -389,6 +389,8 @@
     <ClCompile Include="..\..\source\graphics\DynamicTexture.cc" />
     <ClCompile Include="..\..\source\graphics\gBitmap.cc" />
     <ClCompile Include="..\..\source\graphics\gFont.cc" />
+    <ClCompile Include="..\..\source\graphics\gl\dglglInit.cc" />
+    <ClCompile Include="..\..\source\graphics\gl\glEnumTranslate.cc" />
     <ClCompile Include="..\..\source\graphics\gPalette.cc" />
     <ClCompile Include="..\..\source\graphics\PNGImage.cpp" />
     <ClCompile Include="..\..\source\graphics\splineUtil.cc" />
@@ -907,6 +909,7 @@
     <ClInclude Include="..\..\source\game\gameInterface.h" />
     <ClInclude Include="..\..\source\game\gameInterface_ScriptBinding.h" />
     <ClInclude Include="..\..\source\game\version_ScriptBinding.h" />
+    <ClInclude Include="..\..\source\graphics\dglEnums.h" />
     <ClInclude Include="..\..\source\graphics\gColor.h" />
     <ClInclude Include="..\..\source\graphics\gColor_ScriptBinding.h" />
     <ClInclude Include="..\..\source\graphics\dgl.h" />
@@ -916,6 +919,8 @@
     <ClInclude Include="..\..\source\graphics\gBitmap.h" />
     <ClInclude Include="..\..\source\graphics\gFont.h" />
     <ClInclude Include="..\..\source\graphics\gFont_ScriptBinding.h" />
+    <ClInclude Include="..\..\source\graphics\gl\dglglInit.h" />
+    <ClInclude Include="..\..\source\graphics\gl\glEnumTranslate.h" />
     <ClInclude Include="..\..\source\graphics\gPalette.h" />
     <ClInclude Include="..\..\source\graphics\PNGImage.h" />
     <ClInclude Include="..\..\source\graphics\PNGImage_ScriptBinding.h" />

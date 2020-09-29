@@ -33,6 +33,16 @@ void dglLoadMatrix(const MatrixF *m)
    const_cast<MatrixF*>(m)->transpose();
 }
 
+void dglSetModelViewMatrix()
+{
+   glMatrixMode(GL_MODELVIEW);
+}
+
+void dglSetProjMatrix()
+{
+   glMatrixMode(GL_PROJECTION);
+}
+
 void dglMultMatrix(const MatrixF *m)
 {
    //F32 mat[16];

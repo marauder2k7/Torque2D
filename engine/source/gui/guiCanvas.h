@@ -171,6 +171,7 @@ public:
    GuiCanvas();
    virtual ~GuiCanvas();
 
+   virtual bool onAdd();
     static void             initPersistFields();
 
 

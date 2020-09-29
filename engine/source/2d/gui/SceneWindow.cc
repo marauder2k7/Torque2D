@@ -1668,7 +1668,8 @@ void SceneWindow::onRender( Point2I offset, const RectI& updateRect )
     glOrtho( sceneMin.x, sceneMax.x, sceneMin.y, sceneMax.y, 0.0f, MAX_LAYERS_SUPPORTED );
 
     // Set ModelView.
-    glMatrixMode(GL_MODELVIEW);
+    //glMatrixMode(GL_MODELVIEW);
+    dglSetModelViewMatrix();
     glPushMatrix();
     glLoadIdentity();
 
@@ -1710,11 +1711,13 @@ void SceneWindow::onRender( Point2I offset, const RectI& updateRect )
     pScene->sceneRender( &sceneRenderState );
 
     // Restore Matrices.
-    glMatrixMode(GL_MODELVIEW);
+    //glMatrixMode(GL_MODELVIEW);
+    dglSetModelViewMatrix();
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
-    glMatrixMode(GL_MODELVIEW);
+    //glMatrixMode(GL_MODELVIEW);
+    dglSetModelViewMatrix();
 
     // Render the metrics.
     renderMetricsOverlay( offset, updateRect );

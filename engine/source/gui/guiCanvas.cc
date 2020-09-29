@@ -109,6 +109,15 @@ GuiCanvas::~GuiCanvas()
 
 //-----------------------------------------------------------------------------
 
+bool GuiCanvas::onAdd()
+{
+   DGL *newDGL = new DGL;
+   //DGL *newDGL = eDGL;
+   newDGL->init();
+   bool parentRet = Parent::onAdd();
+   return parentRet;
+}
+
 void GuiCanvas::initPersistFields()
 {
     // Call Parent.

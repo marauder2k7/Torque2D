@@ -128,7 +128,8 @@ void ShapeVector::sceneRender( const SceneRenderState* pSceneRenderState, const 
     glDisable       ( GL_TEXTURE_2D );
 
     // Save Model-view.
-    glMatrixMode(GL_MODELVIEW);
+    //glMatrixMode(GL_MODELVIEW);
+    dglSetModelViewMatrix();
     glPushMatrix();
 
     // Fetch Position/Rotation.

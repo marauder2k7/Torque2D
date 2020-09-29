@@ -202,6 +202,9 @@
     <Filter Include="Box2D\Particle">
       <UniqueIdentifier>{b2903a96-6c49-4961-82a8-f1832989d4a4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="graphics\gl">
+      <UniqueIdentifier>{d020a318-8a02-4a83-bb65-a68146805317}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\audio\audio.cc">
@@ -1473,6 +1476,12 @@
     </ClCompile>
     <ClCompile Include="..\..\source\console\arrayObject.cpp">
       <Filter>console</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\graphics\gl\glEnumTranslate.cc">
+      <Filter>graphics\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\graphics\gl\dglglInit.cc">
+      <Filter>graphics\gl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -3303,6 +3312,15 @@
     </ClInclude>
     <ClInclude Include="..\..\source\console\arrayObject_ScriptBinding.h">
       <Filter>console</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\graphics\gl\glEnumTranslate.h">
+      <Filter>graphics\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\graphics\dglEnums.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\graphics\gl\dglglInit.h">
+      <Filter>graphics\gl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
