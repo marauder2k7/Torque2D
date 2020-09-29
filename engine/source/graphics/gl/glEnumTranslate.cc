@@ -20,7 +20,6 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "platform/platform.h"
 #include "graphics/gl/glEnumTranslate.h"
 #include "graphics/gl/dglglInit.h"
 

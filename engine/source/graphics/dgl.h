@@ -61,9 +61,9 @@ class Point3F;
 /// @see dglDrawBitmapStretch
 /// @see dglDrawBitmapSR
 /// @see dglDrawBitmapStretchSR
-#define eDGL DGL::get()
+#define DGL DGLDevice::get()
 
- class DGL
+ class DGLDevice
  {
  private:
     friend class TextureObject;
@@ -77,13 +77,13 @@ class Point3F;
     friend class Point3F;
 
  public:
-    DGL();
+    DGLDevice();
     virtual void init();
 
-    static DGL *get() { return smDGL; }
+    static DGLDevice *get() { return smDGL; }
 
  private:
-    static DGL * smDGL;
+    static DGLDevice * smDGL;
 
  };
 

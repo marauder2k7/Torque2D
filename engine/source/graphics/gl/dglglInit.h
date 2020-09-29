@@ -25,7 +25,7 @@
 #include "graphics/dgl.h"
 #include "platform/platform.h"
 
-class DGLGL : public DGL
+class DGLGL : public DGLDevice
 {
 
 public:

@@ -41,7 +41,7 @@
 
 #include <vector>
 
-DGL * DGL::smDGL = NULL;
+
 namespace {
 
 ColorI sg_bitmapModulation(255, 255, 255, 255);
@@ -1588,12 +1588,14 @@ GLfloat gVertexFloats[8];
 GLfloat gTextureVerts[8];
 #endif
 
-DGL::DGL()
+DGLDevice * DGLDevice::smDGL = NULL;
+
+DGLDevice::DGLDevice()
 {
    smDGL = this;
 }
 
-void DGL::init()
+void DGLDevice::init()
 {
 
 }

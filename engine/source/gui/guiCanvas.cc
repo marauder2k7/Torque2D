@@ -111,7 +111,7 @@ GuiCanvas::~GuiCanvas()
 
 bool GuiCanvas::onAdd()
 {
-   DGL *newDGL = new DGL;
+   DGLDevice *newDGL = new DGLDevice;
    //DGL *newDGL = eDGL;
    newDGL->init();
    bool parentRet = Parent::onAdd();

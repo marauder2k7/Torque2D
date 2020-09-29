@@ -23,6 +23,7 @@
 #ifndef _GLENUMTRANSLATE_H_
 #define _GLENUMTRANSLATE_H_
 
+#include "graphics/dgl.h"
 #include "graphics/dglEnums.h"
 
 namespace DGLGLEnumTranslate
