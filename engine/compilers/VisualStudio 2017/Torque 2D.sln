@@ -1,12 +1,14 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2013 for Windows Desktop
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.572
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Torque2D", "Torque 2D.vcxproj", "{1564A07D-230E-4C90-AEE6-52AC9A58D6C9}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD} = {3A214E06-B95E-4D61-A291-1F8DF2EC10FD}
 		{15CBFEFF-7965-41F5-B4E2-21E8795C9159} = {15CBFEFF-7965-41F5-B4E2-21E8795C9159}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glad", "glad.vcxproj", "{D4937E8B-7186-4730-97B8-8543BB6734D3}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ljpeg", "ljpeg.vcxproj", "{0B07BA94-AA53-4FD4-ADB4-79EC2DA53B36}"
 EndProject
@@ -91,8 +93,23 @@ Global
 		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Shipping|Win32.Build.0 = Release|Win32
 		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Shipping|x64.ActiveCfg = Release|x64
 		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Shipping|x64.Build.0 = Release|x64
+		{D4937E8B-7186-4730-97B8-8543BB6734D3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D4937E8B-7186-4730-97B8-8543BB6734D3}.Debug|Win32.Build.0 = Debug|Win32
+		{D4937E8B-7186-4730-97B8-8543BB6734D3}.Debug|x64.ActiveCfg = Debug|x64
+		{D4937E8B-7186-4730-97B8-8543BB6734D3}.Debug|x64.Build.0 = Debug|x64
+		{D4937E8B-7186-4730-97B8-8543BB6734D3}.Release|Win32.ActiveCfg = Release|Win32
+		{D4937E8B-7186-4730-97B8-8543BB6734D3}.Release|Win32.Build.0 = Release|Win32
+		{D4937E8B-7186-4730-97B8-8543BB6734D3}.Release|x64.ActiveCfg = Release|x64
+		{D4937E8B-7186-4730-97B8-8543BB6734D3}.Release|x64.Build.0 = Release|x64
+		{D4937E8B-7186-4730-97B8-8543BB6734D3}.Shipping|Win32.ActiveCfg = Release|Win32
+		{D4937E8B-7186-4730-97B8-8543BB6734D3}.Shipping|Win32.Build.0 = Release|Win32
+		{D4937E8B-7186-4730-97B8-8543BB6734D3}.Shipping|x64.ActiveCfg = Release|x64
+		{D4937E8B-7186-4730-97B8-8543BB6734D3}.Shipping|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DA6DE35E-CB28-454F-B507-BF62562190BE}
 	EndGlobalSection
 EndGlobal

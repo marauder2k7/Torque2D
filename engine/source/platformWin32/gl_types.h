@@ -153,13 +153,12 @@
 #define GL_ARB_imaging   1
 
 
-/*
- * Datatypes
- */
+ /*
+  * Datatypes
+  */
 typedef unsigned int	GLenum;
 typedef unsigned char	GLboolean;
 typedef unsigned int	GLbitfield;
-typedef unsigned int GLuint; /* update ogl imp capabilities*/
 typedef void		GLvoid;
 typedef signed char	GLbyte;		/* 1-byte signed */
 typedef short		GLshort;	/* 2-byte signed */
@@ -1052,5 +1051,6 @@ typedef double		GLclampd;	/* double precision float in [0,1] */
 #define GL_TEXTURE_WRAP_R			0x8072
 #define GL_MAX_3D_TEXTURE_SIZE			0x8073
 #define GL_TEXTURE_BINDING_3D			0x806A
+
 
 #endif
