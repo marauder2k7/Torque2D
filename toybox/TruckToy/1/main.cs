@@ -97,7 +97,7 @@ function TruckToy::reset( %this )
 
     // Floor.
     %this.createFloor();
-	%controls = enumerateConsoleClassesByCategory("Gui");
+	%controls = enumerateConsoleClasses("GuiControl");
 	echo(%controls);
      
     // Wrecked cars at start.

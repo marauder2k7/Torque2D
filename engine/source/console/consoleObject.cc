@@ -612,30 +612,22 @@ static const char* returnClassList(Vector< AbstractClassRep* >& classes, U32 buf
    return ret;
 }
 
-/*ConsoleFunctionWithDocs(enumerateConsoleClasses, ConsoleString, 2, 2, (name))
+ConsoleFunctionWithDocs(getCategoryOfClass, ConsoleString, 2, 2, (name))
 {
    AbstractClassRep *base = NULL;
    const char* className = argv[1];
-   if (className && *className)
-   {
-      base = AbstractClassRep::findClassRep(className);
-      if (!base)
-         return "";
-   }
 
-   Vector<AbstractClassRep*> classes;
-   U32 bufSize = 0;
-   for (AbstractClassRep *rep = AbstractClassRep::getClassList(); rep; rep = rep->getNextClass())
+   AbstractClassRep* rep = AbstractClassRep::findClassRep(className);
+   if (rep)
    {
-      if (!base || rep->isClass(base))
-      {
-         classes.push_back(rep);
-         bufSize += dStrlen(rep->getClassName()) + 1;
-      }
+      return rep->getCategory();
    }
-
-   return returnClassList(classes, bufSize);
-}*/
+   else
+   {
+      Con::errorf("class has no category");
+      return "";
+   }
+}
 
 ConsoleFunctionWithDocs(enumerateConsoleClassesByCategory, ConsoleString, 2, 2, (name))
 {
