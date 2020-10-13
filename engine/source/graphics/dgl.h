@@ -60,10 +60,10 @@ class Point3F;*/
 //-------------------------------------- Bitmap Drawing
 //
 /// Enumerations used for telling the bitmap drawing how/if to flip a bitmap
-/// @see dglDrawBitmap
-/// @see dglDrawBitmapStretch
-/// @see dglDrawBitmapSR
-/// @see dglDrawBitmapStretchSR
+/// @see DrawBitmap
+/// @see DrawBitmapStretch
+/// @see DrawBitmapSR
+/// @see DrawBitmapStretchSR
 #define DGL DGLDevice::get()
 
  class DGLDevice

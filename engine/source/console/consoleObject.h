@@ -199,6 +199,7 @@ public:
 
 protected:
     const char *       mClassName;
+    const char *       mCategory;
     AbstractClassRep * nextClass;
     AbstractClassRep * parentClass;
     Namespace *        mNamespace;
@@ -248,6 +249,7 @@ public:
 
     static void registerClassRep(AbstractClassRep*);
     static AbstractClassRep* findClassRep(const char* in_pClassName);
+    static AbstractClassRep* findClassCategory(const char* in_pClassCat);
     static void initialize(); // Called from Con::init once on startup
     static void destroyFieldValidators(AbstractClassRep::FieldList &mFieldList);
 
@@ -267,6 +269,7 @@ public:
     S32                          getClassId  (U32 netClassGroup)   const;
     static U32                   getClassCRC (U32 netClassGroup);
     const char*                  getClassName() const;
+    const char*                  getCategory() const;
     static AbstractClassRep*     getClassList();
     Namespace*                   getNameSpace();
     AbstractClassRep*            getNextClass();
@@ -343,6 +346,11 @@ inline const char* AbstractClassRep::getClassName() const
     return mClassName;
 }
 
+inline const char* AbstractClassRep::getCategory() const
+{
+   return mCategory;
+}
+
 //-----------------------------------------------------------------------------
 
 inline Namespace *AbstractClassRep::getNameSpace()
@@ -360,7 +368,7 @@ public:
     {
         // name is a static compiler string so no need to worry about copying or deleting
         mClassName = name;
-
+        mCategory = T::__category();
         // Clean up mClassId
         for(U32 i = 0; i < NetClassGroupsCount; i++)
             mClassId[i] = -1;
@@ -735,6 +743,10 @@ public:
     /// @note This name can be used to instantiate another instance using create()
     const char *getClassName() const;
 
+    const char *getCategory() const;
+
+    static const char* __category() { return ""; }
+
     /// @}
 };
 
@@ -758,6 +770,13 @@ inline const char * ConsoleObject::getClassName() const
     AssertFatal(getClassRep() != NULL,
         "Cannot get tag from non-declared dynamic class");
     return getClassRep()->getClassName();
+}
+
+inline const char * ConsoleObject::getCategory() const
+{
+   AssertFatal(getClassRep() != NULL,
+      "Cannot get tag from category");
+   return getClassRep()->getCategory();
 }
 
 //-----------------------------------------------------------------------------
@@ -833,6 +852,9 @@ inline bool& ConsoleObject::getDynamicGroupExpand()
 }
 
 //-----------------------------------------------------------------------------
+#define DECLARE_CATEGORY( string )              \
+   static const char* __category() { return string; }
+
 
 #define DECLARE_CONOBJECT(className)                                                                                \
     static ConcreteClassRep<className> dynClassRep;                                                                 \

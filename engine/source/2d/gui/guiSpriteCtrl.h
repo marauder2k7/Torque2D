@@ -63,6 +63,7 @@ public:
     inline StringTableEntry getAnimation( void ) const { return mAnimationAssetId; }
 
     // Declare type.
+    DECLARE_CATEGORY("Gui Images");
     DECLARE_CONOBJECT(GuiSpriteCtrl);
 
 protected:

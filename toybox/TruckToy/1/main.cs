@@ -97,6 +97,8 @@ function TruckToy::reset( %this )
 
     // Floor.
     %this.createFloor();
+	%controls = enumerateConsoleClassesByCategory("Gui");
+	echo(%controls);
      
     // Wrecked cars at start.
     %this.createWreckedCar( 1, -90, TruckToy.FloorLevel + 0.75, 0, true );

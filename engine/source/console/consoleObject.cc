@@ -107,6 +107,18 @@ AbstractClassRep* AbstractClassRep::findClassRep(const char* in_pClassName)
    return NULL;
 }
 
+AbstractClassRep* AbstractClassRep::findClassCategory(const char* in_pClassCat)
+{
+   AssertFatal(initialized,
+      "AbstractClassRep::findClassRep() - Tried to find an AbstractClassRep before AbstractClassRep::initialize().");
+
+   for (AbstractClassRep *walk = classLinkList; walk; walk = walk->nextClass)
+      if (dStricmp(walk->getCategory(), in_pClassCat) == 0)
+         return walk;
+
+   return NULL;
+}
+
 //--------------------------------------
 void AbstractClassRep::registerClassRep(AbstractClassRep* in_pRep)
 {
@@ -580,4 +592,85 @@ ConsoleObject::~ConsoleObject()
 AbstractClassRep* ConsoleObject::getClassRep() const
 {
    return NULL;
+}
+
+static const char* returnClassList(Vector< AbstractClassRep* >& classes, U32 bufSize)
+{
+   if (!classes.size())
+      return "";
+
+   dQsort(classes.address(), classes.size(), sizeof(AbstractClassRep*), ACRCompare);
+
+   char* ret = Con::getReturnBuffer(bufSize);
+   dStrncpy(ret, classes[0]->getClassName(), bufSize);
+   for (U32 i = 1; i < classes.size(); i++)
+   {
+      dStrncat(ret, "\t", bufSize);
+      dStrncat(ret, classes[i]->getClassName(), bufSize);
+   }
+
+   return ret;
+}
+
+/*ConsoleFunctionWithDocs(enumerateConsoleClasses, ConsoleString, 2, 2, (name))
+{
+   AbstractClassRep *base = NULL;
+   const char* className = argv[1];
+   if (className && *className)
+   {
+      base = AbstractClassRep::findClassRep(className);
+      if (!base)
+         return "";
+   }
+
+   Vector<AbstractClassRep*> classes;
+   U32 bufSize = 0;
+   for (AbstractClassRep *rep = AbstractClassRep::getClassList(); rep; rep = rep->getNextClass())
+   {
+      if (!base || rep->isClass(base))
+      {
+         classes.push_back(rep);
+         bufSize += dStrlen(rep->getClassName()) + 1;
+      }
+   }
+
+   return returnClassList(classes, bufSize);
+}*/
+
+ConsoleFunctionWithDocs(enumerateConsoleClassesByCategory, ConsoleString, 2, 2, (name))
+{
+   AbstractClassRep *base = NULL;
+   if (argc > 1)
+   {
+      base = AbstractClassRep::findClassCategory(argv[1]);
+      if (!base)
+         return "";
+   }
+
+   Vector<AbstractClassRep*> classes;
+   U32 bufSize = 0;
+   for (AbstractClassRep *rep = AbstractClassRep::getClassList(); rep; rep = rep->getNextClass())
+   {
+      if (!base || rep->isClass(base))
+      {
+         classes.push_back(rep);
+         bufSize += dStrlen(rep->getClassName()) + 1;
+      }
+   }
+
+   if (!classes.size())
+      return "";
+
+   dQsort(classes.address(), classes.size(), sizeof(AbstractClassRep*), ACRCompare);
+
+   char* ret = Con::getReturnBuffer(bufSize);
+   dStrcpy(ret, classes[0]->getClassName());
+   for (U32 i = 0; i < (U32)classes.size(); i++)
+   {
+      dStrcat(ret, "\t");
+      dStrcat(ret, classes[i]->getClassName());
+   }
+
+   return ret;
+
 }

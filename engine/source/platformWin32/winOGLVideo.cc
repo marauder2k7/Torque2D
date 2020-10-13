@@ -32,6 +32,9 @@
 #include "io/fileStream.h"
 #include "winOGLVideo_ScriptBinding.h"
 
+#include <glad/glad.h>
+#include <glad/glad_wgl.h>
+
 //------------------------------------------------------------------------------
 OpenGLDevice::OpenGLDevice()
 {
@@ -514,7 +517,8 @@ bool OpenGLDevice::setScreenMode( U32 width, U32 height, U32 bpp, bool fullScree
             AssertFatal( false, "OpenGLDevice::setScreenMode\ndwglMakeCurrent failed to make the rendering context current!" );
             return false;
       }
-
+      
+      gladLoadGL();
       // Just for kicks.  Seems a relatively central place to put this...
       glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -563,7 +567,7 @@ bool OpenGLDevice::setScreenMode( U32 width, U32 height, U32 bpp, bool fullScree
 
     //Luma:	Clear window at first, as it is showing previous gl color buffer stuff.
     glClearColor(0.0f,0.0f,0.0f,0.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if ( repaint )
       Con::evaluate( "resetCanvas();" );
