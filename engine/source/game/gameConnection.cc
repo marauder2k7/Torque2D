@@ -345,7 +345,11 @@ void GameConnection::writePacket(BitStream *bstream, PacketNotify *note)
    bstream->clearCompressionPoint();
    stringBuf[0] = 0;
    bstream->setStringBuffer(stringBuf);
-                                                   
+
+   GamePacketNotify *gnote = (GamePacketNotify *) note;
+   
+   U32 startPos = bstream->getCurPos();
+
    Parent::writePacket(bstream, note);
    bstream->clearCompressionPoint();
    bstream->setStringBuffer(NULL);
