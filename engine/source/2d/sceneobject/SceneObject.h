@@ -83,15 +83,98 @@ public:
    virtual ~SceneObjectDatablock();
 
    static void initPersistFields();
+   void onStaticModified(const char* slotName);
+
    virtual bool onAdd();
    virtual void onRemove();
-
    virtual void packData(BitStream* stream);
    virtual void unpackData(BitStream* stream);
 
    void addSceneObjectReference(SceneObject* object);
    void removeSceneObjectReference(SceneObject* object);
 
+   /// Lifetime.
+   F32                     mLifetime;
+   bool                    mLifetimeActive;
+
+   /// Scene layers.
+   U32                     mSceneLayer;
+
+   /// Scene groups.
+   U32                     mSceneGroup;
+
+   /// Area.
+   Vector2                 mSize;
+   bool                    mAutoSizing;
+   b2AABB                  mPreTickAABB;
+   b2AABB                  mCurrentAABB;
+   Vector2                 mLocalSizeOOBB[4];
+   Vector2                 mRenderOOBB[4];
+   S32                     mWorldProxyId;
+
+   /// Growing
+   bool					      mGrowActive;
+   Vector2					   mTargetSize;
+   Vector2					   mDeltaSize;
+
+   /// Position / Angle.
+   Vector2                 mPreTickPosition;
+   F32                     mPreTickAngle;
+   Vector2                 mRenderPosition;
+   F32                     mRenderAngle;
+   bool                    mSpatialDirty;
+   Vector2                 mLastCheckedPosition;
+   Vector2                 mTargetPosition;
+   bool                    mTargetPositionActive;
+   F32                     mDistanceToTarget;
+   F32                     mTargetPositionMargin;
+   bool                    mTargetPositionFound;
+   bool                    mSnapToTargetPosition;
+   bool                    mStopAtTargetPosition;
+
+   /// Body.
+   b2Body*                 mpBody;
+   b2BodyDef               mBodyDefinition;
+   U32                     mWorldQueryKey;
+
+   /// Collision control.
+   U32                     mCollisionLayerMask;
+   U32                     mCollisionGroupMask;
+   bool                    mCollisionSuppress;
+   bool                    mCollisionOneWay;
+   b2FixtureDef            mDefaultFixture;
+   bool                    mGatherContacts;
+   Scene::typeContactVector* mpCurrentContacts;
+
+
+   /// Render visibility.
+   bool                    mVisible;
+
+   /// Render blending.
+   bool                    mBlendMode;
+   S32                     mSrcBlendFactor;
+   S32                     mDstBlendFactor;
+   ColorF                  mBlendColor;
+   F32                     mAlphaTest;
+
+   /// Fading
+   bool					   mFadeActive;
+   ColorF					mTargetColor;
+   F32						mDeltaRed;
+   F32						mDeltaGreen;
+   F32						mDeltaBlue;
+   F32						mDeltaAlpha;
+
+   /// Render sorting.
+   Vector2                 mSortPoint;
+
+   /// Input events.
+   bool                    mUseInputEvents;
+
+   /// Script callbacks.
+   bool                    mCollisionCallback;
+   bool                    mSleepingCallback;
+   bool                    mLastAwakeState;
 
 
 public:
@@ -323,6 +406,8 @@ public:
     virtual void            onDestroyNotify( SceneObject* pSceneObject );
     static void             initPersistFields();
 
+    void setConfigDatablock(const char * datablockName);
+    SceneObjectDatablock *getConfigDatablock() { return mConfigDataBlock; };
     /// Integration.
     virtual void            preIntegrate( const F32 totalTime, const F32 elapsedTime, DebugStats* pDebugStats );
     virtual void            integrateObject( const F32 totalTime, const F32 elapsedTime, DebugStats* pDebugStats );

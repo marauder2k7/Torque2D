@@ -20,7 +20,7 @@ protected:
 public:
 
    BaseDatablock();
-   virtual ~BaseDatablock();
+   virtual ~BaseDatablock() {};
    virtual bool onAdd();
    virtual void onRemove();
 
@@ -29,7 +29,7 @@ public:
    void setIsValid(bool status) { mValid = status; };
 
    // Retrieve Datablock Set.
-   static SimSet* get2DDatablockSet();
+   static SimSet* getDatablock2DSet();
 
    void setDefaultConfigDatablock(const char* config);
    StringTableEntry getDefaultConfigDatablock();
@@ -40,5 +40,16 @@ public:
    DECLARE_CONOBJECT(BaseDatablock);
 
 };
+DECLARE_CONSOLETYPE(BaseDatablock)
+
+template<class T> bool CheckDatablock(T* pDatablock)
+{
+   return (pDatablock != NULL && pDatablock->getIsVald() );
+}
+
+template<class T> bool CheckDatablock(T pDatablock)
+{
+   return (pDatablock != NULL && pDatablock->getIsValid() );
+}
 
 #endif // !_BASEDATABLOCK_H_

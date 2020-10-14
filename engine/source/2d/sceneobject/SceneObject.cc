@@ -74,7 +74,7 @@
 // SceneObjectDatablock
 //-----------------------------------------------------------------------------
 IMPLEMENT_CO_DATABLOCK_V1(SceneObjectDatablock);
-IMPLEMENT_CONOBJECT(SceneObject);
+//IMPLEMENT_CONOBJECT(SceneObject);
 
 SceneObjectDatablock* SceneObject::mDefaultConfig = NULL;
 ConsoleFunction(setDefaultSceneObjectDatablock, void, 2, 2, "")
@@ -84,7 +84,235 @@ ConsoleFunction(setDefaultSceneObjectDatablock, void, 2, 2, "")
       SceneObject::setDefaultConfig(db);
 }
 
+SceneObjectDatablock::SceneObjectDatablock()
+{
+   /// Lifetime.
+   mLifetime = 0.0f;
+   mLifetimeActive = false;
 
+   /// Layers.
+   mSceneLayer = 0;
+
+   /// Scene groups.
+   mSceneGroup = 0;
+
+   /// Area.
+   mWorldProxyId = -1;
+
+   /// Growing.
+   mGrowActive = false;
+
+   /// Position / Angle.
+   mSize = Vector2::getOne();
+   mPreTickPosition = Vector2(0.0f, 0.0f);
+   mPreTickAngle = 0.0f;
+   mRenderPosition = Vector2(0.0f, 0.0f);
+   mRenderAngle = 0.0f;
+   mSpatialDirty = true;
+   mTargetPosition = Vector2(0.0f, 0.0f);
+   mLastCheckedPosition = Vector2(0.0f, 0.0f);
+   mTargetPositionActive = false;
+   mDistanceToTarget = 0.0f;
+   mTargetPositionMargin = 0.1f;
+   mTargetPositionFound = false;
+   mSnapToTargetPosition = true;
+   mStopAtTargetPosition = true;
+
+   /// Body.
+   mpBody = NULL;
+   mWorldQueryKey = 0;
+
+   /// Collision control.
+   mCollisionLayerMask = MASK_ALL;
+   mCollisionGroupMask = MASK_ALL;
+   mCollisionSuppress = false;
+   mCollisionOneWay = false;
+   mGatherContacts = false;
+   mpCurrentContacts = NULL;
+
+   /// Render visibility.                                        
+   mVisible = true;
+
+   /// Render blending.
+   mBlendMode = true;
+   mSrcBlendFactor = GL_SRC_ALPHA;
+   mDstBlendFactor = GL_ONE_MINUS_SRC_ALPHA;
+   mBlendColor = ColorF(1.0f, 1.0f, 1.0f, 1.0f);
+   mAlphaTest = -1.0f;
+
+   /// Fading.
+   mFadeActive = false;
+   mTargetColor = ColorF(1.0f, 1.0f, 1.0f, 1.0f);
+   mDeltaRed = 1.0f;
+   mDeltaGreen = 1.0f;
+   mDeltaBlue = 1.0f;
+   mDeltaAlpha = 1.0f;
+
+   /// Render sorting.
+   mSortPoint = Vector2(0.0f, 0.0f);
+
+   /// Input events.
+   mUseInputEvents = false;
+
+   /// Script callbacks.
+   mCollisionCallback = false;
+   mSleepingCallback = false;
+
+      /// Initialize the body definition.
+      /// Important: If these defaults are changed then modify the associated "write" field protected methods to ensure
+      /// that the associated field is persisted if not the default.
+      ///mBodyDefinition.userData = static_cast<PhysicsProxy*>(this);
+      mBodyDefinition.position.Set(0.0f, 0.0f);
+      mBodyDefinition.angle = 0.0f;
+      mBodyDefinition.linearVelocity.Set(0.0f, 0.0f);
+      mBodyDefinition.angularVelocity = 0.0f;
+      mBodyDefinition.linearDamping = 0.0f;
+      mBodyDefinition.angularDamping = 0.0f;
+      mBodyDefinition.allowSleep = true;
+      mBodyDefinition.awake = true;
+      mBodyDefinition.fixedRotation = false;
+      mBodyDefinition.bullet = false;
+      mBodyDefinition.type = b2_dynamicBody;
+      mBodyDefinition.active = true;
+      mBodyDefinition.gravityScale = 1.0f;
+
+      // Initialize the default fixture definition.
+      // Important: If these defaults are changed then modify the associated "write" field protected methods to ensure
+      // that the associated field is persisted if not the default.
+      ///mDefaultFixture.userData = static_cast<PhysicsProxy*>(this);
+      mDefaultFixture.density = 1.0f;
+      mDefaultFixture.friction = 0.2f;
+      mDefaultFixture.restitution = 0.0f;
+      mDefaultFixture.isSensor = false;
+      mDefaultFixture.shape = NULL;
+}
+
+SceneObjectDatablock::~SceneObjectDatablock()
+{
+
+}
+
+bool SceneObjectDatablock::onAdd()
+{
+   if (!Parent::onAdd())
+      return false;
+
+   return true;
+}
+
+void SceneObjectDatablock::onRemove()
+{
+   if (SceneObjects.isProperlyAdded())
+      SceneObjects.unregisterObject();
+
+   Parent::onRemove();
+}
+
+void SceneObjectDatablock::onStaticModified(const char* slotName)
+{
+   for (S32 i = 0; i < SceneObjects.size(); i++)
+   {
+      SceneObject* sceneObject = dynamic_cast<SceneObject*>(SceneObjects[i]);
+      if (!sceneObject)
+         continue;
+
+      const char* newValue = getDataField(slotName, NULL);
+
+      if (newValue)
+         sceneObject->setDataField(slotName, NULL, newValue);
+      else
+         sceneObject->setDataField(slotName, NULL, "");
+   }
+}
+
+void SceneObjectDatablock::initPersistFields()
+{
+   // Call parent.
+   Parent::initPersistFields();
+
+   /// Lifetime.
+   addField("Lifetime", TypeF32, Offset(mLifetime, SceneObjectDatablock));
+
+   /// Scene Layers.
+   addField("SceneLayer", TypeS32, Offset(mSceneLayer, SceneObjectDatablock));
+
+   // Scene Groups.
+   addField("SceneGroup", TypeS32, Offset(mSceneGroup, SceneObjectDatablock));
+
+   /// Area.
+   addField("Size", TypeVector2, Offset(mSize, SceneObjectDatablock));
+
+   /// Position / Angle.
+   addField("Position", TypeVector2, Offset(mBodyDefinition.position, SceneObjectDatablock));
+   addField("Angle", TypeF32, Offset(mBodyDefinition.angle, SceneObjectDatablock));
+   addField("FixedAngle", TypeBool, Offset(mBodyDefinition.fixedRotation, SceneObjectDatablock));
+
+   /// Body.
+   addField("BodyType", TypeEnum, Offset(mBodyDefinition.type, SceneObjectDatablock));
+   addField("Active", TypeBool, Offset(mBodyDefinition.active,SceneObjectDatablock));
+   addField("Awake", TypeBool, Offset(mBodyDefinition.awake, SceneObjectDatablock));
+   addField("Bullet", TypeBool, Offset(mBodyDefinition.bullet, SceneObjectDatablock));
+   addField("SleepingAllowed", TypeBool, Offset(mBodyDefinition.allowSleep, SceneObjectDatablock));
+
+   /// Collision control.
+   addField("CollisionGroups", TypeS32, Offset(mCollisionGroupMask, SceneObjectDatablock));
+   addField("CollisionLayers", TypeS32, Offset(mCollisionLayerMask, SceneObjectDatablock));
+   addField("CollisionSuppress", TypeBool, Offset(mCollisionSuppress, SceneObjectDatablock));
+   addField("CollisionOneWay", TypeBool, Offset(mCollisionOneWay, SceneObjectDatablock));
+   addField("GatherContacts", TypeBool, Offset(mGatherContacts, SceneObjectDatablock));
+   addField("DefaultDensity", TypeF32, Offset(mDefaultFixture.density, SceneObjectDatablock));
+   addField("DefaultFriction", TypeF32, Offset(mDefaultFixture.friction, SceneObjectDatablock));
+   addField("DefaultRestitution", TypeF32, Offset(mDefaultFixture.restitution, SceneObjectDatablock));
+
+   /// Velocities.
+   addField("LinearVelocity", TypeVector2, Offset(mBodyDefinition.linearVelocity, SceneObjectDatablock));
+   addField("AngularVelocity", TypeF32, Offset(mBodyDefinition.angularVelocity, SceneObjectDatablock));
+   addField("LinearDamping", TypeF32, Offset(mBodyDefinition.linearDamping, SceneObjectDatablock));
+   addField("AngularDamping", TypeF32, Offset(mBodyDefinition.angularDamping, SceneObjectDatablock));
+
+   /// Gravity scaling.
+   addField("GravityScale", TypeF32, Offset(mBodyDefinition.gravityScale, SceneObjectDatablock));
+
+   /// Render visibility.
+   addField("Visible", TypeBool, Offset(mVisible, SceneObjectDatablock));
+
+   /// Render blending.
+   addField("BlendMode", TypeBool, Offset(mBlendMode, SceneObjectDatablock));
+   addField("SrcBlendFactor", TypeEnum, Offset(mSrcBlendFactor, SceneObjectDatablock));
+   addField("DstBlendFactor", TypeEnum, Offset(mDstBlendFactor, SceneObjectDatablock));
+   addField("BlendColor", TypeColorF, Offset(mBlendColor, SceneObjectDatablock));
+   addField("AlphaTest", TypeF32, Offset(mAlphaTest, SceneObjectDatablock));
+
+   /// Render sorting.
+   addField("SortPoint", TypeVector2, Offset(mSortPoint, SceneObjectDatablock));
+
+   /// Input events.
+   addField("UseInputEvents", TypeBool, Offset(mUseInputEvents, SceneObjectDatablock));
+
+   // Script callbacks.
+   addField("CollisionCallback", TypeBool, Offset(mCollisionCallback, SceneObjectDatablock));
+
+}
+
+void SceneObjectDatablock::addSceneObjectReference(SceneObject* object)
+{
+   SceneObjects.addObject(object);
+}
+
+void SceneObjectDatablock::removeSceneObjectReference(SceneObject* object)
+{
+   SceneObjects.removeObject(object);
+}
+
+void SceneObjectDatablock::packData(BitStream* stream)
+{
+   Parent::packData(stream);
+}
+
+void SceneObjectDatablock::unpackData(BitStream* stream)
+{
+   Parent::unpackData(stream);
+}
 
 //-----------------------------------------------------------------------------
 
@@ -369,6 +597,101 @@ void SceneObject::initPersistFields()
     addProtectedField("scene", TypeSimObjectPtr, Offset(mpScene, SceneObject), &setScene, &defaultProtectedGetFn, &writeScene, "");
 }
 
+//-----------------------------------------------------------------------------
+// Specify Datablocks
+//-----------------------------------------------------------------------------
+void SceneObject::setConfigDatablock(const char* datablockName)
+{
+   if (mConfigDataBlock)
+      mConfigDataBlock->removeSceneObjectReference(this);
+
+   if (!datablockName || !*datablockName)
+   {
+      mConfigDataBlock = NULL;
+      return;
+   }
+
+   SceneObjectDatablock *datablock = dynamic_cast<SceneObjectDatablock*>(Sim::findObject(datablockName));
+   if (datablock != NULL)
+   {
+      const AbstractClassRep::FieldList &list = getFieldList();
+      for (S32 i = 0; i < list.size(); i++)
+      {
+         const AbstractClassRep::Field* f = &list[i];
+
+         // Ignore non data fields.
+         if ((f->type == AbstractClassRep::DepricatedFieldType) ||
+            (f->type == AbstractClassRep::StartGroupFieldType) ||
+            (f->type == AbstractClassRep::EndGroupFieldType)) continue;
+
+         // Grab each field in the array
+         for (S32 j = 0; j < f->elementCount; j++)
+         {
+            char index[8];
+            dSprintf(index, 8, "%d", j);
+            const char* array = NULL;
+            if (f->elementCount > 1)
+               array = index;
+
+            // Only copy over fields different from the default.
+            const char* tempValue = datablock->getDataField(f->pFieldname, array);
+            if (!tempValue || !*tempValue)
+               continue;
+
+            // Need to make a copy of getValue since getDataField uses the same buffer for all its returns.
+            char* value = new char[dStrlen(tempValue) + 1];
+            dStrcpy(value, tempValue);
+
+            if (!getDefaultConfig() || (dStricmp(getDefaultConfig()->getDataField(f->pFieldname, array), value) != 0))
+               setDataField(f->pFieldname, array, value);
+
+            delete[] value;
+         }
+      }
+
+      // And now copy over dynamic fields.
+      SimFieldDictionary* fieldDictionary = datablock->getFieldDictionary();
+      if (fieldDictionary)
+      {
+         for (SimFieldDictionaryIterator itr(fieldDictionary); *itr; ++itr)
+         {
+            SimFieldDictionary::Entry* entry = *itr;
+            setDataField(entry->slotName, NULL, entry->value);
+         }
+      }
+
+      datablock->addSceneObjectReference(this);
+      mConfigDataBlock = datablock;
+   }
+
+}
+
+ConsoleMethod(SceneObject, getConfigDatablock, const char*, 2, 2, "() - Gets the configuration datablock this object is using.\n"
+   "@return (configDatablock) The configuration datablock name.")
+{
+   SceneObjectDatablock *datablock = object->getConfigDatablock();
+   if (datablock == NULL)
+      return "";
+
+   return (datablock->getName() != NULL) ? datablock->getName() : "";
+}
+
+ConsoleMethod(SceneObject, setConfigDatablock, void, 2, 3, "(configDatablock) - Applies a configuration datablock to this object.\n"
+   "@param configDatablock The configuration datablock name.\n"
+   "@return No return Value.")
+{
+   if (argc == 2)
+      object->setConfigDatablock(NULL);
+   else
+   {
+      if (dStricmp(argv[2], "NONE") == 0)
+         object->setConfigDatablock(NULL);
+      else
+         object->setConfigDatablock(argv[2]);
+   }
+}
+
+//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
 bool SceneObject::onAdd()

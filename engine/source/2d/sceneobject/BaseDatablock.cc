@@ -6,6 +6,18 @@ IMPLEMENT_CO_DATABLOCK_V1(BaseDatablock);
 
 SimSet Datablock2D;
 
+ConsoleFunction(getT2DDatablockSet, S32, 1, 1, "() Retrieves the datablock-set for T2D."
+   "@return Returns the datablockset ID as an integer")
+{
+   // Return Datablock Set.
+   return Datablock2D.getId();
+}
+
+SimSet* BaseDatablock::getDatablock2DSet()
+{
+   return &Datablock2D;
+}
+
 
 BaseDatablock::BaseDatablock() : mValid(false)
 {
@@ -56,7 +68,6 @@ ConsoleMethod(BaseDatablock, getDefaultConfigDatablock, const char*, 2, 2, "() G
 {
    return object->getDefaultConfigDatablock();
 }
-
 
 void BaseDatablock::setDefaultConfigDatablock(const char* config)
 {
