@@ -67,6 +67,40 @@
 #include "component/behaviors/behaviorInstance.h"
 #endif
 
+#ifndef _BASEDATABLOCK_H_
+#include "2d/sceneobject/BaseDatablock.h"
+#endif // !_BASEDATABLOCK_H_
+
+//-----------------------------------------------------------------------------
+// SceneObject Datablock
+//-----------------------------------------------------------------------------
+
+class SceneObjectDatablock : public BaseDatablock
+{
+public:
+   typedef BaseDatablock Parent;
+   SceneObjectDatablock();
+   virtual ~SceneObjectDatablock();
+
+   static void initPersistFields();
+   virtual bool onAdd();
+   virtual void onRemove();
+
+   virtual void packData(BitStream* stream);
+   virtual void unpackData(BitStream* stream);
+
+   void addSceneObjectReference(SceneObject* object);
+   void removeSceneObjectReference(SceneObject* object);
+
+
+
+public:
+   DECLARE_CONOBJECT(SceneObjectDatablock);
+   SimSet SceneObjects;
+
+};
+
+
 //-----------------------------------------------------------------------------
 
 struct tDestroyNotification
@@ -112,6 +146,8 @@ class SceneObject :
 private:
     typedef BehaviorComponent Parent;
 
+    static SceneObjectDatablock* mDefaultConfig;
+
 public:
     friend class Scene;
     friend class SceneWindow;
@@ -119,6 +155,10 @@ public:
     friend class WorldQuery;
     friend class DebugDraw;
     friend class SceneObjectRotateToEvent;
+
+    SceneObjectDatablock* mConfigDataBlock;
+    static SceneObjectDatablock* getDefaultConfig() { return mDefaultConfig; };
+    static void setDefaultConfig(SceneObjectDatablock* config) { mDefaultConfig = config; };
 
 protected:
     /// Scene.
@@ -130,6 +170,8 @@ protected:
     ///         any simulation related functionality cannot be used such as TorqueScript
     ///         callbacks.
     SimObjectPtr<Scene>     mpTargetScene;
+
+
 
     /// Lifetime.
     F32                     mLifetime;

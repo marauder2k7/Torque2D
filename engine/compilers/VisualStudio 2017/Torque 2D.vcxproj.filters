@@ -1465,6 +1465,9 @@
     <ClCompile Include="..\..\source\2d\sceneobject\Path.cc">
       <Filter>2d\sceneobject</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\2d\sceneobject\BaseDatablock.cc">
+      <Filter>2d\sceneobject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\audio\audio.h">
@@ -3259,6 +3262,9 @@
       <Filter>2d\sceneobject</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\2d\sceneobject\LightObject_ScriptBinding.h">
+      <Filter>2d\sceneobject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\2d\sceneobject\BaseDatablock.h">
       <Filter>2d\sceneobject</Filter>
     </ClInclude>
   </ItemGroup>

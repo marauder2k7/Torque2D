@@ -71,6 +71,22 @@
 #include "debug/profiler.h"
 
 //-----------------------------------------------------------------------------
+// SceneObjectDatablock
+//-----------------------------------------------------------------------------
+IMPLEMENT_CO_DATABLOCK_V1(SceneObjectDatablock);
+IMPLEMENT_CONOBJECT(SceneObject);
+
+SceneObjectDatablock* SceneObject::mDefaultConfig = NULL;
+ConsoleFunction(setDefaultSceneObjectDatablock, void, 2, 2, "")
+{
+   SceneObjectDatablock* db = dynamic_cast<SceneObjectDatablock*>(Sim::findObject(argv[1]));
+   if (db)
+      SceneObject::setDefaultConfig(db);
+}
+
+
+
+//-----------------------------------------------------------------------------
 
 // Scene-Object counter.
 static U32 sGlobalSceneObjectCount = 0;
@@ -98,6 +114,8 @@ static StringTableEntry edgeTypeName            = StringTable->insert( "Edge" );
 // Important: If these defaults are changed then modify the associated "write" field protected methods to ensure
 // that the associated field is persisted if not the default.
 SceneObject::SceneObject() :
+
+    mConfigDataBlock(NULL),
     /// Scene.
     mpScene(NULL),
     mpTargetScene(NULL),

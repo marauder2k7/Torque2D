@@ -270,6 +270,7 @@
     <ClCompile Include="..\..\source\2d\gui\guiSceneObjectCtrl.cc" />
     <ClCompile Include="..\..\source\2d\gui\guiSpriteCtrl.cc" />
     <ClCompile Include="..\..\source\2d\gui\SceneWindow.cc" />
+    <ClCompile Include="..\..\source\2d\sceneobject\BaseDatablock.cc" />
     <ClCompile Include="..\..\source\2d\sceneobject\CompositeSprite.cc" />
     <ClCompile Include="..\..\source\2d\sceneobject\ParticlePlayer.cc" />
     <ClCompile Include="..\..\source\2d\sceneobject\Path.cc" />
@@ -716,6 +717,7 @@
     <ClInclude Include="..\..\source\2d\gui\guiSpriteCtrl_ScriptBindings.h" />
     <ClInclude Include="..\..\source\2d\gui\SceneWindow.h" />
     <ClInclude Include="..\..\source\2d\gui\SceneWindow_ScriptBinding.h" />
+    <ClInclude Include="..\..\source\2d\sceneobject\BaseDatablock.h" />
     <ClInclude Include="..\..\source\2d\sceneobject\CompositeSprite.h" />
     <ClInclude Include="..\..\source\2d\sceneobject\CompositeSprite_ScriptBinding.h" />
     <ClInclude Include="..\..\source\2d\sceneobject\ParticlePlayer.h" />
