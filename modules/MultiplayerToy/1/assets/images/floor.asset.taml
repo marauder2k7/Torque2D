@@ -1,0 +1,5 @@
+<ImageAsset
+	AssetName="floor"
+	ImageFile="floor.png"
+	FilterMode="Nearest"
+/>

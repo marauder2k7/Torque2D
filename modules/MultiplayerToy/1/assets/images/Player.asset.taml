@@ -1,0 +1,5 @@
+<ImageAsset
+	AssetName="Player"
+	ImageFile="Player.png"
+	FilterMode="Nearest"
+/>

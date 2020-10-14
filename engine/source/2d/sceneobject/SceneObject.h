@@ -71,11 +71,21 @@
 #include "2d/sceneobject/BaseDatablock.h"
 #endif // !_BASEDATABLOCK_H_
 
+#ifndef _GAMECONNECTION_H_
+#include "game/gameConnection.h"
+#endif
+#ifndef _SIMCOMPONENT_H_
+#include "component/simComponent.h"
+#endif // !_SIMCOMPONENT_H_
+
+class NetConnection;
+class GameConnection;
+class NetObject;
 //-----------------------------------------------------------------------------
 // SceneObject Datablock
 //-----------------------------------------------------------------------------
-
-class SceneObjectDatablock : public BaseDatablock
+class SceneObjectDatablock : 
+   public BaseDatablock
 {
 public:
    typedef BaseDatablock Parent;
@@ -221,13 +231,13 @@ struct SceneObjectAttachedGUI
 };
 
 class SceneObject :
-    public BehaviorComponent,
+    public NetObject,
     public SceneRenderObject,
     public PhysicsProxy
 {
 
 private:
-    typedef BehaviorComponent Parent;
+    typedef NetObject Parent;
 
     static SceneObjectDatablock* mDefaultConfig;
 
@@ -238,6 +248,8 @@ public:
     friend class WorldQuery;
     friend class DebugDraw;
     friend class SceneObjectRotateToEvent;
+    friend class BehaviorComponent;
+    friend class SimComponent;
 
     SceneObjectDatablock* mConfigDataBlock;
     static SceneObjectDatablock* getDefaultConfig() { return mDefaultConfig; };
@@ -381,7 +393,7 @@ protected:
     /// Scene (un)registering.
     virtual void            OnRegisterScene( Scene* pScene );
     virtual void            OnUnregisterScene( Scene* pScene );
-
+    bool mEnabled;
     /// Ticking.
     void                    resetTickSpatials( const bool resize = false );
     inline bool             getSpatialDirty( void ) const { return mSpatialDirty; }
@@ -439,7 +451,8 @@ public:
     inline F32              getSceneTime( void ) const                  { if ( mpScene ) return mpScene->getSceneTime(); else return 0.0f; }
 
     /// Enabled.
-    virtual void            setEnabled( const bool enabled );
+    void setEnabled(const bool enabled);
+    bool isEnabled() const { return mEnabled; }
 
     /// Lifetime.
     void                    setLifetime( const F32 lifetime );

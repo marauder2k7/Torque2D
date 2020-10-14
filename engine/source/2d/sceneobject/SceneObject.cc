@@ -64,6 +64,11 @@
 #include "string/stringUnit.h"
 #endif
 
+#ifndef _SIMCOMPONENT_H_
+#include "component/simComponent.h"
+#endif // !_SIMCOMPONENT_H_
+
+
 // Script bindings.
 #include "SceneObject_ScriptBinding.h"
 
@@ -161,7 +166,6 @@ SceneObjectDatablock::SceneObjectDatablock()
       /// Initialize the body definition.
       /// Important: If these defaults are changed then modify the associated "write" field protected methods to ensure
       /// that the associated field is persisted if not the default.
-      ///mBodyDefinition.userData = static_cast<PhysicsProxy*>(this);
       mBodyDefinition.position.Set(0.0f, 0.0f);
       mBodyDefinition.angle = 0.0f;
       mBodyDefinition.linearVelocity.Set(0.0f, 0.0f);
@@ -179,7 +183,6 @@ SceneObjectDatablock::SceneObjectDatablock()
       // Initialize the default fixture definition.
       // Important: If these defaults are changed then modify the associated "write" field protected methods to ensure
       // that the associated field is persisted if not the default.
-      ///mDefaultFixture.userData = static_cast<PhysicsProxy*>(this);
       mDefaultFixture.density = 1.0f;
       mDefaultFixture.friction = 0.2f;
       mDefaultFixture.restitution = 0.0f;
@@ -382,6 +385,9 @@ SceneObject::SceneObject() :
     mSnapToTargetPosition( true ),
     mStopAtTargetPosition( true ),
 
+    ///Enabled
+    mEnabled(true),
+
     /// Body.
     mpBody(NULL),
     mWorldQueryKey(0),
@@ -482,6 +488,8 @@ SceneObject::SceneObject() :
     mDefaultFixture.restitution = 0.0f;
     mDefaultFixture.isSensor    = false;
     mDefaultFixture.shape       = NULL;
+
+    mNetFlags.set(ScopeAlways | Ghostable);
 
     // Set last awake state.
     mLastAwakeState = !mBodyDefinition.allowSleep || mBodyDefinition.awake;
@@ -1177,7 +1185,7 @@ void SceneObject::sceneRenderOverlay( const SceneRenderState* sceneRenderState )
 
     // Don't draw debug if not enabled.
     if ( !isEnabled() )
-        return;
+       return;
 
     // Get merged Local/Scene Debug Mask.
     U32 debugMask = getDebugMask() | pScene->getDebugMask();
@@ -1248,25 +1256,32 @@ void SceneObject::sceneRenderOverlay( const SceneRenderState* sceneRenderState )
     }
 }
 
-//-----------------------------------------------------------------------------
-
+//----------------------------------------------------------------------------------------------
+// Network Send.
+//
+// TO BE IMPLEMENTED!
+//----------------------------------------------------------------------------------------------
 U32 SceneObject::packUpdate(NetConnection * conn, U32 mask, BitStream *stream)
 {
-    return 0;
+
+   return 0;
 }
 
-//-----------------------------------------------------------------------------
 
+//----------------------------------------------------------------------------------------------
+// Network Receive.
+//
+// TO BE IMPLEMENTED!
+//----------------------------------------------------------------------------------------------
 void SceneObject::unpackUpdate(NetConnection * conn, BitStream *stream)
 {
 }
-
 //-----------------------------------------------------------------------------
 
 void SceneObject::setEnabled( const bool enabled )
 {
     // Call parent.
-    Parent::setEnabled( enabled );
+    //Parent::setEnabled( enabled );
 
     // If we have a scene, modify active.
     if ( mpScene )
@@ -3765,14 +3780,14 @@ void SceneObject::notifyComponentsAddToScene( void )
     PROFILE_SCOPE(SceneObject_NotifyComponentsAddToScene);
 
     // Notify components.
-    VectorPtr<SimComponent*>& componentList = lockComponentList();
+    /*VectorPtr<SimComponent*>& componentList = lockComponentList();
     for( SimComponentIterator itr = componentList.begin(); itr != componentList.end(); ++itr )
     {
         SimComponent *pComponent = *itr;
         if( pComponent != NULL )
             pComponent->onAddToScene();
     }
-    unlockComponentList();
+    unlockComponentList();*/
 }
 
 //-----------------------------------------------------------------------------
@@ -3783,14 +3798,14 @@ void SceneObject::notifyComponentsRemoveFromScene( void )
     PROFILE_SCOPE(SceneObject_NotifyComponentsRemoveFromScene);
 
     // Notify components.
-    VectorPtr<SimComponent*>& componentList = lockComponentList();
+    /*VectorPtr<SimComponent*>& componentList = SimComponent::lockComponentList();
     for( SimComponentIterator itr = componentList.begin(); itr != componentList.end(); ++itr )
     {
         SimComponent *pComponent = *itr;
         if( pComponent != NULL )
             pComponent->onRemoveFromScene();
     }
-    unlockComponentList();
+    unlockComponentList();*/
 }
 
 //-----------------------------------------------------------------------------
@@ -3801,14 +3816,14 @@ void SceneObject::notifyComponentsUpdate( void )
     PROFILE_SCOPE(SceneObject_NotifyComponentsUpdate);
 
     // Notify components.
-    VectorPtr<SimComponent*>& componentList = lockComponentList();
+    /*VectorPtr<SimComponent*>& componentList = SimComponent::lockComponentList();
     for( SimComponentIterator itr = componentList.begin(); itr != componentList.end(); ++itr )
     {
         SimComponent *pComponent = *itr;
         if( pComponent != NULL )
             pComponent->onUpdate();
     }
-    unlockComponentList();
+    unlockComponentList();*/
 }
 
 //-----------------------------------------------------------------------------
@@ -5176,5 +5191,4 @@ static void WriteCustomTamlSchema( const AbstractClassRep* pClassRep, TiXmlEleme
 }
 
 //-----------------------------------------------------------------------------
-
-IMPLEMENT_CONOBJECT_SCHEMA(SceneObject, WriteCustomTamlSchema);
+IMPLEMENT_CO_NETOBJECT_V1(SceneObject);

@@ -197,8 +197,8 @@ function TruckToy::createBackground(%this)
     %obj.setCollisionSuppress();
     %obj.setAwake( false );
     %obj.setActive( false );
+	
     SandboxScene.add( %obj );  
-
 
     // Industrial Background
     %obj = new Scroller();
@@ -271,6 +271,8 @@ function TruckToy::createWoodPile( %this, %posX, %posY )
     %obj.setCollisionSuppress();
     %obj.setAwake( false );
     %obj.setActive( false );
+	%obj.dump();
+	echo(%obj.getGhostId());
     SandboxScene.add( %obj );
 
     return %obj;   

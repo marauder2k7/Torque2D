@@ -1,0 +1,1 @@
+exec( "modules/ServerToy/1/scripts/client/defaults.cs" );

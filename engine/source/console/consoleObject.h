@@ -187,6 +187,7 @@ class AbstractClassRep
     friend class ConsoleObject;
 
 public:
+
     /// This is a function pointer typedef to support get/set callbacks for fields
     typedef bool (*SetDataNotify)( void *obj, const char *data );
     typedef const char *(*GetDataNotify)( void *obj, const char *data );
@@ -196,6 +197,101 @@ public:
 
     /// Allows the writing of a custom TAML schema.
     typedef void (*WriteCustomTamlSchema)( const AbstractClassRep* pClassRep, TiXmlElement* pParentElement );
+
+    /// @}
+
+    /// @name Representation Interface
+    /// @{
+
+ //TODO: move over to EngineTypeNetInfo
+    S32 mClassGroupMask;                   ///< Mask indicating in which NetGroups this object belongs.
+    S32 mClassType;                        ///< Stores the NetClass of this class.
+    S32 mNetEventDir;                      ///< Stores the NetDirection of this class.
+    S32 mClassId[NetClassGroupsCount];   ///< Stores the IDs assigned to this class for each group.
+    S32 mClassSizeof;                      ///< Size of instances in bytes.
+
+ //TODO: move over to EngineTypeNetInfo
+#ifdef TORQUE_NET_STATS
+    struct NetStatInstance
+    {
+       U32 numEvents;
+       U32 total;
+       S32 min;
+       S32 max;
+
+       void reset()
+       {
+          numEvents = 0;
+          total = 0;
+          min = S32_MAX;
+          max = S32_MIN;
+       }
+
+       void update(U32 amount)
+       {
+          numEvents++;
+          total += amount;
+          min = getMin((S32)amount, min);
+          max = getMax((S32)amount, max);
+       }
+
+       NetStatInstance()
+       {
+          reset();
+       }
+    };
+
+    NetStatInstance mNetStatPack;
+    NetStatInstance mNetStatUnpack;
+    NetStatInstance mNetStatWrite;
+    NetStatInstance mNetStatRead;
+
+    U32 mDirtyMaskFrequency[32];
+    U32 mDirtyMaskTotal[32];
+
+    void resetNetStats()
+    {
+       mNetStatPack.reset();
+       mNetStatUnpack.reset();
+       mNetStatWrite.reset();
+       mNetStatRead.reset();
+
+       for (S32 i = 0; i < 32; i++)
+       {
+          mDirtyMaskFrequency[i] = 0;
+          mDirtyMaskTotal[i] = 0;
+       }
+    }
+
+    void updateNetStatPack(U32 dirtyMask, U32 length)
+    {
+       mNetStatPack.update(length);
+
+       for (S32 i = 0; i < 32; i++)
+          if (BIT(i) & dirtyMask)
+          {
+             mDirtyMaskFrequency[i]++;
+             mDirtyMaskTotal[i] += length;
+          }
+    }
+
+    void updateNetStatUnpack(U32 length)
+    {
+       mNetStatUnpack.update(length);
+    }
+
+    void updateNetStatWriteData(U32 length)
+    {
+       mNetStatWrite.update(length);
+    }
+
+    void updateNetStatReadData(U32 length)
+    {
+       mNetStatRead.update(length);
+    }
+#endif
+
+
 
 protected:
     const char *       mClassName;
@@ -254,15 +350,21 @@ public:
 public:
     AbstractClassRep() 
     {
-        VECTOR_SET_ASSOCIATION(mFieldList);
-        parentClass  = NULL;
+          VECTOR_SET_ASSOCIATION(mFieldList);
+          mClassGroupMask = 0;
+          mClassId[NetClassGroupsCount];
+          mClassSizeof = 0;
+          mClassType = 0;
+          #ifdef TORQUE_NET_STATS
+          dMemset(mDirtyMaskFrequency, 0, sizeof(mDirtyMaskFrequency));
+          dMemset(mDirtyMaskTotal, 0, sizeof(mDirtyMaskTotal));
+          #endif
+          mDynamicGroupExpand = false;
+          mNamespace = NULL;
+          mNetEventDir = 0;
+          parentClass = NULL;
     }
     virtual ~AbstractClassRep() { }
-
-    S32 mClassGroupMask;                ///< Mask indicating in which NetGroups this object belongs.
-    S32 mClassType;                     ///< Stores the NetClass of this class.
-    S32 mNetEventDir;                   ///< Stores the NetDirection of this class.
-    S32 mClassId[NetClassGroupsCount];  ///< Stores the IDs assigned to this class for each group.
 
     S32                          getClassId  (U32 netClassGroup)   const;
     static U32                   getClassCRC (U32 netClassGroup);
@@ -310,9 +412,9 @@ inline AbstractClassRep *AbstractClassRep::getClassList()
 
 //-----------------------------------------------------------------------------
 
-inline U32 AbstractClassRep::getClassCRC(U32 group)
+inline U32 AbstractClassRep::getClassCRC(U32 netClassGroup)
 {
-    return classCRC[group];
+    return classCRC[netClassGroup];
 }
 
 //-----------------------------------------------------------------------------
@@ -331,9 +433,9 @@ inline AbstractClassRep *AbstractClassRep::getParentClass()
 
 
 //-----------------------------------------------------------------------------
-inline S32 AbstractClassRep::getClassId(U32 group) const
+inline S32 AbstractClassRep::getClassId(U32 netClassGroup) const
 {
-    return mClassId[group];
+    return mClassId[netClassGroup];
 }
 
 //-----------------------------------------------------------------------------
@@ -479,6 +581,7 @@ bool defaultProtectedWriteFn( void* obj, StringTableEntry pFieldName );
 
 class ConsoleObject
 {
+   
 protected:
     /// @deprecated This is disallowed.
     ConsoleObject() { /* disallowed */ }
@@ -873,6 +976,14 @@ inline bool& ConsoleObject::getDynamicGroupExpand()
     AbstractClassRep* className::getContainerChildStaticClassRep() { return Children::getStaticClassRep(); }        \
     AbstractClassRep::WriteCustomTamlSchema className::getStaticWriteCustomTamlSchema() { return schema; }          \
     ConcreteClassRep<className> className::dynClassRep(#className, 0, -1, 0, className::getParentStaticClassRep())
+
+#define IMPLEMENT_CO_NETOBJECT_SCEHMA_V1(className, schema)                                                                        \
+    AbstractClassRep* className::getClassRep() const { return &className::dynClassRep; }                            \
+    AbstractClassRep* className::getStaticClassRep() { return &dynClassRep; }                                       \
+    AbstractClassRep* className::getParentStaticClassRep() { return Parent::getStaticClassRep(); }                  \
+    AbstractClassRep* className::getContainerChildStaticClassRep() { return NULL; }                                 \
+    AbstractClassRep::WriteCustomTamlSchema className::getStaticWriteCustomTamlSchema() { return schema; }          \
+    ConcreteClassRep<className> className::dynClassRep(#className, NetClassGroupGameMask, NetClassTypeObject, 0, className::getParentStaticClassRep())
 
 #define IMPLEMENT_CO_NETOBJECT_V1(className)                                                                        \
     AbstractClassRep* className::getClassRep() const { return &className::dynClassRep; }                            \

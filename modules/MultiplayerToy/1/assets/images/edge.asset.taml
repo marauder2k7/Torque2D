@@ -1,0 +1,5 @@
+<ImageAsset
+	AssetName="edge"
+	ImageFile="edge.png"
+	FilterMode="Nearest"
+/>

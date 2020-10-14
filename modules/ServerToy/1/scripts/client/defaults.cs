@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2013 GarageGames, LLC
+// Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,32 +20,14 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-function AppCore::create( %this )
-{
-    // Load system scripts
-    exec("./scripts/constants.cs");
-    exec("./scripts/defaultPreferences.cs");
-    exec("./scripts/canvas.cs");
-    exec("./scripts/openal.cs");
-    
-    // Initialize the canvas
-    initializeCanvas("Torque 2D");
-    
-    // Set the canvas color
-    Canvas.BackgroundColor = "CornflowerBlue";
-    Canvas.UseBackgroundColor = true;
-    
-    // Initialize audio
-    initializeOpenAL();
-    ModuleDatabase.loadGroup("gameBase");
-	//Load server
-	ModuleDatabase.loadExplicit("ServerToy");
-}
+// The master server is declared with the server defaults, which is
+// loaded on both clients & dedicated servers.  If the server mod
+// is not loaded on a client, then the master must be defined. 
 
-//-----------------------------------------------------------------------------
+$pref::Master[0] = "2:master.garagegames.com:28002";
 
-function AppCore::destroy( %this )
-{
+$pref::Player::Name = "Visitor";
 
-}
+$pref::Net::LagThreshold = 400;
+$pref::Net::Port = 28000;
 

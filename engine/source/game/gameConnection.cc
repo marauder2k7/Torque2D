@@ -323,7 +323,20 @@ void GameConnection::setDisconnectReason(const char *str)
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
+void GameConnection::ghostPreRead(NetObject * nobj, bool newGhost)
+{
+   Parent::ghostPreRead(nobj, newGhost);
+}
 
+void GameConnection::ghostReadExtra(NetObject * nobj, BitStream * bstream, bool newGhost)
+{
+   Parent::ghostReadExtra(nobj, bstream, newGhost);
+}
+
+void GameConnection::ghostWriteExtra(NetObject * nobj, BitStream * bstream)
+{
+   Parent::ghostWriteExtra(nobj, bstream);
+}
 
 void GameConnection::readPacket(BitStream *bstream)
 {

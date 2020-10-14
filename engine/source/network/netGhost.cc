@@ -61,6 +61,9 @@ public:
       if(bstream->writeFlag(obj != NULL))
       {
          S32 classId = obj->getClassId(ps->getNetClassGroup());
+         //This is not a fix! nor should it be treated like one
+         if (classId < 0)
+            classId = 0;
          bstream->writeClassId(classId, NetClassTypeObject, ps->getNetClassGroup());
          obj->packUpdate(ps, 0xFFFFFFFF, bstream);
       }
@@ -1062,7 +1065,8 @@ void NetConnection::ghostWriteStartBlock(ResizeBitStream *stream)
    {
       if(mLocalGhosts[i])
       {
-         mLocalGhosts[i]->packUpdate(this, 0xFFFFFFFF, stream);
+         U32 retMask = mLocalGhosts[i]->packUpdate(this, 0xFFFFFFFF, stream);
+         if (retMask != 0) mLocalGhosts[i]->setMaskBits(retMask);
          stream->validate();
       }
    }

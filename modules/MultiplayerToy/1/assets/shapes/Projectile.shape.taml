@@ -1,0 +1,11 @@
+<Sprite
+	Name="ProjectileDefault"
+    Size="0.2 0.2"
+	GravityScale="0"
+    Image="@asset=MultiplayerToy:projectile"
+    Frame="0">
+    <Sprite.CollisionShapes>
+        <Circle
+            Radius="0.1" />
+    </Sprite.CollisionShapes>
+</Sprite>

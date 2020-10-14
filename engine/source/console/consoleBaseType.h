@@ -89,6 +89,9 @@ public:
    virtual StringTableEntry getTypePrefix( void ) const { return StringTable->EmptyString; }
 };
 
+template< typename T >
+S32 TYPEID() { return T::_mTypeId; }
+
 #define DefineConsoleType( type ) extern S32 type;
 
 #define ConsoleType( typeName, type, size, typePrefix ) \

@@ -20,32 +20,43 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-function AppCore::create( %this )
+function MultiplayerToy::create( %this )
 {
-    // Load system scripts
-    exec("./scripts/constants.cs");
-    exec("./scripts/defaultPreferences.cs");
-    exec("./scripts/canvas.cs");
-    exec("./scripts/openal.cs");
-    
-    // Initialize the canvas
-    initializeCanvas("Torque 2D");
-    
-    // Set the canvas color
-    Canvas.BackgroundColor = "CornflowerBlue";
-    Canvas.UseBackgroundColor = true;
-    
-    // Initialize audio
-    initializeOpenAL();
-    ModuleDatabase.loadGroup("gameBase");
-	//Load server
-	ModuleDatabase.loadExplicit("ServerToy");
+	exec("./scripts/client/defaults.cs");
+	exec("./scripts/server/defaults.cs");
+	
+	exec("./scripts/client/init.cs");
+	exec("./scripts/server/init.cs");
+	
+	$pref::HostMultiPlayer = true;
+	$selectedSceneFile = "modules/MultiplayerToy/1/assets/scenes/TestArena.cs";
+	
+	initServer();
+	
+	if($Server::Dedicated)
+		initDedicated();
+	else
+		initClient();
+	
+	Canvas.pushDialog(JoinServerMenu);
 }
 
 //-----------------------------------------------------------------------------
 
-function AppCore::destroy( %this )
+function MultiplayerToy::destroy( %this )
 {
+    echo("Exporting client prefs");
+	export("$pref::*", "./scripts/client/prefs.cs", False);
 
+	echo("Exporting server prefs");
+	export("$Pref::Server::*", "./scripts/server/prefs.cs", False);
 }
 
+//-----------------------------------------------------------------------------
+
+function MultiplayerToy::reset(%this)
+{
+    
+}
+
+//-----------------------------------------------------------------------------

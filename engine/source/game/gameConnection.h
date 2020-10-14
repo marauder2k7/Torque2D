@@ -182,6 +182,9 @@ public:
    static void consoleInit();
 
    void setDisconnectReason(const char *reason);
+   void ghostPreRead(NetObject * nobj, bool newGhost);
+   void ghostReadExtra(NetObject * nobj, BitStream * bstream, bool newGhost);
+   void ghostWriteExtra(NetObject * nobj, BitStream * bstream);
    GameConnection();
    ~GameConnection();
 

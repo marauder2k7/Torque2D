@@ -33,7 +33,7 @@ ConsoleFunctionWithDocs( getGlobalSceneObjectCount, ConsoleInt, 1, 1, ())
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethodGroupBeginWithDocs(SceneObject, BehaviorComponent)
+ConsoleMethodGroupBeginWithDocs(SceneObject, NetObject)
 
 /*! Add the object to a scene.
     @param scene the scene you wish to add this object to.

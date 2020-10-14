@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2013 GarageGames, LLC
+// Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,32 +20,29 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-function AppCore::create( %this )
-{
-    // Load system scripts
-    exec("./scripts/constants.cs");
-    exec("./scripts/defaultPreferences.cs");
-    exec("./scripts/canvas.cs");
-    exec("./scripts/openal.cs");
-    
-    // Initialize the canvas
-    initializeCanvas("Torque 2D");
-    
-    // Set the canvas color
-    Canvas.BackgroundColor = "CornflowerBlue";
-    Canvas.UseBackgroundColor = true;
-    
-    // Initialize audio
-    initializeOpenAL();
-    ModuleDatabase.loadGroup("gameBase");
-	//Load server
-	ModuleDatabase.loadExplicit("ServerToy");
-}
-
+//-----------------------------------------------------------------------------
+// Server Admin Commands
 //-----------------------------------------------------------------------------
 
-function AppCore::destroy( %this )
+function SAD(%password)
 {
-
+   if (%password !$= "")
+      commandToServer('SAD', %password);
 }
+
+function SADSetPassword(%password)
+{
+   commandToServer('SADSetPassword', %password);
+}
+
+//----------------------------------------------------------------------------
+// Misc server commands
+//----------------------------------------------------------------------------
+
+function clientCmdSyncClock(%time)
+{
+   // Time update from the server, this is only sent at the start of a mission
+   // or when a client joins a game in progress.
+}
+
 

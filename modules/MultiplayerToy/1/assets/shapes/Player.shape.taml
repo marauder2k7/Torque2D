@@ -1,0 +1,11 @@
+<Sprite
+	Name="PlayerDefault"
+    Size="0.75 0.75"
+    GravityScale="0"
+    Image="@asset=MultiplayerToy:Player"
+    Frame="0">
+    <Sprite.CollisionShapes>
+        <Circle
+            Radius="0.4" />
+    </Sprite.CollisionShapes>
+</Sprite>

@@ -1,0 +1,13 @@
+<ModuleDefinition
+	ModuleId="ServerToy"
+	VersionId="1"
+	Description="A collection of scripts for networking."
+	ScriptFile="main.cs"
+	Group="Core"
+	CreateFunction="create"
+	DestroyFunction="destroy">
+		<DeclaredAssets
+			Path="assets"
+			Extension="asset.taml"
+			Recurse="true"/>
+</ModuleDefinition>
