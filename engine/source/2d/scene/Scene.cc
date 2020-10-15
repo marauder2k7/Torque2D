@@ -1696,6 +1696,28 @@ bool Scene::hasJoints( SceneObject* pSceneObject )
     return true;
 }
 
+//----------------------------------------------------------------------------------------------
+// Network Send.
+//
+// TO BE IMPLEMENTED!
+//----------------------------------------------------------------------------------------------
+U32 Scene::packUpdate(NetConnection * conn, U32 mask, BitStream *stream)
+{
+   U32 retMask = Parent::packUpdate(conn, mask, stream);
+
+   return retMask;
+}
+
+
+//----------------------------------------------------------------------------------------------
+// Network Receive.
+//
+// TO BE IMPLEMENTED!
+//----------------------------------------------------------------------------------------------
+void Scene::unpackUpdate(NetConnection * conn, BitStream *stream)
+{
+   Parent::unpackUpdate(conn, stream);
+}
 //-----------------------------------------------------------------------------
 
 S32 Scene::createDistanceJoint(
@@ -5628,4 +5650,4 @@ static void WriteCustomTamlSchema( const AbstractClassRep* pClassRep, TiXmlEleme
 
 //------------------------------------------------------------------------------
 
-IMPLEMENT_CONOBJECT_CHILDREN_SCHEMA(Scene, WriteCustomTamlSchema);
+IMPLEMENT_NETOBJECT_CHILDREN_SCHEMA(Scene, WriteCustomTamlSchema);

@@ -1027,6 +1027,14 @@ inline bool& ConsoleObject::getDynamicGroupExpand()
     AbstractClassRep::WriteCustomTamlSchema className::getStaticWriteCustomTamlSchema() { return schema; }          \
     ConcreteClassRep<className> className::dynClassRep(#className, 0, -1, 0, className::getParentStaticClassRep())
 
+#define IMPLEMENT_NETOBJECT_CHILDREN_SCHEMA(className, schema)                                                      \
+    AbstractClassRep* className::getClassRep() const { return &className::dynClassRep; }                            \
+    AbstractClassRep* className::getStaticClassRep() { return &dynClassRep; }                                       \
+    AbstractClassRep* className::getParentStaticClassRep() { return Parent::getStaticClassRep(); }                  \
+    AbstractClassRep* className::getContainerChildStaticClassRep() { return Children::getStaticClassRep(); }        \
+    AbstractClassRep::WriteCustomTamlSchema className::getStaticWriteCustomTamlSchema() { return schema; }          \
+    ConcreteClassRep<className> className::dynClassRep(#className, NetClassGroupGameMask, NetClassTypeObject, 0, className::getParentStaticClassRep())
+
 #define IMPLEMENT_CO_NETOBJECT_V1(className)                                                                        \
     AbstractClassRep* className::getClassRep() const { return &className::dynClassRep; }                            \
     AbstractClassRep* className::getStaticClassRep() { return &dynClassRep; }                                       \

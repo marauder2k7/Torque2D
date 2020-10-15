@@ -158,7 +158,7 @@ struct TickContact
 ///-----------------------------------------------------------------------------
 
 class Scene :
-    public BehaviorComponent,
+    public NetObject,
     public TamlChildren,
     public PhysicsProxy,
     public b2ContactListener,
@@ -208,7 +208,7 @@ public:
     DebugDraw                   mDebugDraw;
 
 private:
-    typedef BehaviorComponent   Parent;
+    typedef NetObject   Parent;
     typedef SceneObject         Children;
 
     /// World.
@@ -375,6 +375,10 @@ public:
     S32                     createJoint( b2JointDef* pJointDef );
     bool                    deleteJoint( const U32 jointId );
     bool                    hasJoints( SceneObject* pSceneObject );
+
+    /// Networking.
+    virtual U32             packUpdate(NetConnection * conn, U32 mask, BitStream *stream);
+    virtual void            unpackUpdate(NetConnection * conn, BitStream *stream);
 
     /// Distance joint.
     S32                     createDistanceJoint(
