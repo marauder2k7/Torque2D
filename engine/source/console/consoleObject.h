@@ -197,10 +197,20 @@ public:
 
    /// Allows the writing of a custom TAML schema.
    typedef void(*WriteCustomTamlSchema)(const AbstractClassRep* pClassRep, TiXmlElement* pParentElement);
-
+   
    AbstractClassRep()
    {
       VECTOR_SET_ASSOCIATION(mFieldList);
+      mCategory = StringTable->EmptyString;
+      mClassGroupMask = 0;
+      for (U32 i = 0; i < NetClassGroupsCount; i++)
+         mClassId[i] = -1;
+      mClassName = StringTable->EmptyString;
+      mClassSizeof = 0;
+      mClassType = 0;
+      mDynamicGroupExpand = false;
+      mNamespace = NULL;
+      mNetEventDir = 0;
       parentClass = NULL;
    }
 
@@ -349,8 +359,11 @@ protected:
    AbstractClassRep * parentClass;
    Namespace *        mNamespace;
 
+   const char* mCategory;
+
 public:
 
+   const char* getCategory() const { return mCategory; }
    /// This is a function pointer typedef to support get/set callbacks for fields
    typedef bool(*SetDataNotify)(void *obj, const char *data);
    typedef const char *(*GetDataNotify)(void *obj, const char *data);
@@ -411,11 +424,11 @@ public:
    static AbstractClassRep* findClassRep(const char* in_pClassName);
    static AbstractClassRep * findClassRep(U32 groupId, U32 typeId, U32 classId);
    static void initialize(); // Called from Con::init once on startup
-   //void shutdown();
+   void shutdown();
 
 };
 
-//extern AbstractClassRep::FieldList sg_tempFieldList;
+extern AbstractClassRep::FieldList sg_tempFieldList;
 
 //=============================================================================
 //    ConcreteClassRep.
@@ -457,18 +470,20 @@ public:
        AbstractClassRep *parent )
     {
         // name is a static compiler string so no need to worry about copying or deleting
-        mClassName = name;
+        mClassName = StringTable->insert(name);
+        mCategory = T::__category();
 
         // Clean up mClassId
         for(U32 i = 0; i < NetClassGroupsCount; i++)
             mClassId[i] = -1;
 
         // Set properties for this ACR
-        mClassType      = netClassType;
         mClassGroupMask = netClassGroupMask;
+        mClassType      = netClassType;
+        
         mNetEventDir    = netEventDir;
         parentClass     = parent;
-        //mClassSizeof = sizeof(T);
+        mClassSizeof = sizeof(T);
         // Finally, register ourselves.
         registerClassRep(this);
     };
@@ -618,12 +633,12 @@ public:
     /// Gets the ClassRep.
     virtual AbstractClassRep* getClassRep() const;
 
-/*#define DECLARE_ABSTRACT_CONOBJECT( className )                \
+#define DECLARE_ABSTRACT_CONOBJECT( className )                \
    static ConcreteAbstractClassRep< className > dynClassRep;   \
    static AbstractClassRep* getParentStaticClassRep();         \
    static AbstractClassRep* getStaticClassRep();               \
    virtual AbstractClassRep* getClassRep() const 
-   */
+   
     /// Set the value of a field.
     bool setField(const char *fieldName, const char *value);
 
@@ -865,6 +880,8 @@ public:
     /// @note This name can be used to instantiate another instance using create()
     const char *getClassName() const;
 
+    static const char* __category() { return ""; }
+
     /// @}
     static ConsoleObject* __findObject(const char*) { return NULL; }
     static const char* __getObjectId(ConsoleObject*) { return ""; }
@@ -974,6 +991,9 @@ inline bool& ConsoleObject::getDynamicGroupExpand()
     static AbstractClassRep::WriteCustomTamlSchema getStaticWriteCustomTamlSchema();                                \
     virtual AbstractClassRep* getClassRep() const
 
+#define DECLARE_CATEGORY( string )                      \
+   static const char* __category() { return string; }
+
 #define IMPLEMENT_CONOBJECT(className)                                                                              \
     AbstractClassRep* className::getClassRep() const { return &className::dynClassRep; }                            \
     AbstractClassRep* className::getStaticClassRep() { return &dynClassRep; }                                       \
@@ -1012,6 +1032,14 @@ inline bool& ConsoleObject::getDynamicGroupExpand()
     AbstractClassRep* className::getParentStaticClassRep() { return Parent::getStaticClassRep(); }                  \
     AbstractClassRep* className::getContainerChildStaticClassRep() { return NULL; }                                 \
     AbstractClassRep::WriteCustomTamlSchema className::getStaticWriteCustomTamlSchema() { return NULL; }            \
+    ConcreteClassRep<className> className::dynClassRep(#className, NetClassGroupGameMask, NetClassTypeObject, 0, className::getParentStaticClassRep())
+
+#define IMPLEMENT_NETOBJECT_SCHEMA(className, schema)                                                               \
+    AbstractClassRep* className::getClassRep() const { return &className::dynClassRep; }                            \
+    AbstractClassRep* className::getStaticClassRep() { return &dynClassRep; }                                       \
+    AbstractClassRep* className::getParentStaticClassRep() { return Parent::getStaticClassRep(); }                  \
+    AbstractClassRep* className::getContainerChildStaticClassRep() { return NULL; }                                 \
+    AbstractClassRep::WriteCustomTamlSchema className::getStaticWriteCustomTamlSchema() { return schema; }          \
     ConcreteClassRep<className> className::dynClassRep(#className, NetClassGroupGameMask, NetClassTypeObject, 0, className::getParentStaticClassRep())
 
 #define IMPLEMENT_CO_DATABLOCK_V1(className)                                                                        \

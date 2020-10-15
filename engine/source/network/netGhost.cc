@@ -72,7 +72,7 @@ public:
          S32 classId = obj->getClassId(ps->getNetClassGroup());
          //This is not a fix! nor should it be treated like one
          //if (classId < 0)
-           // classId = 0;
+          //  classId = 0;
          bstream->writeClassId(classId, NetClassTypeObject, ps->getNetClassGroup());
          U32 retMask = obj->packUpdate(ps, 0xFFFFFFFF, bstream);
          if (retMask != 0)obj->setMaskBits(retMask);

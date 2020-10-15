@@ -259,6 +259,20 @@ void AbstractClassRep::initialize()
 
 }
 
+void AbstractClassRep::shutdown()
+{
+   AssertFatal(initialized, "AbstractClassRep::shutdown - not initialized");
+
+   // Release storage allocated to the class table.
+
+   for (U32 group = 0; group < NetClassGroupsCount; group++)
+      for (U32 type = 0; type < NetClassTypesCount; type++)
+         if (classTable[group][type])
+            SAFE_DELETE_ARRAY(classTable[group][type]);
+
+   initialized = false;
+}
+
 void AbstractClassRep::destroyFieldValidators( AbstractClassRep::FieldList &mFieldList )
 {
    for(S32 i = mFieldList.size()-1; i>=0; i-- )
