@@ -49,7 +49,8 @@ class ConsoleObject;
 
 //-----------------------------------------------------------------------------
 
-enum NetClassTypes {
+enum NetClassTypes 
+{
     NetClassTypeObject = 0,
     NetClassTypeDataBlock,
     NetClassTypeEvent,
@@ -58,7 +59,8 @@ enum NetClassTypes {
 
 //-----------------------------------------------------------------------------
 
-enum NetClassGroups {
+enum NetClassGroups 
+{
     NetClassGroupGame = 0,
     NetClassGroupCommunity,
     NetClassGroup3,
@@ -68,7 +70,8 @@ enum NetClassGroups {
 
 //-----------------------------------------------------------------------------
 
-enum NetClassMasks {
+enum NetClassMasks 
+{
     NetClassGroupGameMask      = BIT(NetClassGroupGame),
     NetClassGroupCommunityMask = BIT(NetClassGroupCommunity),
 };
@@ -88,6 +91,10 @@ class SimObject;
 class ConsoleTypeValidator;
 
 //-----------------------------------------------------------------------------
+//=============================================================================
+//    AbstractClassRep.
+//=============================================================================
+
 /// Core functionality for class manipulation.
 ///
 /// @section AbstractClassRep_intro Introduction (or, Why AbstractClassRep?)
@@ -188,29 +195,29 @@ class AbstractClassRep
 
 public:
 
-    /// This is a function pointer typedef to support get/set callbacks for fields
-    typedef bool (*SetDataNotify)( void *obj, const char *data );
-    typedef const char *(*GetDataNotify)( void *obj, const char *data );
+   /// Allows the writing of a custom TAML schema.
+   typedef void(*WriteCustomTamlSchema)(const AbstractClassRep* pClassRep, TiXmlElement* pParentElement);
 
-    /// This is a function pointer typedef to support optional writing for fields.
-    typedef bool (*WriteDataNotify)( void* obj, const char* pFieldName );
+   AbstractClassRep()
+   {
+      VECTOR_SET_ASSOCIATION(mFieldList);
+      parentClass = NULL;
+   }
 
-    /// Allows the writing of a custom TAML schema.
-    typedef void (*WriteCustomTamlSchema)( const AbstractClassRep* pClassRep, TiXmlElement* pParentElement );
+   /// @}
+   virtual ~AbstractClassRep() {} 
+   /// @name Representation Interface
+   /// @{
 
-    /// @}
+   //TODO: move over to EngineTypeNetInfo
+   S32 mClassGroupMask;                   ///< Mask indicating in which NetGroups this object belongs.
+   S32 mClassType;                        ///< Stores the NetClass of this class.
+   S32 mNetEventDir;                      ///< Stores the NetDirection of this class.
+   S32 mClassId[NetClassGroupsCount];   ///< Stores the IDs assigned to this class for each group.
+   S32 mClassSizeof;                      ///< Size of instances in bytes.
 
-    /// @name Representation Interface
-    /// @{
+   //TODO: move over to EngineTypeNetInfo
 
- //TODO: move over to EngineTypeNetInfo
-    S32 mClassGroupMask;                   ///< Mask indicating in which NetGroups this object belongs.
-    S32 mClassType;                        ///< Stores the NetClass of this class.
-    S32 mNetEventDir;                      ///< Stores the NetDirection of this class.
-    S32 mClassId[NetClassGroupsCount];   ///< Stores the IDs assigned to this class for each group.
-    S32 mClassSizeof;                      ///< Size of instances in bytes.
-
- //TODO: move over to EngineTypeNetInfo
 #ifdef TORQUE_NET_STATS
     struct NetStatInstance
     {
@@ -291,174 +298,163 @@ public:
     }
 #endif
 
+    S32                          getClassId(U32 netClassGroup)   const { return mClassId[netClassGroup]; }
+    static U32                   getClassCRC (U32 netClassGroup) { return classCRC[netClassGroup]; }
 
+    // Return className
+    const char*                  getClassName() const { return mClassName; }
+    // Return namespace
+    Namespace*                   getNameSpace() { return mNamespace; }
+    // Return Parent
+    AbstractClassRep*            getParentClass() const { return parentClass; }
 
-protected:
-    const char *       mClassName;
-    AbstractClassRep * nextClass;
-    AbstractClassRep * parentClass;
-    Namespace *        mNamespace;
+    virtual AbstractClassRep*    getContainerChildClass(const bool recurse) = 0;
+    virtual WriteCustomTamlSchema getCustomTamlSchema(void) = 0;
 
-    static AbstractClassRep ** classTable[NetClassGroupsCount][NetClassTypesCount];
-    static AbstractClassRep *  classLinkList;
-    static U32                 classCRC[NetClassGroupsCount];
-    static bool                initialized;
+    // Return size of instances
+    S32 getSizeof() const { return mClassSizeof; }
 
-    static ConsoleObject* create(const char*  in_pClassName);
-    static ConsoleObject* create(const U32 groupId, const U32 typeId, const U32 in_classId);
+    // Get next class in class list
+    AbstractClassRep*            getNextClass() const { return nextClass; }
 
-public:
-    enum ACRFieldTypes
-    {
-        StartGroupFieldType = 0xFFFFFFFD,
-        EndGroupFieldType   = 0xFFFFFFFE,
-        DepricatedFieldType = 0xFFFFFFFF
-    };
-
-    struct Field {
-        const char* pFieldname;    ///< Name of the field.
-        const char* pGroupname;      ///< Optionally filled field containing the group name.
-        ///
-        ///  This is filled when type is StartField or EndField
-
-        const char*    pFieldDocs;    ///< Documentation about this field; see consoleDoc.cc.
-        bool           groupExpand;   ///< Flag to track expanded/not state of this group in the editor.
-        U32            type;          ///< A type ID. @see ACRFieldTypes
-        dsize_t        offset;        ///< Memory offset from beginning of class for this field.
-        S32            elementCount;  ///< Number of elements, if this is an array.
-        EnumTable *    table;         ///< If this is an enum, this points to the table defining it.
-        BitSet32       flag;          ///< Stores various flags
-        ConsoleTypeValidator *validator;     ///< Validator, if any.
-        SetDataNotify  setDataFn;     ///< Set data notify Fn
-        GetDataNotify  getDataFn;     ///< Get data notify Fn
-        WriteDataNotify writeDataFn;   ///< Function to determine whether data should be written or not.
-    };
-    typedef Vector<Field> FieldList;
-
-    FieldList mFieldList;
-
-    bool mDynamicGroupExpand;
-
-    static U32  NetClassCount [NetClassGroupsCount][NetClassTypesCount];
-    static U32  NetClassBitSize[NetClassGroupsCount][NetClassTypesCount];
-
-    static void registerClassRep(AbstractClassRep*);
-    static AbstractClassRep* findClassRep(const char* in_pClassName);
-    static void initialize(); // Called from Con::init once on startup
-    static void destroyFieldValidators(AbstractClassRep::FieldList &mFieldList);
-
-public:
-    AbstractClassRep() 
-    {
-          VECTOR_SET_ASSOCIATION(mFieldList);
-          mClassGroupMask = 0;
-          mClassId[NetClassGroupsCount];
-          mClassSizeof = 0;
-          mClassType = 0;
-          #ifdef TORQUE_NET_STATS
-          dMemset(mDirtyMaskFrequency, 0, sizeof(mDirtyMaskFrequency));
-          dMemset(mDirtyMaskTotal, 0, sizeof(mDirtyMaskTotal));
-          #endif
-          mDynamicGroupExpand = false;
-          mNamespace = NULL;
-          mNetEventDir = 0;
-          parentClass = NULL;
-    }
-    virtual ~AbstractClassRep() { }
-
-    S32                          getClassId  (U32 netClassGroup)   const;
-    static U32                   getClassCRC (U32 netClassGroup);
-    const char*                  getClassName() const;
-    static AbstractClassRep*     getClassList();
-    Namespace*                   getNameSpace();
-    AbstractClassRep*            getNextClass();
-    AbstractClassRep*            getParentClass();
-    virtual AbstractClassRep*    getContainerChildClass( const bool recurse ) = 0;
-    virtual WriteCustomTamlSchema getCustomTamlSchema( void ) = 0;
-
-    /// Helper class to see if we are a given class, or a subclass thereof.
+    // Return global class list
+    static AbstractClassRep*     getClassList() { return classLinkList; }
+    
+    /// Helper class to see if we are a given class, or a subclass thereof by
+    /// comparing AbstractClassRep pointers.
     bool                       isClass(AbstractClassRep  *acr)
     {
-        AbstractClassRep  *walk = this;
+       AbstractClassRep  *walk = this;
 
-        //  Walk up parents, checking for equivalence.
-        while(walk)
-        {
-            if(walk == acr)
-                return true;
+       //  Walk up parents, checking for equivalence.
+       while (walk)
+       {
+          if (walk == acr)
+             return true;
 
-            walk = walk->parentClass;
-        };
+          walk = walk->parentClass;
+       };
 
-        return false;
+       return false;
     }
 
-public:
     virtual ConsoleObject* create() const = 0;
-    const Field *findField(StringTableEntry fieldName) const;
     AbstractClassRep* findFieldRoot( StringTableEntry fieldName );
     AbstractClassRep* findContainerChildRoot( AbstractClassRep* pChild );
+protected:
+
+   virtual void init() const = 0;
+   const char *       mClassName;
+   AbstractClassRep * nextClass;
+   AbstractClassRep * parentClass;
+   Namespace *        mNamespace;
+
+public:
+
+   /// This is a function pointer typedef to support get/set callbacks for fields
+   typedef bool(*SetDataNotify)(void *obj, const char *data);
+   typedef const char *(*GetDataNotify)(void *obj, const char *data);
+
+   /// This is a function pointer typedef to support optional writing for fields.
+   typedef bool(*WriteDataNotify)(void* obj, const char* pFieldName);
+
+   enum ACRFieldTypes
+   {
+      StartGroupFieldType = 0xFFFFFFFD,
+      EndGroupFieldType = 0xFFFFFFFE,
+      DepricatedFieldType = 0xFFFFFFFF
+   };
+
+   struct Field 
+   {
+      const char* pFieldname;    ///< Name of the field.
+      const char* pGroupname;      ///< Optionally filled field containing the group name.
+      ///
+      ///  This is filled when type is StartField or EndField
+
+      const char*    pFieldDocs;    ///< Documentation about this field; see consoleDoc.cc.
+      bool           groupExpand;   ///< Flag to track expanded/not state of this group in the editor.
+      U32            type;          ///< A type ID. @see ACRFieldTypes
+      dsize_t        offset;        ///< Memory offset from beginning of class for this field.
+      S32            elementCount;  ///< Number of elements, if this is an array.
+      EnumTable *    table;         ///< If this is an enum, this points to the table defining it.
+      BitSet32       flag;          ///< Stores various flags
+      ConsoleTypeValidator *validator;     ///< Validator, if any.
+      SetDataNotify  setDataFn;     ///< Set data notify Fn
+      GetDataNotify  getDataFn;     ///< Get data notify Fn
+      WriteDataNotify writeDataFn;   ///< Function to determine whether data should be written or not.
+   };
+   typedef Vector<Field> FieldList;
+
+   FieldList mFieldList;
+
+   bool mDynamicGroupExpand;
+
+   const Field *findField(StringTableEntry fieldName) const;
+
+   static void destroyFieldValidators(AbstractClassRep::FieldList &mFieldList);
 
 protected:
-    virtual void init() const = 0;
+   static AbstractClassRep ** classTable[NetClassGroupsCount][NetClassTypesCount];
+   static AbstractClassRep *  classLinkList;
+   static U32                 classCRC[NetClassGroupsCount];
+   static bool                initialized;
+
+   static ConsoleObject* create(const char*  in_pClassName);
+   static ConsoleObject* create(const U32 groupId, const U32 typeId, const U32 in_classId);
+
+public:
+   static U32  NetClassCount[NetClassGroupsCount][NetClassTypesCount];
+   static U32  NetClassBitSize[NetClassGroupsCount][NetClassTypesCount];
+
+   static void registerClassRep(AbstractClassRep*);
+   static AbstractClassRep* findClassRep(const char* in_pClassName);
+   static AbstractClassRep * findClassRep(U32 groupId, U32 typeId, U32 classId);
+   static void initialize(); // Called from Con::init once on startup
+   //void shutdown();
+
 };
 
-//-----------------------------------------------------------------------------
+//extern AbstractClassRep::FieldList sg_tempFieldList;
 
-inline AbstractClassRep *AbstractClassRep::getClassList()
-{
-    return classLinkList;
-}
-
-//-----------------------------------------------------------------------------
-
-inline U32 AbstractClassRep::getClassCRC(U32 netClassGroup)
-{
-    return classCRC[netClassGroup];
-}
-
-//-----------------------------------------------------------------------------
-
-inline AbstractClassRep *AbstractClassRep::getNextClass()
-{
-    return nextClass;
-}
-
-//-----------------------------------------------------------------------------
-
-inline AbstractClassRep *AbstractClassRep::getParentClass()
-{
-    return parentClass;
-}
-
-
-//-----------------------------------------------------------------------------
-inline S32 AbstractClassRep::getClassId(U32 netClassGroup) const
-{
-    return mClassId[netClassGroup];
-}
-
-//-----------------------------------------------------------------------------
-
-inline const char* AbstractClassRep::getClassName() const
-{
-    return mClassName;
-}
-
-//-----------------------------------------------------------------------------
-
-inline Namespace *AbstractClassRep::getNameSpace()
-{
-    return mNamespace;
-}
-
-//-----------------------------------------------------------------------------
-
+//=============================================================================
+//    ConcreteClassRep.
+//=============================================================================
+/// Helper class for AbstractClassRep.
+///
+/// @see AbtractClassRep
+/// @see ConsoleObject
 template <class T>
-class ConcreteClassRep : public AbstractClassRep
+class ConcreteAbstractClassRep : public AbstractClassRep
 {
 public:
-    ConcreteClassRep(const char *name, S32 netClassGroupMask, S32 netClassType, S32 netEventDir, AbstractClassRep *parent )
+
+   virtual AbstractClassRep* getContainerChildClass(const bool recurse)
+   {
+      // Fetch container children type.
+      AbstractClassRep* pChildren = T::getContainerChildStaticClassRep();
+      if (!recurse || pChildren != NULL)
+         return pChildren;
+
+      // Fetch parent type.
+      AbstractClassRep* pParent = T::getParentStaticClassRep();
+      if (pParent == NULL)
+         return NULL;
+
+      // Get parent container children.
+      return pParent->getContainerChildClass(recurse);
+   }
+
+   virtual WriteCustomTamlSchema getCustomTamlSchema(void)
+   {
+      return T::getStaticWriteCustomTamlSchema();
+   }
+
+   ConcreteAbstractClassRep(const char *name,
+       S32 netClassGroupMask, 
+       S32 netClassType, 
+       S32 netEventDir, 
+       AbstractClassRep *parent )
     {
         // name is a static compiler string so no need to worry about copying or deleting
         mClassName = name;
@@ -472,32 +468,13 @@ public:
         mClassGroupMask = netClassGroupMask;
         mNetEventDir    = netEventDir;
         parentClass     = parent;
-
+        //mClassSizeof = sizeof(T);
         // Finally, register ourselves.
         registerClassRep(this);
     };
 
-    virtual AbstractClassRep* getContainerChildClass( const bool recurse )
-    {
-        // Fetch container children type.
-        AbstractClassRep* pChildren = T::getContainerChildStaticClassRep();
-        if ( !recurse || pChildren != NULL )
-            return pChildren;
-
-        // Fetch parent type.
-        AbstractClassRep* pParent = T::getParentStaticClassRep();
-        if ( pParent == NULL )
-            return NULL;
-
-        // Get parent container children.
-        return pParent->getContainerChildClass( recurse );
-    }
-
-    virtual WriteCustomTamlSchema getCustomTamlSchema( void )
-    {
-        return T::getStaticWriteCustomTamlSchema();
-    }
-
+   /// Wrap constructor.
+   ConsoleObject* create() const { return NULL; }
     /// Perform class specific initialization tasks.
     ///
     /// Link namespaces, call initPersistFields() and consoleInit().
@@ -511,13 +488,53 @@ public:
         if(parent && child)
             Con::classLinkNamespaces(parent->getNameSpace(), child->getNameSpace());
 
-        // Finally, do any class specific initialization...
+        // do any class specific initialization...
         T::initPersistFields();
         T::consoleInit();
+
+        // Let the base finish up.
+        //AbstractClassRep::init();
     }
 
-    /// Wrap constructor.
-    ConsoleObject* create() const { return new T; }
+    /// @name Console Type Interface
+   /// @{
+
+    virtual void setData(void* dptr, S32 argc, const char** argv, const EnumTable* tbl, BitSet32 flag)
+    {
+       if (argc == 1)
+       {
+          T** obj = (T**)dptr;
+          *obj = dynamic_cast<T*>(T::__findObject(argv[0]));
+       }
+       else
+          Con::errorf("Cannot set multiple args to a single ConsoleObject*.");
+    }
+
+    virtual const char* getData(void* dptr, const EnumTable* tbl, BitSet32 flag)
+    {
+       T** obj = (T**)dptr;
+       return Con::getReturnBuffer(T::__getObjectId(*obj));
+    }
+
+    virtual const char* getTypeClassName() { return mClassName; }
+    
+};
+
+template< class T >
+class ConcreteClassRep : public ConcreteAbstractClassRep<T>
+{
+public:
+   ConcreteClassRep(const char* name,
+      S32 netClassGroupMask,
+      S32 netClassType,
+      S32 netEventDir,
+      AbstractClassRep* parent)
+      : ConcreteAbstractClassRep<T>(name, netClassGroupMask, netClassType, netEventDir, parent)
+   {
+   }
+
+   /// Wrap constructor.
+   ConsoleObject* create() const { return new T; }
 };
 
 //-----------------------------------------------------------------------------
@@ -525,8 +542,12 @@ public:
 // Forward declarations so they can be used in the class
 const char *defaultProtectedGetFn( void *obj, const char *data );
 bool defaultProtectedWriteFn( void* obj, StringTableEntry pFieldName );
-
 //-----------------------------------------------------------------------------
+//=============================================================================
+//    ConsoleObject.
+//=============================================================================
+
+
 /// Interface class to the console.
 ///
 /// @section ConsoleObject_basics The Basics
@@ -583,21 +604,28 @@ class ConsoleObject
 {
    
 protected:
-    /// @deprecated This is disallowed.
-    ConsoleObject() { /* disallowed */ }
+    
     /// @deprecated This is disallowed.
     ConsoleObject(const ConsoleObject&);
 
 public:
+
+   /// @deprecated This is disallowed.
+   ConsoleObject() { /* disallowed */ }
     /// Get a reference to a field by name.
     const AbstractClassRep::Field* findField(StringTableEntry fieldName) const;
 
     /// Gets the ClassRep.
     virtual AbstractClassRep* getClassRep() const;
 
+/*#define DECLARE_ABSTRACT_CONOBJECT( className )                \
+   static ConcreteAbstractClassRep< className > dynClassRep;   \
+   static AbstractClassRep* getParentStaticClassRep();         \
+   static AbstractClassRep* getStaticClassRep();               \
+   virtual AbstractClassRep* getClassRep() const 
+   */
     /// Set the value of a field.
     bool setField(const char *fieldName, const char *value);
-    virtual ~ConsoleObject();
 
 public:
     /// @name Object Creation
@@ -610,7 +638,6 @@ public:
     /// Get the classname from a class tag.
     static const char* lookupClassName(const U32 in_classTag);
 
-protected:
     /// @name Fields
     /// @{
 
@@ -839,6 +866,8 @@ public:
     const char *getClassName() const;
 
     /// @}
+    static ConsoleObject* __findObject(const char*) { return NULL; }
+    static const char* __getObjectId(ConsoleObject*) { return ""; }
 };
 
 //-----------------------------------------------------------------------------
@@ -976,14 +1005,6 @@ inline bool& ConsoleObject::getDynamicGroupExpand()
     AbstractClassRep* className::getContainerChildStaticClassRep() { return Children::getStaticClassRep(); }        \
     AbstractClassRep::WriteCustomTamlSchema className::getStaticWriteCustomTamlSchema() { return schema; }          \
     ConcreteClassRep<className> className::dynClassRep(#className, 0, -1, 0, className::getParentStaticClassRep())
-
-#define IMPLEMENT_CO_NETOBJECT_SCEHMA_V1(className, schema)                                                                        \
-    AbstractClassRep* className::getClassRep() const { return &className::dynClassRep; }                            \
-    AbstractClassRep* className::getStaticClassRep() { return &dynClassRep; }                                       \
-    AbstractClassRep* className::getParentStaticClassRep() { return Parent::getStaticClassRep(); }                  \
-    AbstractClassRep* className::getContainerChildStaticClassRep() { return NULL; }                                 \
-    AbstractClassRep::WriteCustomTamlSchema className::getStaticWriteCustomTamlSchema() { return schema; }          \
-    ConcreteClassRep<className> className::dynClassRep(#className, NetClassGroupGameMask, NetClassTypeObject, 0, className::getParentStaticClassRep())
 
 #define IMPLEMENT_CO_NETOBJECT_V1(className)                                                                        \
     AbstractClassRep* className::getClassRep() const { return &className::dynClassRep; }                            \

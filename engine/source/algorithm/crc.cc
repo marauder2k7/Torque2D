@@ -56,7 +56,7 @@ static void calculateCRCTable()
 
 //-----------------------------------------------------------------------------
 
-U32 calculateCRC(const void * buffer, S32 len, U32 crcVal )
+U32 CRC::calculateCRC(const void * buffer, S32 len, U32 crcVal )
 {
    // check if need to generate the crc table
    if(!crcTableValid)
@@ -69,7 +69,7 @@ U32 calculateCRC(const void * buffer, S32 len, U32 crcVal )
    return(crcVal);
 }
 
-U32 calculateCRCStream(Stream *stream, U32 crcVal )
+U32 CRC::calculateCRCStream(Stream *stream, U32 crcVal )
 {
    // check if need to generate the crc table
    if(!crcTableValid)

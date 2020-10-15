@@ -71,7 +71,6 @@ namespace Utility
 
 #define STATIC_VOID_CAST_TO( pointerType, castToType, obj ) static_cast<castToType*>( reinterpret_cast<pointerType*>(obj) )
 #define DYNAMIC_VOID_CAST_TO( pointerType, castToType, obj ) dynamic_cast<castToType*>( reinterpret_cast<pointerType*>(obj) )
-
 //-----------------------------------------------------------------------------
 
 /// String helpers.

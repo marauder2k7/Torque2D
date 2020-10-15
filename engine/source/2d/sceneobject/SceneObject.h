@@ -74,9 +74,6 @@
 #ifndef _GAMECONNECTION_H_
 #include "game/gameConnection.h"
 #endif
-#ifndef _SIMCOMPONENT_H_
-#include "component/simComponent.h"
-#endif // !_SIMCOMPONENT_H_
 
 class NetConnection;
 class GameConnection;
@@ -769,7 +766,7 @@ public:
     static const char* getDstBlendFactorDescription(const GLenum factor);
 
     /// Declare Console Object.
-    DECLARE_CONOBJECT( SceneObject );
+    DECLARE_CONOBJECT(SceneObject);
 
 protected:
     S32                     copyCircleCollisionShapeTo( SceneObject* pSceneObject, const b2FixtureDef& fixtureDef ) const;

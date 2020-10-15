@@ -7,7 +7,6 @@
         BodyType="Static";
         Image="MultiplayerToy:Edge";
 };
-GhostAlwaysSet.add(%sprite);
 %scene.add(%sprite);
 
 %sprite = new Sprite(){
@@ -15,7 +14,6 @@ GhostAlwaysSet.add(%sprite);
         BodyType="Static";
         Image="MultiplayerToy:Edge";
 };
-GhostAlwaysSet.add(%sprite);
 %scene.add(%sprite);
 
 %sprite = new Sprite(){
@@ -23,7 +21,6 @@ GhostAlwaysSet.add(%sprite);
         BodyType="Static";
         Image="MultiplayerToy:Edge";
 };
-GhostAlwaysSet.add(%sprite);
 %scene.add(%sprite);
 
 %sprite = new Sprite(){
@@ -31,7 +28,6 @@ GhostAlwaysSet.add(%sprite);
         BodyType="Static";
         Image="MultiplayerToy:Edge";
 };
-GhostAlwaysSet.add(%sprite);
 %scene.add(%sprite);
 
 %sprite = new Sprite(){
@@ -39,7 +35,6 @@ GhostAlwaysSet.add(%sprite);
         BodyType="Static";
         Image="MultiplayerToy:Edge";
 };
-GhostAlwaysSet.add(%sprite);
 %scene.add(%sprite);
 
 %sprite = new Sprite(){
@@ -47,7 +42,6 @@ GhostAlwaysSet.add(%sprite);
         BodyType="Static";
         Image="MultiplayerToy:Edge";
 };
-GhostAlwaysSet.add(%sprite);
 %scene.add(%sprite);
 
 SandboxWindow.setScene(%scene);

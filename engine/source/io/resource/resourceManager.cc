@@ -800,7 +800,7 @@ bool ResManager::getCrc (const char *fileName, U32 & crcVal,
       stream->read (obj->fileSize, buffer);
 
       // get the crc value
-      crcVal = calculateCRC (buffer, obj->fileSize, crcInitialVal);
+      crcVal = CRC::calculateCRC (buffer, obj->fileSize, crcInitialVal);
       if (waterMark == 0xFFFFFFFF)
          delete[]buffer;
       else
@@ -872,7 +872,7 @@ ResourceInstance * ResManager::loadInstance (ResourceObject * obj, bool computeC
    }
 
    if (computeCRC)
-      obj->crc = calculateCRCStream (stream, InvalidCRC);
+      obj->crc = CRC::calculateCRCStream (stream, InvalidCRC);
    else
       obj->crc = InvalidCRC;
 

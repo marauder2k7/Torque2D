@@ -36,7 +36,7 @@ U32                                AbstractClassRep::NetClassBitSize[NetClassGro
 
 AbstractClassRep **                AbstractClassRep::classTable[NetClassGroupsCount][NetClassTypesCount];
 
-U32                                AbstractClassRep::classCRC[NetClassGroupsCount] = {INITIAL_CRC_VALUE, };
+U32                                AbstractClassRep::classCRC[NetClassGroupsCount] = {CRC::INITIAL_CRC_VALUE, };
 bool                               AbstractClassRep::initialized = false;
 
 //--------------------------------------
@@ -107,6 +107,22 @@ AbstractClassRep* AbstractClassRep::findClassRep(const char* in_pClassName)
    return NULL;
 }
 
+AbstractClassRep* AbstractClassRep::findClassRep(U32 groupId, U32 typeId, U32 classId)
+{
+   AssertFatal(initialized,
+      "AbstractClassRep::findClasRep() - Tried to create an object before AbstractClassRep::initialize().");
+   AssertFatal(classId < NetClassCount[groupId][typeId],
+      "AbstractClassRep::findClassRep() - Class id out of range.");
+   AssertFatal(classTable[groupId][typeId][classId] != NULL,
+      "AbstractClassRep::findClassRep() - No class with requested ID type.");
+
+   // Look up the specified class and create it.
+   if (classTable[groupId][typeId][classId])
+      return classTable[groupId][typeId][classId];
+
+   return NULL;
+}
+
 //--------------------------------------
 void AbstractClassRep::registerClassRep(AbstractClassRep* in_pRep)
 {
@@ -142,18 +158,11 @@ ConsoleObject* AbstractClassRep::create(const char* in_pClassName)
 //--------------------------------------
 ConsoleObject* AbstractClassRep::create(const U32 groupId, const U32 typeId, const U32 in_classId)
 {
-   AssertFatal(initialized,
-      "AbstractClassRep::create() - Tried to create an object before AbstractClassRep::initialize().");
-   AssertFatal(in_classId < NetClassCount[groupId][typeId],
-      "AbstractClassRep::create() - Class id out of range.");
-   AssertFatal(classTable[groupId][typeId][in_classId] != NULL,
-      "AbstractClassRep::create() - No class with requested ID type.");
+   const AbstractClassRep* classRep = findClassRep(groupId, typeId, in_classId);
+   if (!classRep)
+      return NULL;
 
-   // Look up the specified class and create it.
-   if(classTable[groupId][typeId][in_classId])
-      return classTable[groupId][typeId][in_classId]->create();
-
-   return NULL;
+   return classRep->create();
 }
 
 //--------------------------------------
@@ -194,10 +203,10 @@ void AbstractClassRep::initialize()
       // So if we have things in it, copy it over...
       if (sg_tempFieldList.size() != 0)
       {
-         if( !walk->mFieldList.size())
+         if (!walk->mFieldList.size())
             walk->mFieldList = sg_tempFieldList;
          else
-            destroyFieldValidators( sg_tempFieldList );
+            destroyFieldValidators(sg_tempFieldList);
       }
 
       // And of course delete it every round.
@@ -210,18 +219,18 @@ void AbstractClassRep::initialize()
       U32 groupMask = 1 << group;
 
       // Specifically, for each NetClass of each NetGroup...
-      for(U32 type = 0; type < NetClassTypesCount; type++)
+      for (U32 type = 0; type < NetClassTypesCount; type++)
       {
          // Go through all the classes and find matches...
          for (walk = classLinkList; walk; walk = walk->nextClass)
          {
-            if(walk->mClassType == type && walk->mClassGroupMask & groupMask)
+            if (walk->mClassType == type && walk->mClassGroupMask & groupMask)
                dynamicTable.push_back(walk);
          }
 
          // Set the count for this NetGroup and NetClass
          NetClassCount[group][type] = dynamicTable.size();
-         if(!NetClassCount[group][type])
+         if (!NetClassCount[group][type])
             continue; // If no classes matched, skip to next.
 
          // Sort by type and then by name.
@@ -231,7 +240,7 @@ void AbstractClassRep::initialize()
          classTable[group][type] = new AbstractClassRep*[NetClassCount[group][type]];
 
          // Fill this in and assign class ids for this group.
-         for(U32 i = 0; i < NetClassCount[group][type];i++)
+         for (U32 i = 0; i < NetClassCount[group][type]; i++)
          {
             classTable[group][type][i] = dynamicTable[i];
             dynamicTable[i]->mClassId[group] = i;
@@ -239,7 +248,7 @@ void AbstractClassRep::initialize()
 
          // And calculate the size of bitfields for this group and type.
          NetClassBitSize[group][type] =
-               getBinLog2(getNextPow2(NetClassCount[group][type] + 1));
+            getBinLog2(getNextPow2(NetClassCount[group][type] + 1));
 
          dynamicTable.clear();
       }
@@ -569,10 +578,6 @@ void ConsoleObject::initPersistFields()
 
 //--------------------------------------
 void ConsoleObject::consoleInit()
-{
-}
-
-ConsoleObject::~ConsoleObject()
 {
 }
 

@@ -1263,8 +1263,9 @@ void SceneObject::sceneRenderOverlay( const SceneRenderState* sceneRenderState )
 //----------------------------------------------------------------------------------------------
 U32 SceneObject::packUpdate(NetConnection * conn, U32 mask, BitStream *stream)
 {
+   U32 retMask = Parent::packUpdate(conn, mask, stream);
 
-   return 0;
+   return retMask;
 }
 
 
@@ -1275,6 +1276,7 @@ U32 SceneObject::packUpdate(NetConnection * conn, U32 mask, BitStream *stream)
 //----------------------------------------------------------------------------------------------
 void SceneObject::unpackUpdate(NetConnection * conn, BitStream *stream)
 {
+   Parent::unpackUpdate(conn, stream);
 }
 //-----------------------------------------------------------------------------
 

@@ -253,7 +253,7 @@ public:
    const U32 getCRC()
    {
       // This could be kinda inefficient - BJG
-      return calculateCRC(getBuffer(), getStreamSize());
+      return CRC::calculateCRC(getBuffer(), getStreamSize());
    }
 };
 

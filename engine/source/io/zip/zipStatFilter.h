@@ -115,7 +115,7 @@ protected:
          return false;
 
       mCD->mUncompressedSize += numBytes;
-      mCD->mCRC32 = calculateCRC(buffer, numBytes, mCD->mCRC32);
+      mCD->mCRC32 = CRC::calculateCRC(buffer, numBytes, mCD->mCRC32);
 
       return true;
    }
@@ -126,7 +126,7 @@ protected:
          return false;
 
       mCD->mUncompressedSize += numBytes;
-      mCD->mCRC32 = calculateCRC(buffer, numBytes, mCD->mCRC32);
+      mCD->mCRC32 = CRC::calculateCRC(buffer, numBytes, mCD->mCRC32);
 
       return true;
    }
@@ -146,7 +146,7 @@ public:
 
       mStream = stream;
       mCD->mUncompressedSize = 0;
-      mCD->mCRC32 = INITIAL_CRC_VALUE;
+      mCD->mCRC32 = CRC::INITIAL_CRC_VALUE;
       return true;
    }
 
@@ -156,7 +156,7 @@ public:
          return;
 
       // Post condition the CRC
-      mCD->mCRC32 ^= CRC_POSTCOND_VALUE;
+      mCD->mCRC32 ^= CRC::CRC_POSTCOND_VALUE;
       mStream = NULL;
    }
 

@@ -802,6 +802,9 @@ public:
 #define ConsoleVoid		void
 #define ConsoleBool		bool
 
+//SAFE_DELETE_ARRAY
+#define SAFE_DELETE_ARRAY(a) { delete [] (a); (a) = NULL; }
+
 // Console function macros
 #  define ConsoleFunctionGroupBegin(groupName, usage) \
       static ConsoleConstructor gConsoleFunctionGroup##groupName##__GroupBegin(NULL,#groupName,usage);

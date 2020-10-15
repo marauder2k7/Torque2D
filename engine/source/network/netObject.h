@@ -268,7 +268,7 @@ protected:
    /// @note "Premature optimization is the root of all evil" - Donald Knuth. The current codebase
    ///       uses this feature in three small places, mostly for non-speed-related purposes.
    SimObjectPtr<NetObject> mServerObject;
-
+   SimObjectPtr<NetObject> mClientObject;
    enum NetFlags
    {
       IsGhost           =  BIT(1),   ///< This is a ghost.

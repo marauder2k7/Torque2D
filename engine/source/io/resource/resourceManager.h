@@ -469,7 +469,7 @@ public:
    /// Computes the CRC of a file.
    ///
    /// By passing a different crcInitialVal, you can take the CRC of multiple files.
-   bool getCrc(const char * fileName, U32 & crcVal, const U32 crcInitialVal = INITIAL_CRC_VALUE );
+   bool getCrc(const char * fileName, U32 & crcVal, const U32 crcInitialVal = CRC::INITIAL_CRC_VALUE );
 
    void setWriteablePath(const char *path);           ///< Sets the writable path for a file to the one given.
    bool isValidWriteFileName(const char *fn);         ///< Checks to see if the given path is valid for writing.
