@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-ConsoleMethodGroupBeginWithDocs(NetObject, SimObject)
+ConsoleMethodGroupBeginWithDocs(NetObject, BehaviorComponent)
 
 /*! Use the scopeToClient method to force this object to be SCOPE_ALWAYS on client.
     When an object is SCOPE_ALWAYS it is always ghosted. Therefore, if you have an object that should always be ghosted to a client, use this method.

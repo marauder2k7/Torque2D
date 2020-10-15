@@ -249,8 +249,6 @@ public:
     friend class WorldQuery;
     friend class DebugDraw;
     friend class SceneObjectRotateToEvent;
-    friend class BehaviorComponent;
-    friend class SimComponent;
 
     enum SceneObjectMasks
     {
@@ -446,7 +444,6 @@ public:
     virtual bool            validRender( void ) const { return true; }
     virtual bool            shouldRender( void ) const { return false; }
 
-    
     /// Render Output.
     virtual bool            canPrepareRender( void ) const { return false; }
     virtual void            scenePrepareRender( const SceneRenderState* pSceneRenderState, SceneRenderQueue* pSceneRenderQueue ) {}

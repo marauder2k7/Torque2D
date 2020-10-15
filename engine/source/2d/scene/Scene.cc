@@ -591,12 +591,12 @@ void Scene::dispatchBeginContactCallbacks( void )
                     sceneObjectBBuffer,
                     miscInfoBufferA );
             }
-            /*else
+            else
             {
                 // No, so call it on its behaviors.
                 const char* args[4] = { "onCollision", "", sceneObjectBBuffer, miscInfoBufferA };
                 pSceneObjectA->callOnBehaviors( 4, args );
-            }*/
+            }
         }
 
         // Is object B allowed to collide with object A?
@@ -611,12 +611,12 @@ void Scene::dispatchBeginContactCallbacks( void )
                     sceneObjectABuffer,
                     miscInfoBufferB );
             }
-            /*else
+            else
             {
                 // No, so call it on its behaviors.
                 const char* args[4] = { "onCollision", "", sceneObjectABuffer, miscInfoBufferB };
                 pSceneObjectB->callOnBehaviors( 4, args );
-            }*/
+            }
         }
     }
 }
@@ -703,12 +703,12 @@ void Scene::dispatchEndContactCallbacks( void )
                     sceneObjectBBuffer,
                     miscInfoBuffer );
             }
-            /*else
+            else
             {
                 // No, so call it on its behaviors.
                 const char* args[4] = { "onEndCollision", "", sceneObjectBBuffer, miscInfoBuffer };
                 pSceneObjectA->callOnBehaviors( 4, args );
-            }*/
+            }
         }
 
         // Is object B allowed to collide with object A?
@@ -723,12 +723,12 @@ void Scene::dispatchEndContactCallbacks( void )
                     sceneObjectABuffer,
                     miscInfoBuffer );
             }
-            /*else
+            else
             {
                 // No, so call it on its behaviors.
                 const char* args[4] = { "onEndCollision", "", sceneObjectABuffer, miscInfoBuffer };
                 pSceneObjectB->callOnBehaviors( 4, args );
-            }*/
+            }
         }
     }
 }
