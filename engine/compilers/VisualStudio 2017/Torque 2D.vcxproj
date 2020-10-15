@@ -717,6 +717,7 @@
     <ClInclude Include="..\..\source\2d\gui\guiSpriteCtrl_ScriptBindings.h" />
     <ClInclude Include="..\..\source\2d\gui\SceneWindow.h" />
     <ClInclude Include="..\..\source\2d\gui\SceneWindow_ScriptBinding.h" />
+    <ClInclude Include="..\..\source\2d\objectTypes.h" />
     <ClInclude Include="..\..\source\2d\sceneobject\BaseDatablock.h" />
     <ClInclude Include="..\..\source\2d\sceneobject\CompositeSprite.h" />
     <ClInclude Include="..\..\source\2d\sceneobject\CompositeSprite_ScriptBinding.h" />

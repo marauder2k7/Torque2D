@@ -47,6 +47,7 @@ protected:
    const char *mTypeName;
    const char *mInspectorFieldType;
 
+
 public:
 
    /// @name cbt_list List Interface
@@ -88,9 +89,6 @@ public:
    virtual const char *prepData(const char *data, char *buffer, U32 bufferLen) { return data; };
    virtual StringTableEntry getTypePrefix( void ) const { return StringTable->EmptyString; }
 };
-
-template< typename T >
-S32 TYPEID() { return T::_mTypeId; }
 
 #define DefineConsoleType( type ) extern S32 type;
 

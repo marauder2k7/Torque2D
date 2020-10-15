@@ -461,6 +461,8 @@ SceneObject::SceneObject() :
     mSerialId = ++sSceneObjectMasterSerialId;
     sGlobalSceneObjectCount++;
 
+    mTypeMask = GameBaseObjectType;
+
     // Initialize the body definition.
     // Important: If these defaults are changed then modify the associated "write" field protected methods to ensure
     // that the associated field is persisted if not the default.

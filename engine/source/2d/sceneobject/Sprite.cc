@@ -37,7 +37,7 @@
 
 //------------------------------------------------------------------------------
 
-IMPLEMENT_CONOBJECT(Sprite);
+IMPLEMENT_CO_NETOBJECT_V1(Sprite);
 
 //------------------------------------------------------------------------------
 
@@ -95,5 +95,29 @@ void Sprite::sceneRender( const SceneRenderState* pSceneRenderState, const Scene
         mRenderOOBB[3],
         pBatchRenderer );
 }
+
+//----------------------------------------------------------------------------------------------
+// Network Send.
+//
+// TO BE IMPLEMENTED!
+//----------------------------------------------------------------------------------------------
+U32 Sprite::packUpdate(NetConnection * conn, U32 mask, BitStream *stream)
+{
+   U32 retMask = Parent::packUpdate(conn, mask, stream);
+
+   return retMask;
+}
+
+
+//----------------------------------------------------------------------------------------------
+// Network Receive.
+//
+// TO BE IMPLEMENTED!
+//----------------------------------------------------------------------------------------------
+void Sprite::unpackUpdate(NetConnection * conn, BitStream *stream)
+{
+   Parent::unpackUpdate(conn, stream);
+}
+//-----------------------------------------------------------------------------
 
 

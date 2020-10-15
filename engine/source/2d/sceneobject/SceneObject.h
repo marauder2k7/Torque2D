@@ -67,6 +67,10 @@
 #include "component/behaviors/behaviorInstance.h"
 #endif
 
+#ifndef _OBJECTTYPES_H_
+#include "2d/objectTypes.h"
+#endif
+
 #ifndef _BASEDATABLOCK_H_
 #include "2d/sceneobject/BaseDatablock.h"
 #endif // !_BASEDATABLOCK_H_
@@ -248,6 +252,15 @@ public:
     friend class BehaviorComponent;
     friend class SimComponent;
 
+    enum SceneObjectMasks
+    {
+       InitialUpdateMask = BIT(0),
+       ScaleMask = BIT(1),
+       FlagMask = BIT(2),
+       MountedMask = BIT(3),
+       NextFreeMask = BIT(4)
+    };
+
     SceneObjectDatablock* mConfigDataBlock;
     static SceneObjectDatablock* getDefaultConfig() { return mDefaultConfig; };
     static void setDefaultConfig(SceneObjectDatablock* config) { mDefaultConfig = config; };
@@ -263,7 +276,9 @@ protected:
     ///         callbacks.
     SimObjectPtr<Scene>     mpTargetScene;
 
+    BitSet32                mObjectFlags;
 
+    U32                     mTypeMask;
 
     /// Lifetime.
     F32                     mLifetime;
@@ -738,6 +753,9 @@ public:
     void                    notifyComponentsAddToScene( void );
     void                    notifyComponentsRemoveFromScene( void );
     void                    notifyComponentsUpdate( void );
+    
+    //Type Mask
+    U32 getTypeMask() { return mTypeMask ; }
 
     /// Miscellaneous.
     inline const char*      scriptThis(void) const                      { return Con::getIntArg(getId()); }

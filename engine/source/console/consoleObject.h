@@ -211,11 +211,12 @@ public:
       mDynamicGroupExpand = false;
       mNamespace = NULL;
       mNetEventDir = 0;
+      nextClass = NULL;
       parentClass = NULL;
    }
 
    /// @}
-   virtual ~AbstractClassRep() {} 
+   //virtual ~AbstractClassRep() {} 
    /// @name Representation Interface
    /// @{
 
@@ -310,7 +311,7 @@ public:
 
     S32                          getClassId(U32 netClassGroup)   const { return mClassId[netClassGroup]; }
     static U32                   getClassCRC (U32 netClassGroup) { return classCRC[netClassGroup]; }
-
+    
     // Return className
     const char*                  getClassName() const { return mClassName; }
     // Return namespace
@@ -424,7 +425,7 @@ public:
    static AbstractClassRep* findClassRep(const char* in_pClassName);
    static AbstractClassRep * findClassRep(U32 groupId, U32 typeId, U32 classId);
    static void initialize(); // Called from Con::init once on startup
-   void shutdown();
+   static void shutdown();
 
 };
 

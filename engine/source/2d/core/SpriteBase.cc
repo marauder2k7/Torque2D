@@ -33,7 +33,7 @@
 
 //------------------------------------------------------------------------------
 
-IMPLEMENT_CONOBJECT(SpriteBase);
+IMPLEMENT_CO_NETOBJECT_V1(SpriteBase);
 
 //------------------------------------------------------------------------------
 
@@ -102,3 +102,27 @@ void SpriteBase::onAnimationEnd( void )
     // Do script callback.
     Con::executef( this, 1, "onAnimationEnd" );
 }
+
+//----------------------------------------------------------------------------------------------
+// Network Send.
+//
+// TO BE IMPLEMENTED!
+//----------------------------------------------------------------------------------------------
+U32 SpriteBase::packUpdate(NetConnection * conn, U32 mask, BitStream *stream)
+{
+   U32 retMask = Parent::packUpdate(conn, mask, stream);
+
+   return retMask;
+}
+
+
+//----------------------------------------------------------------------------------------------
+// Network Receive.
+//
+// TO BE IMPLEMENTED!
+//----------------------------------------------------------------------------------------------
+void SpriteBase::unpackUpdate(NetConnection * conn, BitStream *stream)
+{
+   Parent::unpackUpdate(conn, stream);
+}
+//-----------------------------------------------------------------------------
