@@ -243,6 +243,7 @@
     <ClCompile Include="..\..\source\2d\assets\AnimationAsset.cc" />
     <ClCompile Include="..\..\source\2d\assets\FontAsset.cc" />
     <ClCompile Include="..\..\source\2d\assets\ImageAsset.cc" />
+    <ClCompile Include="..\..\source\2d\assets\LevelAsset.cc" />
     <ClCompile Include="..\..\source\2d\assets\ParticleAsset.cc" />
     <ClCompile Include="..\..\source\2d\assets\ParticleAssetEmitter.cc" />
     <ClCompile Include="..\..\source\2d\assets\ParticleAssetField.cc" />
@@ -672,6 +673,8 @@
     <ClInclude Include="..\..\source\2d\assets\FontAsset_ScriptBinding.h" />
     <ClInclude Include="..\..\source\2d\assets\ImageAsset.h" />
     <ClInclude Include="..\..\source\2d\assets\ImageAsset_ScriptBinding.h" />
+    <ClInclude Include="..\..\source\2d\assets\LevelAsset.h" />
+    <ClInclude Include="..\..\source\2d\assets\LevelAsset_ScriptBinding.h" />
     <ClInclude Include="..\..\source\2d\assets\ParticleAsset.h" />
     <ClInclude Include="..\..\source\2d\assets\ParticleAssetEmitter.h" />
     <ClInclude Include="..\..\source\2d\assets\ParticleAssetEmitter_ScriptBinding.h" />

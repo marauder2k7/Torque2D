@@ -65,7 +65,7 @@ function initServer()
    $Server::TestCheats = false;
 
    // Specify where the mission files are.
-   $Server::MissionFileSpec = "assets/scenes/*.taml";
+   $Server::MissionFileSpec = "^assets/scenes/*.cs";
 
    // The common module provides the basic server functionality
    initBaseServer();

@@ -384,6 +384,7 @@ ConsoleFunctionWithDocs(exec, ConsoleBool, 2, 4, ( fileName, [nocalls]?, [journa
    }
 #endif //TORQUE_ALLOW_JOURNALING
 
+   
    // Ok, we let's try to load and compile the script.
    ResourceObject *rScr = ResourceManager->find(scriptFileName);
    ResourceObject *rCom = NULL;
@@ -517,9 +518,9 @@ ConsoleFunctionWithDocs(exec, ConsoleBool, 2, 4, ( fileName, [nocalls]?, [journa
 #endif
       {
          // compile this baddie.
-         #if defined(TORQUE_DEBUG)
+#if defined(TORQUE_DEBUG)
          Con::printf("Compiling %s...", scriptFileName);
-         #endif
+#endif
          CodeBlock *code = new CodeBlock();
          code->compile(nameBuffer, scriptFileName, script);
          delete code;
@@ -583,18 +584,7 @@ ConsoleFunctionWithDocs(exec, ConsoleBool, 2, 4, ( fileName, [nocalls]?, [journa
          CodeBlock *newCodeBlock = new CodeBlock();
          StringTableEntry name = StringTable->insert(scriptFileName);
 
-      
-      //Luma: Profile script executions 
-         F32 st1 = (F32)Platform::getRealMilliseconds();
-         
          newCodeBlock->compileExec(name, script, noCalls, 0);
-
-         F32 et1 = (F32)Platform::getRealMilliseconds();
-
-         F32 etf = et1 - st1;
-         
-        if ( scriptExecutionEcho )
-            Con::printf("Executed %s. Took %.0f ms", scriptFileName, etf);
 
          ret = true;
    }

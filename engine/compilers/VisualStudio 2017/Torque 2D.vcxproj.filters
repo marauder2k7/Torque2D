@@ -1468,6 +1468,9 @@
     <ClCompile Include="..\..\source\2d\sceneobject\BaseDatablock.cc">
       <Filter>2d\sceneobject</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\2d\assets\LevelAsset.cc">
+      <Filter>2d\assets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\audio\audio.h">
@@ -3269,6 +3272,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\2d\objectTypes.h">
       <Filter>2d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\2d\assets\LevelAsset.h">
+      <Filter>2d\assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\2d\assets\LevelAsset_ScriptBinding.h">
+      <Filter>2d\assets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

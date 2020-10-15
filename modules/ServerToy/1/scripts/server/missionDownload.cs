@@ -86,6 +86,7 @@ function GameConnection::onGhostAlwaysFailed(%client)
 function GameConnection::onGhostAlwaysObjectsReceived(%client)
 {
    // Ready for next phase.
+   echo ("*** Phase 2: Download Ghost Finished");
    commandToClient(%client, 'MissionStartPhase3', $missionSequence, $Server::MissionFile);
 }
 

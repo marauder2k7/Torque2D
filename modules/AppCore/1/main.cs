@@ -27,6 +27,7 @@ function AppCore::create( %this )
     exec("./scripts/defaultPreferences.cs");
     exec("./scripts/canvas.cs");
     exec("./scripts/openal.cs");
+	exec("./scripts/levelManagement.cs");
     
     // Initialize the canvas
     initializeCanvas("Torque 2D");
