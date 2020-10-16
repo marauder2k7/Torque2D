@@ -252,11 +252,11 @@ public:
 
     enum SceneObjectMasks
     {
-       InitialUpdateMask = BIT(0),
-       ScaleMask = BIT(1),
-       FlagMask = BIT(2),
-       MountedMask = BIT(3),
-       NextFreeMask = BIT(4)
+       InitialUpdateMask   = BIT(0),
+       ScaleMask           = BIT(1),
+       MoveMask            = BIT(2),
+       MountedMask         = BIT(3),
+       NextFreeMask        = BIT(4)
     };
 
     SceneObjectDatablock* mConfigDataBlock;
@@ -298,12 +298,12 @@ protected:
     b2AABB                  mCurrentAABB;
     Vector2                 mLocalSizeOOBB[4];
     Vector2                 mRenderOOBB[4];
-	S32                     mWorldProxyId;
+	 S32                     mWorldProxyId;
 
-	// Growing
-	bool					mGrowActive;
-	Vector2					mTargetSize;
-	Vector2					mDeltaSize;
+	 // Growing
+	 bool					       mGrowActive;
+	 Vector2					    mTargetSize;
+	 Vector2					    mDeltaSize;
 
     /// Position / Angle.
     Vector2                 mPreTickPosition;
@@ -319,6 +319,7 @@ protected:
     bool                    mTargetPositionFound;
     bool                    mSnapToTargetPosition;
     bool                    mStopAtTargetPosition;
+    Vector2                 mVelocity;
 
     /// Body.
     b2Body*                 mpBody;
@@ -351,12 +352,12 @@ protected:
     F32                     mAlphaTest;
 
 	// Fading
-	bool					mFadeActive;
-	ColorF					mTargetColor;
-	F32						mDeltaRed;
-	F32						mDeltaGreen;
-	F32						mDeltaBlue;
-	F32						mDeltaAlpha;
+	bool					       mFadeActive;
+	ColorF					    mTargetColor;
+	F32						    mDeltaRed;
+	F32						    mDeltaGreen;
+	F32						    mDeltaBlue;
+	F32						    mDeltaAlpha;
 
     /// Render sorting.
     Vector2                 mSortPoint;
@@ -559,8 +560,8 @@ public:
     virtual void            onEndCollision( const TickContact& tickContact );
 
     /// Velocities.
-    inline void             setLinearVelocity( const Vector2& velocity ) { if ( mpScene ) mpBody->SetLinearVelocity( velocity ); else mBodyDefinition.linearVelocity = velocity; }
-    inline Vector2          getLinearVelocity(void) const               { if ( mpScene ) return mpBody->GetLinearVelocity(); else return mBodyDefinition.linearVelocity; }
+    inline void             setLinearVelocity(const Vector2& velocity) { if (mpScene) mpBody->SetLinearVelocity(velocity); else mBodyDefinition.linearVelocity = velocity; mVelocity = velocity; }
+    inline Vector2          getLinearVelocity(void) const               { return mVelocity; }
     inline Vector2          getLinearVelocityFromWorldPoint( const Vector2& worldPoint ) { if ( mpScene ) return mpBody->GetLinearVelocityFromWorldPoint( worldPoint ); else return mBodyDefinition.linearVelocity; }
     inline Vector2          getLinearVelocityFromLocalPoint( const Vector2& localPoint ) { if ( mpScene ) return mpBody->GetLinearVelocityFromLocalPoint( localPoint ); else return mBodyDefinition.linearVelocity; }
     inline void             setAngularVelocity( const F32 velocity )    { if ( mpScene ) mpBody->SetAngularVelocity( velocity ); else mBodyDefinition.angularVelocity = velocity; }

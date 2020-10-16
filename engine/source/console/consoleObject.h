@@ -314,6 +314,7 @@ public:
     
     // Return className
     const char*                  getClassName() const { return mClassName; }
+
     // Return namespace
     Namespace*                   getNameSpace() { return mNamespace; }
     // Return Parent
@@ -379,24 +380,47 @@ public:
       DepricatedFieldType = 0xFFFFFFFF
    };
 
+   enum FieldFlags
+   {
+      FIELD_HideInInspectors     = BIT(0),
+      FIELD_ComponentInspectors  = BIT(1),
+      FIELD_CustomInspectors     = BIT(2),
+   };
+
    struct Field 
    {
+      Field()
+         :  pFieldname(NULL),
+            pGroupname(NULL),
+            pFieldDocs(NULL),
+            groupExpand(false),
+            type(0),
+            offset(0),
+            elementCount(0),
+            table(NULL),
+            validator(NULL),
+            setDataFn(NULL),
+            getDataFn(NULL),
+            writeDataFn(NULL),
+            networkMask(0)
+      {}
       const char* pFieldname;    ///< Name of the field.
       const char* pGroupname;      ///< Optionally filled field containing the group name.
       ///
       ///  This is filled when type is StartField or EndField
 
-      const char*    pFieldDocs;    ///< Documentation about this field; see consoleDoc.cc.
-      bool           groupExpand;   ///< Flag to track expanded/not state of this group in the editor.
-      U32            type;          ///< A type ID. @see ACRFieldTypes
-      dsize_t        offset;        ///< Memory offset from beginning of class for this field.
-      S32            elementCount;  ///< Number of elements, if this is an array.
-      EnumTable *    table;         ///< If this is an enum, this points to the table defining it.
-      BitSet32       flag;          ///< Stores various flags
-      ConsoleTypeValidator *validator;     ///< Validator, if any.
-      SetDataNotify  setDataFn;     ///< Set data notify Fn
-      GetDataNotify  getDataFn;     ///< Get data notify Fn
-      WriteDataNotify writeDataFn;   ///< Function to determine whether data should be written or not.
+      const char*             pFieldDocs;    ///< Documentation about this field; see consoleDoc.cc.
+      bool                    groupExpand;   ///< Flag to track expanded/not state of this group in the editor.
+      U32                     type;          ///< A type ID. @see ACRFieldTypes
+      dsize_t                 offset;        ///< Memory offset from beginning of class for this field.
+      S32                     elementCount;  ///< Number of elements, if this is an array.
+      EnumTable *             table;         ///< If this is an enum, this points to the table defining it.
+      BitSet32                flag;          ///< Stores various flags
+      ConsoleTypeValidator    *validator;     ///< Validator, if any.
+      SetDataNotify           setDataFn;     ///< Set data notify Fn
+      GetDataNotify           getDataFn;     ///< Get data notify Fn
+      WriteDataNotify         writeDataFn;   ///< Function to determine whether data should be written or not.
+      U32                     networkMask;
    };
    typedef Vector<Field> FieldList;
 
@@ -405,6 +429,9 @@ public:
    bool mDynamicGroupExpand;
 
    const Field *findField(StringTableEntry fieldName) const;
+
+   virtual void* getNativeVariable() { return new (AbstractClassRep*); } // Any pointer-sized allocation will do.
+   virtual void deleteNativeVariable(void* var) { delete reinterpret_cast<AbstractClassRep**>(var); }
 
    static void destroyFieldValidators(AbstractClassRep::FieldList &mFieldList);
 
@@ -479,9 +506,8 @@ public:
             mClassId[i] = -1;
 
         // Set properties for this ACR
-        mClassGroupMask = netClassGroupMask;
         mClassType      = netClassType;
-        
+        mClassGroupMask = netClassGroupMask;
         mNetEventDir    = netEventDir;
         parentClass     = parent;
         mClassSizeof = sizeof(T);

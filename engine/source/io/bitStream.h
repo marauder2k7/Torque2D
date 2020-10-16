@@ -60,6 +60,10 @@ protected:
    bool mCompressRelative;
    Point3F mCompressPoint;
 
+   ///2d Networking
+   bool m2dCompressRelative;
+   Point2F m2dCompressPoint;
+
    friend class HuffmanProcessor;
 public:
    static BitStream *getPacketStream(U32 writeSize = 0);
@@ -158,6 +162,10 @@ public:
    void writeNormalVector(const Point3F& vec, S32 bitCount);
    void readNormalVector(Point3F *vec, S32 bitCount);
 
+   /// writes a 2d normalized vector
+   void write2dNormalVector(const Point2F& vec, S32 bitCount);
+   void read2dNormalVector(Point2F *vec, S32 bitCount);
+
    void clearCompressionPoint();
    void setCompressionPoint(const Point3F& p);
 
@@ -165,6 +173,15 @@ public:
    // have matching scale values.
    void writeCompressedPoint(const Point3F& p,F32 scale = 0.01f);
    void readCompressedPoint(Point3F* p,F32 scale = 0.01f);
+   
+   ///2d
+   void clear2dCompressionPoint();
+   void set2dCompressionPoint(const Point2F& p);
+
+   // Matching calls to these compression methods must, of course,
+   // have matching scale values.
+   void write2dCompressedPoint(const Point2F& p, F32 scale = 0.01f);
+   void read2dCompressedPoint(Point2F* p, F32 scale = 0.01f);
 
    // Uses the above method to reduce the precision of a normal vector so the server can
    //  determine exactly what is on the client.  (Pre-dumbing the vector before sending
@@ -175,6 +192,7 @@ public:
    // writes a normalized vector using alternate method
    void writeNormalVector(const Point3F& vec, S32 angleBitCount, S32 zBitCount);
    void readNormalVector(Point3F *vec, S32 angleBitCount, S32 zBitCount);
+
 
    void readVector(Point3F * vec, F32 minMag, F32 maxMag, S32 magBits, S32 angleBits, S32 zBits);
    void writeVector(Point3F vec, F32 minMag, F32 maxMag, S32 magBits, S32 angleBits, S32 zBits);

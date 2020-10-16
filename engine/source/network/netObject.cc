@@ -245,3 +245,34 @@ void NetObject::initPersistFields()
 {
    Parent::initPersistFields();
 }
+
+U16 NetObject::addScopeRef()
+{
+   if (mScope_refs == 0)
+   {
+      mScope_id = NetObject::generateScopeId();
+      onScopeIdChange();
+   }
+   mScope_refs++;
+   return mScope_id;
+}
+
+void NetObject::removeScopeRef()
+{
+   if (mScope_refs == 0)
+      return;
+   mScope_refs--;
+   if (mScope_refs == 0)
+   {
+      mScope_id = 0;
+      onScopeIdChange();
+   }
+}
+
+U16 NetObject::generateScopeId()
+{
+   U16 ret_id = master_scope_id++;
+   if (master_scope_id >= BIT(SCOPE_ID_BITS))
+      master_scope_id = 1;
+   return ret_id;
+}

@@ -1266,6 +1266,12 @@ void SceneObject::sceneRenderOverlay( const SceneRenderState* sceneRenderState )
 U32 SceneObject::packUpdate(NetConnection * conn, U32 mask, BitStream *stream)
 {
    U32 retMask = Parent::packUpdate(conn, mask, stream);
+   if (stream->writeFlag(mask & MoveMask))
+   {
+      Vector2 pos;
+      pos = mpBody->GetPosition();
+      stream->write2dCompressedPoint(pos);
+   }
 
    return retMask;
 }
@@ -1279,6 +1285,12 @@ U32 SceneObject::packUpdate(NetConnection * conn, U32 mask, BitStream *stream)
 void SceneObject::unpackUpdate(NetConnection * conn, BitStream *stream)
 {
    Parent::unpackUpdate(conn, stream);
+   if (stream->readFlag())
+   {
+      Point2F pos;
+      stream->read2dCompressedPoint(&pos);
+      this->setPosition(pos);
+   }
 }
 //-----------------------------------------------------------------------------
 
@@ -1652,6 +1664,8 @@ void SceneObject::setPosition( const Vector2& position )
     {
         mBodyDefinition.position = position;
     }
+
+    setMaskBits(MoveMask);
 }
 
 //-----------------------------------------------------------------------------

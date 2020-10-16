@@ -410,6 +410,24 @@ void BitStream::readNormalVector(Point3F * vec, S32 angleBitCount, S32 zBitCount
    vec->y = mult * mCos(angle);
 }
 
+void BitStream::write2dNormalVector(const Point2F& vec, S32 bitCount)
+{
+   F32 phi = mAtan(vec.x, vec.y) / (F32)M_PI;
+   F32 theta = mAtan(vec.x*vec.x, vec.y*vec.y);
+
+   writeSignedFloat(phi, bitCount + 1);
+   writeSignedFloat(theta, bitCount);
+}
+
+void BitStream::read2dNormalVector(Point2F *vec, S32 bitCount)
+{
+   F32 phi = readSignedFloat(bitCount + 1) * (U32)M_PI;
+   F32 theta = readSignedFloat(bitCount) * ((F32)M_PI / 2.0f);
+
+   vec->x = mSin(phi)*mCos(theta);
+   vec->y = mCos(phi)*mCos(theta);
+}
+
 void BitStream::writeAffineTransform(const MatrixF& matrix)
 {
 //   AssertFatal(matrix.isAffine() == true,
@@ -524,6 +542,79 @@ void BitStream::readCompressedPoint(Point3F* p,F32 scale)
       p->x = mCompressPoint.x + p->x * scale;
       p->y = mCompressPoint.y + p->y * scale;
       p->z = mCompressPoint.z + p->z * scale;
+   }
+}
+
+//------------------------------------------------------------------------------
+// 2d CompressionPoint
+//------------------------------------------------------------------------------
+
+void BitStream::clear2dCompressionPoint()
+{
+   mCompressRelative = false;
+}
+
+void BitStream::set2dCompressionPoint(const Point2F& p)
+{
+   m2dCompressRelative = true;
+   m2dCompressPoint = p;
+}
+
+void BitStream::write2dCompressedPoint(const Point2F& p, F32 scale)
+{
+   // Same # of bits for all axis
+   Point2F vec;
+   F32 invScale = 1 / scale;
+   U32 type;
+   if (m2dCompressRelative)
+   {
+      vec = p - m2dCompressPoint;
+      F32 dist = vec.len() * invScale;
+      if (dist < (1 << 15))
+         type = 0;
+      else if (dist < (1 << 17))
+         type = 1;
+      else if (dist < (1 << 19))
+         type = 2;
+      else
+         type = 3;
+   }
+   else
+      type = 3;
+
+   writeInt(type, 2);
+
+   if (type != 3)
+   {
+      type = gBitCounts[type];
+      writeSignedInt(S32(vec.x * invScale), type);
+      writeSignedInt(S32(vec.y * invScale), type);
+   }
+   else
+   {
+      write(p.x);
+      write(p.y);
+   }
+}
+
+void BitStream::read2dCompressedPoint(Point2F* p, F32 scale)
+{
+   // Same # of bits for all axis
+   U32 type = readInt(2);
+
+   if (type == 3)
+   {
+      read(&p->x);
+      read(&p->y);
+   }
+   else
+   {
+      type = gBitCounts[type];
+      p->x = (F32)readSignedInt(type);
+      p->y = (F32)readSignedInt(type);
+
+      p->x = mCompressPoint.x + p->x * scale;
+      p->y = mCompressPoint.y + p->y * scale;
    }
 }
 

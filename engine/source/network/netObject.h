@@ -379,6 +379,36 @@ public:
    bool isScopeable() const;     ///< Is this object subject to scoping?
    bool isGhostable() const;     ///< Is this object ghostable?
    bool isGhostAlways() const;   ///< Should this object always be ghosted?
+
+   /// Returns a pointer to the server object when on a local connection.
+   NetObject* getServerObject() const { return mServerObject; }
+
+   /// Return a pointer t the client object
+   NetObject* getClientObject() const { return mClientObject; }
+
+   /// Template form for the callers convenience
+   template <class T>
+   static T* getServerObject(T *netObj) { return static_cast<T*>(netObj->getServerObject()); }
+
+   /// Template form for the callers convenience
+   template <class T>
+   static T* getClientObject(T *netObj) { return static_cast<T*>(netObj->getClientObject()); }
+
+protected:
+   U16          mScope_id;
+   U16          mScope_refs;
+   bool         mScope_registered;
+   virtual void onScopeIdChange() {}
+public:
+   enum {SCOPE_ID_BITS = 14};
+   U16          getScopeId() const { return mScope_id; }
+   U16          addScopeRef();
+   U16          generateScopeId();
+   U16          master_scope_id = 1;
+   void         removeScopeRef();
+   void         setScopeRegistered(bool flag) { mScope_registered = flag; }
+   bool         getScopeRegistered() const { return mScope_registered; }
+
 };
 
 //-----------------------------------------------------------------------------
@@ -419,5 +449,6 @@ inline bool NetObject::isGhostAlways() const
                "That's strange, a ScopeAlways non-ghostable object?  Something wrong here");
    return mNetFlags.test(Ghostable) && mNetFlags.test(ScopeAlways);
 }
+
 
 #endif
