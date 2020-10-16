@@ -46,6 +46,12 @@ ConsoleMethodWithDocs(NetConnection,setSimulatedNetParams, ConsoleVoid,4, 4, ( p
    object->setSimulatedNetParams(dAtof(argv[2]), dAtoi(argv[3]));
 }
 
+ConsoleMethodWithDocs(NetConnection, transmitPaths, ConsoleVoid, 3, 3, (bool status?))
+{
+   // Set paths transmitted
+   object->setMissionPathsSent(dAtob(argv[2]));
+}
+
 /*! Use the getPing method to determine the round-trip travel time from this connection to the agent on the other end and back again.
     @return Returns an integer value representing the total time in milliseconds it takes for a ping request to travel to the agent on the other end of a connection and back to this agent.
     @sa getPacketLoss

@@ -95,6 +95,11 @@ void SpriteBase::copyTo(SimObject* object)
     ImageFrameProvider::copyTo( pSpriteBase );
 }
 
+void SpriteBase::setControllingClient(GameConnection * connection)
+{
+   Parent::setControllingClient(connection);
+}
+
 //------------------------------------------------------------------------------
 
 void SpriteBase::onAnimationEnd( void )

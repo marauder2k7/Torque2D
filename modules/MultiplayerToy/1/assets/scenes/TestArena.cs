@@ -2,7 +2,7 @@
       cameraPosition = "0 0";
       cameraSize = "100 75";
 
-	new Sprite(){
+	new Sprite(TestSprite){
 			Scene = TestArenaScene;
 			Position="0.0 0.0";
 			BodyType="Static";
@@ -39,3 +39,5 @@
 			Image="MultiplayerToy:Edge";
 	};
 };
+
+SandboxWindow.setScene(TestArenaScene);

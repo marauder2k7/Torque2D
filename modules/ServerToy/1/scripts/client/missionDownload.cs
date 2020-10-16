@@ -62,9 +62,7 @@ function onGhostAlwaysStarted(%ghostCount)
 
 function onGhostAlwaysObjectReceived()
 {
-   echo ("*** Phase 2: Download Ghost Received");
    $ghostsRecvd++;
-   onPhase2Progress($ghostsRecvd / $ghostCount);
 }
 
 //----------------------------------------------------------------------------
@@ -76,7 +74,6 @@ function clientCmdMissionStartPhase3(%seq,%missionName)
    $MSeq = %seq;
    $Client::MissionFile = %missionName;
    echo(%missionName);
-   exec(%missionName);
    commandToServer('MissionStartPhase3Ack', $MSeq);
 }
 

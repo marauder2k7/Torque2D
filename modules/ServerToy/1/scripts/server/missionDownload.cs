@@ -100,14 +100,7 @@ function serverCmdMissionStartPhase3Ack(%client, %seq)
    %client.currentPhase = 3;
    
    // Server is ready to drop into the game
-   
-   if ( $Pref::Server::MinPlayers > 1 )
-   {
-      PlayerReady(%client);
-   }
-   else
-   {
-      %client.startMission();
-      %client.onClientEnterGame();
-   }
+  
+    %client.startMission();
+    %client.onClientEnterGame();
 }

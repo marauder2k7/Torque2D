@@ -50,15 +50,17 @@ public:
 
     virtual void copyTo(SimObject* object);
 
+    virtual void setControllingClient(GameConnection* connection);
+
     /// Declare Console Object.
     DECLARE_CONOBJECT( SpriteBase );
 
 protected:
     virtual void onAnimationEnd( void );
 
-    U32 packUpdate(NetConnection * conn, U32 mask, BitStream * stream);
+    virtual U32 packUpdate(NetConnection * conn, U32 mask, BitStream * stream);
 
-    void unpackUpdate(NetConnection * conn, BitStream * stream);
+    virtual void unpackUpdate(NetConnection * conn, BitStream * stream);
 
 protected:
     static bool setImage(void* obj, const char* data)                           { DYNAMIC_VOID_CAST_TO(SpriteBase, ImageFrameProvider, obj)->setImage(data); return false; };

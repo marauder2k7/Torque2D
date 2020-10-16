@@ -27,7 +27,7 @@
 #include "io/bitStream.h"
 #include "game/gameConnection.h"
 #include "io/resource/resourceManager.h"
-
+#include "2d/sceneobject/SceneObject.h"
 #include "gameConnection_ScriptBinding.h"
 
 //----------------------------------------------------------------------------
@@ -368,6 +368,29 @@ void GameConnection::writePacket(BitStream *bstream, PacketNotify *note)
    bstream->setStringBuffer(NULL);
 }
 
+
+void GameConnection::setControlObject(SceneObject * cObj)
+{
+   if (mControlObject == cObj)
+      return;
+
+   if (cObj)
+   {
+
+      if (GameConnection *con = cObj->getControllingClient())
+      {
+         if (this != con)
+         {
+            if (con->getControlObject() == cObj)
+               con->setControlObject(0);
+         }
+      }
+
+      cObj->setControllingClient(this);
+   }
+
+   mControlObject = cObj;
+}
 
 void GameConnection::detectLag()
 {

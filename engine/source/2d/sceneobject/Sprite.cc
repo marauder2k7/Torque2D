@@ -118,6 +118,10 @@ void Sprite::unpackUpdate(NetConnection * conn, BitStream *stream)
 {
    Parent::unpackUpdate(conn, stream);
 }
+void Sprite::setControllingClient(GameConnection * connection)
+{
+   Parent::setControllingClient(connection);
+}
 //-----------------------------------------------------------------------------
 
 

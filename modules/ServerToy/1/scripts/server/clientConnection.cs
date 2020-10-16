@@ -192,6 +192,7 @@ function GameConnection::onDrop(%client, %reason)
 function GameConnection::startMission(%this)
 {
    // Inform the client the mission starting
+   echo("%---MissionStart Command Received---%");
    commandToClient(%this, 'MissionStart', $missionSequence);
 }
 

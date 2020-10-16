@@ -242,6 +242,8 @@ private:
 
     static SceneObjectDatablock* mDefaultConfig;
 
+    GameConnection* mControllingClient;
+
 public:
     friend class Scene;
     friend class SceneWindow;
@@ -319,6 +321,8 @@ protected:
     bool                    mTargetPositionFound;
     bool                    mSnapToTargetPosition;
     bool                    mStopAtTargetPosition;
+
+    Vector2                 mPosition;
     Vector2                 mVelocity;
 
     /// Body.
@@ -751,7 +755,12 @@ public:
     void                    notifyComponentsAddToScene( void );
     void                    notifyComponentsRemoveFromScene( void );
     void                    notifyComponentsUpdate( void );
+
+
     
+    virtual void setControllingClient(GameConnection* connection);
+    GameConnection* getControllingClient() { return mControllingClient; }
+
     //Type Mask
     U32 getTypeMask() { return mTypeMask ; }
 

@@ -59,6 +59,7 @@ function clientEndMission()
 
 function clientCmdMissionStart(%seq)
 {
+   echo("%---Starting Mission---%");
    clientStartMission();
    $Client::missionSeq = %seq;
 }

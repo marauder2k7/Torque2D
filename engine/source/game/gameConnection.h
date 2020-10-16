@@ -32,6 +32,10 @@
 #ifndef _BITVECTOR_H_
 #include "collection/bitVector.h"
 #endif
+#ifndef _SCENEOBJECT_H_
+#include "2d/sceneobject/SceneObject.h"
+#endif // !_SCENEOBJECT_H_
+
 
 enum GameConnectionConstants {
    MaxClients = 126,
@@ -82,7 +86,9 @@ class GameConnection : public NetConnection
 private:
    typedef NetConnection Parent;
 
-
+   SimObjectPtr<SceneObject> mControlObject;
+  
+   
    char mDisconnectReason[256];
    
    U32  mMissionCRC;             // crc of the current mission file from the server
@@ -195,6 +201,10 @@ public:
    static GameConnection *getLocalClientConnection() { return dynamic_cast<GameConnection*>((NetConnection *) mLocalClientConnection); }
 
    /// @}
+
+   /// Control object
+   void setControlObject(SceneObject *cObj);
+   SceneObject* getControlObject() { return mControlObject; }
 
    void detectLag();
 

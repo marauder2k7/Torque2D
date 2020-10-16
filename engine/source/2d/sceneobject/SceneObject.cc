@@ -1270,6 +1270,7 @@ U32 SceneObject::packUpdate(NetConnection * conn, U32 mask, BitStream *stream)
    {
       Vector2 pos;
       pos = mpBody->GetPosition();
+      Point2F pos2F = pos.ToPoint2F();
       stream->write2dCompressedPoint(pos);
    }
 
@@ -1289,7 +1290,8 @@ void SceneObject::unpackUpdate(NetConnection * conn, BitStream *stream)
    {
       Point2F pos;
       stream->read2dCompressedPoint(&pos);
-      this->setPosition(pos);
+      Vector2 posV = pos;
+      this->setPosition(posV);
    }
 }
 //-----------------------------------------------------------------------------
@@ -1665,6 +1667,7 @@ void SceneObject::setPosition( const Vector2& position )
         mBodyDefinition.position = position;
     }
 
+    mPosition = position;
     setMaskBits(MoveMask);
 }
 
@@ -3798,14 +3801,14 @@ void SceneObject::notifyComponentsAddToScene( void )
     PROFILE_SCOPE(SceneObject_NotifyComponentsAddToScene);
 
     // Notify components.
-    /*VectorPtr<SimComponent*>& componentList = lockComponentList();
+    VectorPtr<SimComponent*>& componentList = lockComponentList();
     for( SimComponentIterator itr = componentList.begin(); itr != componentList.end(); ++itr )
     {
         SimComponent *pComponent = *itr;
         if( pComponent != NULL )
             pComponent->onAddToScene();
     }
-    unlockComponentList();*/
+    unlockComponentList();
 }
 
 //-----------------------------------------------------------------------------
@@ -3816,14 +3819,14 @@ void SceneObject::notifyComponentsRemoveFromScene( void )
     PROFILE_SCOPE(SceneObject_NotifyComponentsRemoveFromScene);
 
     // Notify components.
-    /*VectorPtr<SimComponent*>& componentList = SimComponent::lockComponentList();
+    VectorPtr<SimComponent*>& componentList = SimComponent::lockComponentList();
     for( SimComponentIterator itr = componentList.begin(); itr != componentList.end(); ++itr )
     {
         SimComponent *pComponent = *itr;
         if( pComponent != NULL )
             pComponent->onRemoveFromScene();
     }
-    unlockComponentList();*/
+    unlockComponentList();
 }
 
 //-----------------------------------------------------------------------------
@@ -3834,14 +3837,32 @@ void SceneObject::notifyComponentsUpdate( void )
     PROFILE_SCOPE(SceneObject_NotifyComponentsUpdate);
 
     // Notify components.
-    /*VectorPtr<SimComponent*>& componentList = SimComponent::lockComponentList();
+    VectorPtr<SimComponent*>& componentList = SimComponent::lockComponentList();
     for( SimComponentIterator itr = componentList.begin(); itr != componentList.end(); ++itr )
     {
         SimComponent *pComponent = *itr;
         if( pComponent != NULL )
             pComponent->onUpdate();
     }
-    unlockComponentList();*/
+    unlockComponentList();
+}
+
+void SceneObject::setControllingClient(GameConnection * connection)
+{
+   if (isClientObject())
+   {
+      if (mControllingClient)
+      {
+         Con::executef(this, 3, "setControl", 0);
+      }
+      if (connection)
+      {
+         Con::executef(this, 3, "setControl", "1");
+      }
+
+   }
+   
+   mControllingClient = connection;
 }
 
 //-----------------------------------------------------------------------------

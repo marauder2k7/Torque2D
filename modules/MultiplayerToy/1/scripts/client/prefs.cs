@@ -79,4 +79,4 @@ $pref::Video::disableVerticalSync = 1;
 $pref::Video::displayDevice = "OpenGL";
 $pref::Video::fullScreen = "0";
 $pref::Video::preferOpenGL = 1;
-$pref::Video::windowedRes = "1024 764 16";
+$pref::Video::windowedRes = "1024 782 16";
