@@ -43,7 +43,7 @@ function GameConnection::loadMission(%this)
    %this.currentPhase = 0;
 
       commandToClient(%this, 'MissionStartPhase1', $missionSequence,
-         $Server::MissionFile, MissionGroup.musicTrack);
+         $Server::MissionFile);
       echo("*** Sending mission load to client: " @ $Server::MissionFile);
 }
 
@@ -53,6 +53,7 @@ function serverCmdMissionStartPhase1Ack(%client, %seq)
       return;
    if (%client.currentPhase != 0)
       return;
+  
    %client.currentPhase = 1;
    // On to the next phase
    commandToClient(%client, 'MissionStartPhase2', $missionSequence, $Server::MissionFile);
@@ -100,7 +101,8 @@ function serverCmdMissionStartPhase3Ack(%client, %seq)
    %client.currentPhase = 3;
    
    // Server is ready to drop into the game
+   
+   %hasGameMode = callGamemodeFunction("onClientEnterGame", %client);
   
     %client.startMission();
-    %client.onClientEnterGame();
 }

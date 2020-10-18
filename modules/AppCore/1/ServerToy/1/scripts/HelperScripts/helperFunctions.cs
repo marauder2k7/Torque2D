@@ -56,6 +56,7 @@ function callOnModules(%functionName, %moduleGroup)
 {
    //clear per module group file execution chain
    ExecFilesList.clear();
+   echo("We got to callOnModules");
    //Get our modules so we can exec any specific client-side loading/handling
    %modulesList = ModuleDatabase.findModules(false);
    for(%i=0; %i < getWordCount(%modulesList); %i++)

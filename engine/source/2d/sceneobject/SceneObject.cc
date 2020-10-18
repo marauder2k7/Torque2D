@@ -491,7 +491,7 @@ SceneObject::SceneObject() :
     mDefaultFixture.isSensor    = false;
     mDefaultFixture.shape       = NULL;
 
-    mNetFlags.set(ScopeAlways | Ghostable);
+    mNetFlags.set(Ghostable | ScopeAlways);
 
     // Set last awake state.
     mLastAwakeState = !mBodyDefinition.allowSleep || mBodyDefinition.awake;
@@ -1268,9 +1268,9 @@ U32 SceneObject::packUpdate(NetConnection * conn, U32 mask, BitStream *stream)
    U32 retMask = Parent::packUpdate(conn, mask, stream);
    if (stream->writeFlag(mask & MoveMask))
    {
-      Vector2 pos;
-      pos = mpBody->GetPosition();
-      Point2F pos2F = pos.ToPoint2F();
+      //Vector2 pos;
+      Point2F pos = getRenderPosition();
+      //Point2F pos2F = pos.ToPoint2F();
       stream->write2dCompressedPoint(pos);
    }
 

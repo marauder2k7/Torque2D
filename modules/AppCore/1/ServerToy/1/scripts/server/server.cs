@@ -20,15 +20,28 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-function initBaseServer()
+function initServer()
 {
    // Base server functionality
+   exec("./commands.cs");
+   exec("./kickban.cs");
    exec("./message.cs");
    exec("./commands.cs");
-   exec("./missionLoad.cs");
    exec("./missionDownload.cs");
-   exec("./clientConnection.cs");
-   exec("./game.cs");
+   exec("./missionLoad.cs");
+   exec("./connectionToClient.cs");
+   
+   // Server::Status is returned in the Game Info Query and represents the
+   // current status of the server. This string sould be very short.
+   $Server::Status = "Unknown";
+
+   // Turn on testing/debug script functions
+   $Server::TestCheats = false;
+
+   // Specify where the mission files are.
+   $Server::MissionFileSpec = "assets/scenes/*.cs";
+   
+   callOnModules("initServer");
 }
 
 /// Attempt to find an open port to initialize the server with
@@ -73,6 +86,11 @@ function createAndConnectToLocalServer( %serverType, %level )
 /// Specify the level to load on the server
 function createServer(%serverType, %level)
 {
+	if($Game::firstTimeServerRun == true)
+   {
+      initServer();
+      $Game::firstTimeServerRun = false;
+   }
    // Increase the server session number.  This is used to make sure we're
    // working with the server session we think we are.
    $Server::Session++;
@@ -122,6 +140,27 @@ function createServer(%serverType, %level)
    return true;
 }
 
+function onServerCreated()
+{
+   // Server::GameType is sent to the master server.
+   // This variable should uniquely identify your game and/or mod.
+   $Server::GameType = $appName;
+
+   // Server::MissionType sent to the master server.  Clients can
+   // filter servers based on mission type.
+  // $Server::MissionType = "Deathmatch";
+
+   // GameStartTime is the sim time the game started. Used to calculated
+   // game elapsed time.
+   $Game::StartTime = 0;
+   
+   callOnModules("onServerScriptExec", "Core");
+   callOnModules("onServerScriptExec", "Game");   
+   
+   // Keep track of when the game started
+   $Game::StartTime = $Sim::Time;
+}
+
 /// Shut down the server
 function destroyServer()
 {
@@ -130,8 +169,6 @@ function destroyServer()
    stopHeartbeat();
    $missionRunning = false;
    
-   // End any running levels
-   endMission();
    onServerDestroyed();
 
    // Delete all the server objects
@@ -156,16 +193,29 @@ function destroyServer()
    $Server::Session++;
 }
 
-/// Reset the server's default prefs
-function resetServerDefaults()
+function onServerDestroyed()
 {
-   echo( "Resetting server defaults..." );
    
-   exec( "./defaults.cs" );
-   exec( "./prefs.cs" );
+   if (!isObject( getScene(0) ))
+      return;
 
-   // Reload the current level
-   loadMission( $Server::MissionFile );
+   echo("*** ENDING MISSION");
+   
+   // Inform the game code we're done.
+   %hasGameMode = callGamemodeFunction("onMissionEnded");
+
+   // Inform the clients
+   for( %clientIndex = 0; %clientIndex < ClientGroup.getCount(); %clientIndex++ ) {
+      // clear ghosts and paths from all clients
+      %cl = ClientGroup.getObject( %clientIndex );
+      %cl.endMission();
+      %cl.resetGhosting();
+   }
+   
+   // Delete everything
+   getScene(0).delete();
+   MissionCleanup.delete();
+   
 }
 
 /// Guid list maintenance functions

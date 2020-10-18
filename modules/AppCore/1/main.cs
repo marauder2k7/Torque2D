@@ -38,9 +38,11 @@ function AppCore::create( %this )
     
     // Initialize audio
     initializeOpenAL();
-    ModuleDatabase.loadGroup("gameBase");
-	//Load server
-	ModuleDatabase.loadExplicit("ServerToy");
+	
+	setNetPort(0);
+	
+	ModuleDatabase.loadGroup("gameBase");
+	
 }
 
 //-----------------------------------------------------------------------------

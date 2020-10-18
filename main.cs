@@ -59,6 +59,11 @@ ModuleDatabase.scanModules( "./modules" );
 // Load AppCore module.
 ModuleDatabase.LoadExplicit( "AppCore" );
 
+//Load server
+ModuleDatabase.loadExplicit("ServerToy");
+
+
+
 //-----------------------------------------------------------------------------
 
 function onExit()

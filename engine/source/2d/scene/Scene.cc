@@ -66,6 +66,9 @@
 
 SimObjectPtr<Scene> Scene::LoadingScene = NULL;
 
+Scene * Scene::smRootScene = nullptr;
+Vector<Scene*> Scene::smSceneList;
+
 //------------------------------------------------------------------------------
 
 static ContactFilter mContactFilter;
@@ -171,7 +174,7 @@ Scene::Scene() :
     mIsEditorScene(0),
     mUpdateCallback(false),
     mRenderCallback(false),
-    mSceneIndex(0)
+    mSceneIndex(-1)
 {
     // Set Vector Associations.
     VECTOR_SET_ASSOCIATION( mSceneObjects );
@@ -191,9 +194,11 @@ Scene::Scene() :
     mControllers = new SimSet();
     mControllers->registerObject();
 
+    mNetFlags.set(ScopeAlways | Ghostable);
+
     // Assign scene index.    
-    mSceneIndex = ++sSceneMasterIndex;
-    sSceneCount++;
+    //mSceneIndex = ++sSceneMasterIndex;
+    //sSceneCount++;
 }
 
 //-----------------------------------------------------------------------------
@@ -205,7 +210,7 @@ Scene::~Scene()
         mControllers->deleteObject();
 
     // Decrease scene count.
-    --sSceneCount;
+    //--sSceneCount;
 }
 
 //-----------------------------------------------------------------------------
@@ -215,6 +220,9 @@ bool Scene::onAdd()
     // Call Parent.
     if(!Parent::onAdd())
         return false;
+
+    smSceneList.push_back(this);
+    mSceneIndex = smSceneList.size() - 1;
 
     // Create physics world.
     mpWorld = new b2World( mWorldGravity );
@@ -254,6 +262,7 @@ bool Scene::onAdd()
 
 void Scene::onRemove()
 {
+
     // Turn-off tick processing.
     setProcessTicks( false );
 
@@ -278,7 +287,10 @@ void Scene::onRemove()
 
     // Call Parent. Clear scene handles all the object removal, so we can skip
     // that part and just do the sim-object stuff.
-    SimObject::onRemove();
+    Parent::onRemove();
+
+    smSceneList.remove(this);
+    mSceneIndex = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -5250,7 +5262,7 @@ void Scene::onTamlCustomRead( const TamlCustomNodes& customNodes )
 
 U32 Scene::getGlobalSceneCount( void )
 {
-    return sSceneCount;
+    return Scene::smSceneList.size();
 }
 
 //-----------------------------------------------------------------------------
@@ -5649,5 +5661,4 @@ static void WriteCustomTamlSchema( const AbstractClassRep* pClassRep, TiXmlEleme
 }
 
 //------------------------------------------------------------------------------
-
 IMPLEMENT_NETOBJECT_CHILDREN_SCHEMA(Scene, WriteCustomTamlSchema);

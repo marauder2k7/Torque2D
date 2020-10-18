@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-ConsoleMethodGroupBeginWithDocs(Scene, BehaviorComponent)
+ConsoleMethodGroupBeginWithDocs(Scene, NetObject)
 
 /*! Gets the system-wide scene count.
     @return The system-wide scene count.
@@ -28,6 +28,23 @@ ConsoleMethodGroupBeginWithDocs(Scene, BehaviorComponent)
 ConsoleFunctionWithDocs( getGlobalSceneCount, ConsoleInt, 1, 1, ())
 {
     return Scene::getGlobalSceneCount();
+}
+
+ConsoleFunctionWithDocs( getScene, ConsoleInt, 2, 2, (sceneIndex))
+{
+   // Fetch Object Index.
+   const U32 sceneIndex = dAtoi(argv[1]);
+
+   if (sceneIndex < 0 || sceneIndex >= S32(Scene::smSceneList.size()))
+   {
+      Con::printf("Scene index out of range.");
+      return -1;
+   }
+
+   // Fetch Scene.
+   const Scene* pScene = Scene::smSceneList[sceneIndex];
+
+   return pScene->getId();
 }
 
 //-----------------------------------------------------------------------------

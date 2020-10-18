@@ -22,34 +22,25 @@
 
 function MultiplayerToy::create( %this )
 {
-	exec("./scripts/client/defaults.cs");
-	exec("./scripts/server/defaults.cs");
-	
-	exec("./scripts/client/init.cs");
-	exec("./scripts/server/init.cs");
-	
 	$pref::HostMultiPlayer = true;
 	$selectedSceneFile = "modules/MultiplayerToy/1/assets/scenes/TestArena.cs";
-	
-	initServer();
-	
-	if($Server::Dedicated)
-		initDedicated();
-	else
-		initClient();
-	
+	%object = getScene(0);
+	echo(%object);
 	Canvas.pushDialog(JoinServerMenu);
 }
 
 //-----------------------------------------------------------------------------
+function Multiplayertoy::initServer(%this)
+{
+	exec("./scripts/GameMode.cs");
+}
+
+//-----------------------------------------------------------------------------
+
 
 function MultiplayerToy::destroy( %this )
 {
-    echo("Exporting client prefs");
-	export("$pref::*", "./scripts/client/prefs.cs", False);
-
-	echo("Exporting server prefs");
-	export("$Pref::Server::*", "./scripts/server/prefs.cs", False);
+	
 }
 
 //-----------------------------------------------------------------------------

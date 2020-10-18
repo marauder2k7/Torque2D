@@ -75,7 +75,13 @@ function loadMissionStage2()
       // Exec the mission.  The MissionGroup (loaded components) is added to the ServerGroup
       exec(%file);
 	  
-
+	  //%scene = getScene(0);
+	  
+		if(!isObject(getScene(0)))
+		{
+			$Server::LoadFailMsg = "No scene found in level\"" @ %file @ "\"." ;
+		}
+		
    }
 
    if( $Server::LoadFailMsg !$= "" )
@@ -97,6 +103,8 @@ function loadMissionStage2()
 
    // Make the MissionCleanup group the place where all new objects will automatically be added.
    $instantGroup = MissionCleanup;
+   
+   %hasGameMode = callGamemodeFunction("onCreateGame");
 
    // Mission loading done...
    echo("*** Mission loaded");
@@ -107,7 +115,7 @@ function loadMissionStage2()
       ClientGroup.getObject(%clientIndex).loadMission();
 
    // Go ahead and launch the game
-   onMissionLoaded();
+   %hasGameMode = callGamemodeFunction("onMissionStart");
 }
 
 
@@ -121,7 +129,7 @@ function endMission()
    echo("*** ENDING MISSION");
    
    // Inform the game code we're done.
-   onMissionEnded();
+   %hasGameMode = callGamemodeFunction("onMissionEnded");
 
    // Inform the clients
    for( %clientIndex = 0; %clientIndex < ClientGroup.getCount(); %clientIndex++ ) {
@@ -132,7 +140,7 @@ function endMission()
    }
    
    // Delete everything
-   MissionGroup.delete();
+   getScene(0).delete();
    MissionCleanup.delete();
    
 }
@@ -150,5 +158,5 @@ function resetMission()
    new SimGroup( MissionCleanup );
    $instantGroup = MissionCleanup;
    //
-   onMissionReset();
+   %hasGameMode = callGamemodeFunction("onMissionReset", %client);
 }

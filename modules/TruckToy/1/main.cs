@@ -271,8 +271,6 @@ function TruckToy::createWoodPile( %this, %posX, %posY )
     %obj.setCollisionSuppress();
     %obj.setAwake( false );
     %obj.setActive( false );
-	%obj.dump();
-	echo(%obj.getGhostId());
     SandboxScene.add( %obj );
 
     return %obj;   

@@ -173,6 +173,16 @@ public:
     typedef HashMap<b2Contact*, TickContact>    typeContactHash;
     typedef Vector<AssetPtr<AssetBase>*>        typeAssetPtrVector;
 
+    static Scene *getRootScene()
+    {
+       if (Scene::smSceneList.empty())
+          return nullptr;
+
+       return Scene::smSceneList[0];
+    }
+
+    static Vector<Scene *> smSceneList;
+
     /// Scene Debug Options.
     enum DebugOption
     {
@@ -301,7 +311,7 @@ protected:
     virtual void            onTamlPostRead( const TamlCustomNodes& customNodes );
     virtual void            onTamlCustomWrite( TamlCustomNodes& customNodes );
     virtual void            onTamlCustomRead( const TamlCustomNodes& customNodes );
-
+    static Scene * smRootScene;
 public:
     Scene();
     virtual ~Scene();

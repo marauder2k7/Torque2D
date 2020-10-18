@@ -1,14 +1,26 @@
 function ServerToy::create(%this)
 {
+	echo("\n--------- Initializing Directory: scripts ---------");
 	exec("./scripts/HelperScripts/helperFunctions.cs");
 	//load start up scripts
 	exec("./scripts/client/client.cs");
 	exec("./scripts/server/server.cs");
 	
+	$Game::MainScene = getScene(0);
+	
+	$Game::firstTimeServerRun = true;
+	
 	exec("./scripts/JoinServerMenu.cs");
 	exec("./assets/guis/JoinServerMenu.gui");
 	
-	setNetPort(0);
+	if($Server::Dedicated)
+	{
+		initDedicated();
+	}
+	else
+	{
+		initClient();
+	}
 	
 }
 

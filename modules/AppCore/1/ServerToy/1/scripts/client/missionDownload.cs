@@ -35,11 +35,14 @@
 // Phase 1 
 //----------------------------------------------------------------------------
 
-function clientCmdMissionStartPhase1(%seq, %missionName, %musicTrack)
+function clientCmdMissionStartPhase1(%seq, %missionName)
 {
    // These need to come after the cls.
    echo ("*** New Mission: " @ %missionName);
    echo ("*** Phase 1: Download Datablocks & Targets");
+   
+   $Client::MissionFile = %missionName;
+   
    commandToServer('MissionStartPhase1Ack', %seq);
 }
 
@@ -71,6 +74,7 @@ function onGhostAlwaysObjectReceived()
 
 function clientCmdMissionStartPhase3(%seq,%missionName)
 {
+	echo ("*** Phase 3: Started");
    $MSeq = %seq;
    $Client::MissionFile = %missionName;
    echo(%missionName);

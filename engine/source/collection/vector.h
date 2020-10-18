@@ -165,6 +165,9 @@ class Vector
    void clear();
    void compact();
    void sort(compare_func f);
+
+   bool remove(const T&);
+
    T& first();
    T& last();
    const T& first() const;
@@ -374,6 +377,21 @@ template<class T> inline void Vector<T>::erase_fast(U32 index)
    decrement();
 }
 
+template <class T> inline bool Vector<T>::remove(const T& x)
+{
+   iterator i = begin();
+   while (i != end())
+   {
+      if (*i == x)
+      {
+         erase(i);
+         return true;
+      }
+      i++;
+   }
+   return false;
+}
+
 template<class T> inline T& Vector<T>::first()
 {
    AssertFatal(mElementCount != 0, "Vector<T>::first - Error, no first element of a zero sized array!");
@@ -509,7 +527,7 @@ template<class T> inline void Vector<T>::push_front(const T& x)
 template<class T> inline void Vector<T>::push_back(const T& x)
 {
    increment(&x);
-//   mArray[mElementCount - 1] = x;
+   mArray[mElementCount - 1] = x;
 }
 
 template<class T> inline U32 Vector<T>::push_front_unique(const T& x)

@@ -38,6 +38,13 @@ class SpriteBase : public SceneObject, public ImageFrameProvider
     typedef SceneObject Parent;
 
 public:
+
+   enum SpriteBaseMasks
+   {
+      ImageMask = Parent::NextFreeMask,
+      NextFreeMask = Parent::NextFreeMask << 1
+   };
+
     SpriteBase();
     virtual ~SpriteBase();
 
@@ -61,9 +68,10 @@ protected:
     virtual U32 packUpdate(NetConnection * conn, U32 mask, BitStream * stream);
 
     virtual void unpackUpdate(NetConnection * conn, BitStream * stream);
+    bool setImage(const char* data);
 
 protected:
-    static bool setImage(void* obj, const char* data)                           { DYNAMIC_VOID_CAST_TO(SpriteBase, ImageFrameProvider, obj)->setImage(data); return false; };
+   static bool _setImage(void* obj, const char* data);                           /// { DYNAMIC_VOID_CAST_TO(SpriteBase, ImageFrameProvider, obj)->setImage(data);  return false; };
     static const char* getImage(void* obj, const char* data)                    { return DYNAMIC_VOID_CAST_TO(SpriteBase, ImageFrameProvider, obj)->getImage(); }
     static bool writeImage( void* obj, StringTableEntry pFieldName )            { SpriteBase* pCastObject = static_cast<SpriteBase*>(obj); if ( !pCastObject->isStaticFrameProvider() ) return false; return pCastObject->mImageAsset.notNull(); }
     static bool setImageFrame(void* obj, const char* data)                      { DYNAMIC_VOID_CAST_TO(SpriteBase, ImageFrameProvider, obj)->setImageFrame(dAtoi(data)); return false; };

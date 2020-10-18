@@ -38,12 +38,12 @@ function GameConnection::onConnectRequest( %client, %netAddress, %name )
 //-----------------------------------------------------------------------------
 // This script function is the first called on a client accept
 //
-function GameConnection::onConnect( %client, %name )
+function GameConnection::onConnect( %this, %name )
 {
    // Send down the connection error info, the client is
    // responsible for displaying this message if a connection
    // error occures.
-   messageClient(%client,'MsgConnectionError',"",$Pref::Server::ConnectionError);
+   messageClient(%this,'MsgConnectionError',"",$Pref::Server::ConnectionError);
 
    // Simulated client lag for testing...
    // %client.setSimulatedNetParams(0.1, 30);
@@ -51,77 +51,35 @@ function GameConnection::onConnect( %client, %name )
    // Get the client's unique id:
    // %authInfo = %client.getAuthInfo();
    // %client.guid = getField( %authInfo, 3 );
-   %client.guid = 0;
-   addToServerGuidList( %client.guid );
+   %this.guid = 0;
+   addToServerGuidList( %this.guid );
    
    // Set admin status
-   if (%client.getAddress() $= "local") {
-      %client.isAdmin = true;
-      %client.isSuperAdmin = true;
+   if (%this.getAddress() $= "local") {
+      %this.isAdmin = true;
+      %this.isSuperAdmin = true;
    }
    else {
-      %client.isAdmin = false;
-      %client.isSuperAdmin = false;
+      %this.isAdmin = false;
+      %this.isSuperAdmin = false;
    }
 
-   // Save client preferences on the connection object for later use.
-   %client.gender = "Male";
-   %client.armor = "Light";
-   %client.race = "Human";
-   %client.setPlayerName(%name);
-   %client.team = "";
-   %client.score = 0;
+   echo("CADD: " @ %this @ " " @ %this.getAddress());
+   
+   	// If the mission is running, go ahead download it to the client
+	if ($missionRunning)
+	{
+		%this.loadMission();
+	}
+	else if ($Server::LoadFailMsg !$= "")
+	{
+		messageClient(%this, 'MsgLoadFailed', $Server::LoadFailMsg);
+	}
+	
+	%this.connectData = %clientData;
+	
+	callGamemodeFunction("onClientConnect", %this);
 
-   // 
-   echo("CADD: " @ %client @ " " @ %client.getAddress());
-
-   // Inform the client of all the other clients
-   %count = ClientGroup.getCount();
-   for (%cl = 0; %cl < %count; %cl++) {
-      %other = ClientGroup.getObject(%cl);
-      if ((%other != %client)) {
-         // These should be "silent" versions of these messages...
-         messageClient(%client, 'MsgClientJoin', "", 
-               %other.playerName,
-               %other,
-               %other.sendGuid,
-               %other.team,
-               %other.score, 
-               %other.isAdmin, 
-               %other.isSuperAdmin);
-      }
-   }
-
-   // Inform the client we've joined up
-   messageClient(%client,
-      'MsgClientJoin', 'Welcome to a Torque application %1.', 
-      %client.playerName, 
-      %client,
-      %client.sendGuid,
-      %client.team,
-      %client.score,
-      %client.isAdmin, 
-      %client.isSuperAdmin);
-
-   // Inform all the other clients of the new guy
-   messageAllExcept(%client, -1, 'MsgClientJoin', '\c1%1 joined the game.', 
-      %client.playerName, 
-      %client,
-      %client.sendGuid,
-      %client.team,
-      %client.score,
-      %client.isAdmin, 
-      %client.isSuperAdmin);
-
-   // If the mission is running, go ahead download it to the client
-   if ($missionRunning)
-   {
-      %client.loadMission();
-   }
-   else if ($Server::LoadFailMsg !$= "")
-   {
-      messageClient(%client, 'MsgLoadFailed', $Server::LoadFailMsg);
-   }
    $Server::PlayerCount++;
 }
 
@@ -172,18 +130,14 @@ function isNameUnique(%name)
 //
 function GameConnection::onDrop(%client, %reason)
 {
-   %client.onClientLeaveGame();
+   if($missionRunning)
+   {
+      %hasGameMode = callGamemodeFunction("onClientLeaveGame", %client);
+   }
    
    removeFromServerGuidList( %client.guid );
-   messageAllExcept(%client, -1, 'MsgClientDrop', '\c1%1 has left the game.', %client.playerName, %client);
 
-   removeTaggedString(%client.playerName);
-   echo("CDROP: " @ %client @ " " @ %client.getAddress());
    $Server::PlayerCount--;
-   
-   // Reset the server if everyone has left the game
-   if( $Server::PlayerCount == 0 && $Server::Dedicated)
-      schedule(0, 0, "resetServerDefaults");
 }
 
 
@@ -192,7 +146,6 @@ function GameConnection::onDrop(%client, %reason)
 function GameConnection::startMission(%this)
 {
    // Inform the client the mission starting
-   echo("%---MissionStart Command Received---%");
    commandToClient(%this, 'MissionStart', $missionSequence);
 }
 
@@ -206,23 +159,4 @@ function GameConnection::endMission(%this)
    // In this case, the client will only see the disconnect from the server
    // and should manually trigger a mission cleanup.
    commandToClient(%this, 'MissionEnd', $missionSequence);
-}
-
-
-//--------------------------------------------------------------------------
-// Sync the clock on the client.
-
-function GameConnection::syncClock(%client, %time)
-{
-   commandToClient(%client, 'syncClock', %time);
-}
-
-
-//--------------------------------------------------------------------------
-// Update all the clients with the new score
-
-function GameConnection::incScore(%this,%delta)
-{
-   %this.score += %delta;
-   messageAll('MsgClientScoreChanged', "", %this.score, %this);
 }

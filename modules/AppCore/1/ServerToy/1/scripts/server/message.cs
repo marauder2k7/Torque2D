@@ -21,28 +21,34 @@
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
-// Server Admin Commands
+// Server side message commands
 //-----------------------------------------------------------------------------
 
-function SAD(%password)
+function messageClient(%client, %msgType, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8, %a9, %a10, %a11, %a12, %a13)
 {
-   if (%password !$= "")
-      commandToServer('SAD', %password);
+   commandToClient(%client, 'ServerMessage', %msgType, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8, %a9, %a10, %a11, %a12, %a13);
 }
 
-function SADSetPassword(%password)
+function messageAll(%msgType, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8, %a9, %a10, %a11, %a12, %a13)
 {
-   commandToServer('SADSetPassword', %password);
+   %count = ClientGroup.getCount();
+   for(%cl = 0; %cl < %count; %cl++)
+   {
+      %client = ClientGroup.getObject(%cl);
+      messageClient(%client, %msgType, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8, %a9, %a10, %a11, %a12, %a13);
+   }
 }
 
-//----------------------------------------------------------------------------
-// Misc server commands
-//----------------------------------------------------------------------------
-
-function clientCmdSyncClock(%time)
-{
-   // Time update from the server, this is only sent at the start of a mission
-   // or when a client joins a game in progress.
+function messageAllExcept(%client, %team, %msgtype, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8, %a9, %a10, %a11, %a12, %a13)
+{  
+   //can exclude a client, a team or both. A -1 value in either field will ignore that exclusion, so
+   //messageAllExcept(-1, -1, $Mesblah, 'Blah!'); will message everyone (since there shouldn't be a client -1 or client on team -1).
+   %count = ClientGroup.getCount();
+   for(%cl= 0; %cl < %count; %cl++)
+   {
+      %recipient = ClientGroup.getObject(%cl);
+      if((%recipient != %client) && (%recipient.team != %team))
+         messageClient(%recipient, %msgType, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8, %a9, %a10, %a11, %a12, %a13);
+   }
 }
-
 
