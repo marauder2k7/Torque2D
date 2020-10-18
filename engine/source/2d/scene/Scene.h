@@ -312,6 +312,10 @@ protected:
     virtual void            onTamlCustomWrite( TamlCustomNodes& customNodes );
     virtual void            onTamlCustomRead( const TamlCustomNodes& customNodes );
     static Scene * smRootScene;
+
+    bool mIsClient;
+    F32 mVisibleGhostDistance;
+
 public:
     Scene();
     virtual ~Scene();
@@ -693,6 +697,12 @@ public:
     static DebugOption getDebugOptionEnum(const char* label);
     static const char* getDebugOptionDescription( DebugOption debugOption );
     b2ParticleSystem*			mParticleSystem;
+
+    // Level Info
+    void setVisibleGhostDistance(F32 dist) { mVisibleGhostDistance = dist; }
+    F32  getVisibleGhostDistance() { return mVisibleGhostDistance; }
+
+
     /// Declare Console Object.
     DECLARE_CONOBJECT(Scene);
 
@@ -743,6 +753,14 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+
+/// The client-side scene graph.  Not used if the engine is running
+/// as a dedicated server.
+extern SimObjectPtr<Scene> gClientScene;
+
+/// The server-side scene graph.  Not used if the engine is running
+/// as a pure client.
+//extern Scene* gServerScene;
 
 extern void findObjectsCallback(SceneObject* pSceneObject, void* storage);
 extern void findLayeredObjectsCallback(SceneObject* pSceneObject, void* storage);

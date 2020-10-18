@@ -75,9 +75,9 @@ function loadMissionStage2()
       // Exec the mission.  The MissionGroup (loaded components) is added to the ServerGroup
       exec(%file);
 	  
-	  //%scene = getScene(0);
+	  %scene = getScene(0);
 	  
-		if(!isObject(getScene(0)))
+		if(!isObject(%scene))
 		{
 			$Server::LoadFailMsg = "No scene found in level\"" @ %file @ "\"." ;
 		}

@@ -1,6 +1,6 @@
 function GameMode::onCreateGame()
 {
-
+	
 }
 
 //This function is called when the level finishes loading. It sets up the initial configuration, variables and
@@ -85,6 +85,8 @@ function GameMode::onClientEnterGame(%this, %client)
 {
    //Set the player name based on the client's connection data
    %client.setPlayerName(%client.connectData);
+   %scene = getScene(0);
+   SandboxWindow.setScene(%scene);
    
    //%this.spawnControlObject(%client);
 }

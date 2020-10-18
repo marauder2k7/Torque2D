@@ -36,12 +36,12 @@ function AppCore::create( %this )
     Canvas.BackgroundColor = "CornflowerBlue";
     Canvas.UseBackgroundColor = true;
     
+	ModuleDatabase.LoadExplicit( "Sandbox" );
+	
     // Initialize audio
     initializeOpenAL();
 	
 	setNetPort(0);
-	
-	ModuleDatabase.loadGroup("gameBase");
 	
 }
 

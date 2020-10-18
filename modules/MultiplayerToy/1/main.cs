@@ -26,6 +26,7 @@ function MultiplayerToy::create( %this )
 	$selectedSceneFile = "modules/MultiplayerToy/1/assets/scenes/TestArena.cs";
 	%object = getScene(0);
 	echo(%object);
+	%object.delete();
 	Canvas.pushDialog(JoinServerMenu);
 }
 

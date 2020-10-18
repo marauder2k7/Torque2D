@@ -1,4 +1,4 @@
-%levelContent = new Scene(TestArenaScene) {
+new Scene(TestArenaScene) {
       cameraPosition = "0 0";
       cameraSize = "100 75";
 
@@ -39,5 +39,3 @@
 			Image="MultiplayerToy:Edge";
 	};
 };
-
-SandboxWindow.setScene(TestArenaScene);

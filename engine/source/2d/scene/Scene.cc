@@ -65,6 +65,7 @@
 //------------------------------------------------------------------------------
 
 SimObjectPtr<Scene> Scene::LoadingScene = NULL;
+SimObjectPtr<Scene> gClientScene = NULL;
 
 Scene * Scene::smRootScene = nullptr;
 Vector<Scene*> Scene::smSceneList;
@@ -151,6 +152,7 @@ static StringTableEntry assetNodeName                     = StringTable->insert(
 
 Scene::Scene() :
     /// World.
+    mIsClient(true),
     mpWorld(NULL),
     mWorldGravity(0.0f, 0.0f),
     mVelocityIterations(8),
@@ -196,6 +198,7 @@ Scene::Scene() :
 
     mNetFlags.set(ScopeAlways | Ghostable);
 
+    gClientScene = this;
     // Assign scene index.    
     //mSceneIndex = ++sSceneMasterIndex;
     //sSceneCount++;
@@ -1348,6 +1351,8 @@ void Scene::addToScene( SceneObject* pSceneObject )
 {
     if ( pSceneObject == NULL )
         return;
+
+
 
     // Fetch current scene.
     Scene* pCurrentScene = pSceneObject->getScene();
@@ -3658,6 +3663,8 @@ void Scene::attachSceneWindow( SceneWindow* pSceneWindow2D )
 
     // Add to Attached List.
     mAttachedSceneWindows.addObject( pSceneWindow2D );
+
+
 }
 
 //-----------------------------------------------------------------------------
