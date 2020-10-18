@@ -756,11 +756,11 @@ public:
 
 /// The client-side scene graph.  Not used if the engine is running
 /// as a dedicated server.
-extern SimObjectPtr<Scene> gClientScene;
+extern Scene* gClientScene;
 
 /// The server-side scene graph.  Not used if the engine is running
 /// as a pure client.
-//extern Scene* gServerScene;
+extern Scene* gServerScene;
 
 extern void findObjectsCallback(SceneObject* pSceneObject, void* storage);
 extern void findLayeredObjectsCallback(SceneObject* pSceneObject, void* storage);

@@ -65,7 +65,9 @@
 //------------------------------------------------------------------------------
 
 SimObjectPtr<Scene> Scene::LoadingScene = NULL;
-SimObjectPtr<Scene> gClientScene = NULL;
+
+Scene* gClientScene = NULL;
+Scene* gServerScene = NULL;
 
 Scene * Scene::smRootScene = nullptr;
 Vector<Scene*> Scene::smSceneList;
