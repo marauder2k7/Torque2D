@@ -685,6 +685,7 @@ public:
     inline bool             getRenderCallback( void ) const             { return mRenderCallback; }
     static SceneRenderRequest* createDefaultRenderRequest( SceneRenderQueue* pSceneRenderQueue, SceneObject* pSceneObject  );
 
+    inline void             setClientScene(const bool isClient) { mIsClient = isClient; }
     /// Taml children.
     virtual U32 getTamlChildCount( void ) const                         { return (U32)mSceneObjects.size(); }
     virtual SimObject* getTamlChild( const U32 childIndex ) const;

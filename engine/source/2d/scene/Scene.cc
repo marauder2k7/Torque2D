@@ -201,6 +201,7 @@ Scene::Scene() :
     mNetFlags.set(ScopeAlways | Ghostable);
 
     gClientScene = this;
+
     // Assign scene index.    
     //mSceneIndex = ++sSceneMasterIndex;
     //sSceneCount++;
@@ -226,7 +227,8 @@ bool Scene::onAdd()
     if(!Parent::onAdd())
         return false;
 
-    smSceneList.push_back(this);
+    //smSceneList.pop_front(this);
+    smSceneList.push_front(this);
     mSceneIndex = smSceneList.size() - 1;
 
     // Create physics world.

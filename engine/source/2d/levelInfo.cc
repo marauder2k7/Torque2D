@@ -84,7 +84,7 @@ void LevelInfo::onRemove()
 void LevelInfo::_updateScene()
 {
 
-   Scene* scene = gClientScene;
+   Scene* scene = isClientObject() ? gClientScene : gServerScene;
 
    scene->setVisibleGhostDistance(mVisibleGhostDistance);
 
