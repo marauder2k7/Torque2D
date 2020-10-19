@@ -5,6 +5,7 @@ function initClient()
 	$Server::Dedicated = false;
 	
 	$Client::GameTypeQuery = $appName;
+	$Client::MissionTypeQuery = "Any";
 	
 	exec("./message.cs");
 	exec("./connectionToServer.cs");

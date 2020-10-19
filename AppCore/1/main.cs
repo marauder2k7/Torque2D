@@ -20,32 +20,39 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-function MultiplayerToy::create( %this )
+function AppCore::create( %this )
 {
-	$pref::HostMultiPlayer = true;
-	$selectedSceneFile = "modules/MultiplayerToy/1/assets/scenes/TestArena.cs";
-	Canvas.pushDialog(JoinServerMenu);
-}
-
-//-----------------------------------------------------------------------------
-function Multiplayertoy::initServer(%this)
-{
-	exec("./scripts/GameMode.cs");
-}
-
-//-----------------------------------------------------------------------------
-
-
-function MultiplayerToy::destroy( %this )
-{
+    // Load system scripts
+    exec("./scripts/constants.cs");
+    exec("./scripts/defaultPreferences.cs");
+    exec("./scripts/canvas.cs");
+    exec("./scripts/openal.cs");
+	exec("./scripts/levelManagement.cs");
+    
+    // Initialize the canvas
+    initializeCanvas($appName);
+	
+	
+    
+    // Set the canvas color
+    Canvas.BackgroundColor = "CornflowerBlue";
+    Canvas.UseBackgroundColor = true;
+    
+	ModuleDatabase.LoadExplicit( "Sandbox" );
+	
+	
+	
+    // Initialize audio
+    initializeOpenAL();
+	
+	setNetPort(0);
 	
 }
 
 //-----------------------------------------------------------------------------
 
-function MultiplayerToy::reset(%this)
+function AppCore::destroy( %this )
 {
-    
+
 }
 
-//-----------------------------------------------------------------------------

@@ -22,6 +22,12 @@
 
 function initServer()
 {
+	echo("%--- Initializing " @ $appName @ ": Server Scripts ---%");
+	exec("./defaults.cs");
+	
+	if ( isFile("./prefs.cs" ) )
+      exec( "./serverPrefs.cs" );
+	
    // Base server functionality
    exec("./commands.cs");
    exec("./kickban.cs");

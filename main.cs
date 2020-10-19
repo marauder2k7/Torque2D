@@ -53,16 +53,19 @@ AssetDatabase.EchoInfo = false;
 // This cases assets to stay in memory unless assets are purged.
 AssetDatabase.IgnoreAutoUnload = true;
 
-// Scan modules.
-ModuleDatabase.scanModules( "./modules" );
+$appName = "Torque 2D";
 
+// Scan Core.
+ModuleDatabase.scanModules( "./AppCore" ) ;
 // Load AppCore module.
 ModuleDatabase.LoadExplicit( "AppCore" );
+
+ModuleDatabase.scanModules( "./modules" );
+ModuleDatabase.loadGroup("gameBase");
 
 //Load server
 ModuleDatabase.loadExplicit("ServerToy");
 
-ModuleDatabase.loadGroup("gameBase");
 
 //-----------------------------------------------------------------------------
 

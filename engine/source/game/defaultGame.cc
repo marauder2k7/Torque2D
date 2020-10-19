@@ -59,6 +59,8 @@
 #include "platform/nativeDialogs/fileDialog.h"
 #include "memory/safeDelete.h"
 
+#include "game/module.h"
+
 #include <stdio.h>
 
 #ifndef _NETWORK_PROCESS_LIST_H_
@@ -112,7 +114,6 @@ bool initializeLibraries()
 {
     PlatformAssert::create();
     Con::init();
-    Sim::init();
 
     if(!Net::init())
     {
@@ -162,6 +163,8 @@ bool initializeLibraries()
 
     Platform::init();    // platform specific initialization
 
+    EngineModuleManager::initializeSystem();
+
     // Initialize the particle system.
     ParticleSystem::Init();
     
@@ -183,7 +186,8 @@ void shutdownLibraries()
     TelnetDebugger::destroy();
     TelnetConsole::destroy();
 
-    Sim::shutdown();
+    EngineModuleManager::shutdownSystem();
+
     Platform::shutdown();
 
     NetStringTable::destroy();

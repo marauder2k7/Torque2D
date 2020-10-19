@@ -79,8 +79,10 @@ function TruckToy::destroy( %this )
 function TruckToy::reset( %this )
 {   
     // Clear the scene.
+	echo("clear scene");
     SandboxScene.clear();    
     
+	echo("set gravity");
     // Set a typical Earth gravity.
     SandboxScene.setGravity( 0, -9.8 );  
 
@@ -186,6 +188,7 @@ function TruckToy::reset( %this )
 
 function TruckToy::createBackground(%this)
 {  
+	echo("first object creation");
     // Atmosphere
     %obj = new Sprite();
     %obj.setBodyType( "static" );
@@ -197,8 +200,6 @@ function TruckToy::createBackground(%this)
     %obj.setCollisionSuppress();
     %obj.setAwake( false );
     %obj.setActive( false );
-	
-    SandboxScene.add( %obj );  
 
     // Industrial Background
     %obj = new Scroller();
@@ -212,7 +213,6 @@ function TruckToy::createBackground(%this)
     %obj.setCollisionSuppress();
     %obj.setAwake( false );
     %obj.setActive( false );
-    SandboxScene.add( %obj );    
 }
 
 // -----------------------------------------------------------------------------

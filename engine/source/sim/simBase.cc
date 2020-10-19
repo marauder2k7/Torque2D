@@ -32,9 +32,24 @@
 #include "debug/profiler.h"
 #include "console/ConsoleTypeValidators.h"
 #include "memory/frameAllocator.h"
+#include "game/module.h"
 
 // Script bindings.
 #include "simBase_ScriptBinding.h"
+
+MODULE_BEGIN(Sim)
+
+   MODULE_INIT
+   {
+      Sim::init();
+   }
+
+   MODULE_SHUTDOWN
+   {
+      Sim::shutdown();
+   }
+
+MODULE_END;
 
 namespace Sim
 {
