@@ -1471,6 +1471,9 @@
     <ClCompile Include="..\..\source\2d\assets\LevelAsset.cc">
       <Filter>2d\assets</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\game\module.cc">
+      <Filter>game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\audio\audio.h">
@@ -3278,6 +3281,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\2d\assets\LevelAsset_ScriptBinding.h">
       <Filter>2d\assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\game\module.h">
+      <Filter>game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
