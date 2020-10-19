@@ -35,31 +35,9 @@ function Sandbox::create( %this )
         
     // Load GUI profiles.
     exec("./gui/guiProfiles.cs");
-	
-	SandboxWindow.dump();
-	SandboxScene.dump();
 
     // Create the sandbox window.
-    //CreateSandboxWindow();
-	
-	if(!isObject(SandboxWindowProfile)) new GuiControlProfile (SandboxWindowProfile : GuiDefaultProfile)
-	{
-		// fill color
-		opaque = false;
-		fillColor = "0 0 0 92";
-
-		// font
-		fontType = $platformFontType;
-		fontSize = $platformFontSize;
-		fontColor = "255 255 255 255";
-		lockMouse = "0";
-	}; 
-
-	
-	SandboxWindow.Profile = SandboxWindowProfile;
-	Canvas.setContent( SandboxWindow ); 
-	
-	SandboxWindow.setScene(SandboxScene);
+    CreateSandboxWindow();
     
     // Load and configure the console.
     Sandbox.add( TamlRead("./gui/ConsoleDialog.gui.taml") );

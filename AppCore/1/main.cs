@@ -32,15 +32,11 @@ function AppCore::create( %this )
     // Initialize the canvas
     initializeCanvas($appName);
 	
-	
-    
     // Set the canvas color
     Canvas.BackgroundColor = "CornflowerBlue";
     Canvas.UseBackgroundColor = true;
     
 	ModuleDatabase.LoadExplicit( "Sandbox" );
-	
-	
 	
     // Initialize audio
     initializeOpenAL();

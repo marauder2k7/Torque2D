@@ -22,9 +22,19 @@
 
 function createSandboxWindow()
 {
+    // Sanity!
+    if ( !isObject(SandboxWindow) )
+    {
+        // Create the scene window.
+        new SceneWindow(SandboxWindow);
 
-    // Set profile.        
-    SandboxWindow.Profile = SandboxWindowProfile;
+        // Set profile.        
+        SandboxWindow.Profile = SandboxWindowProfile;
+        
+        // Push the window.
+        Canvas.setContent( SandboxWindow );                     
+    }
+
     // Set camera to a canonical state.
     %allBits = "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31";
     SandboxWindow.stopCameraMove();
@@ -39,7 +49,6 @@ function createSandboxWindow()
     SandboxWindow.setCameraSize( 100, 75 );
     SandboxWindow.setCameraZoom( 1 );
     SandboxWindow.setCameraAngle( 0 );
-
 }
 
 //-----------------------------------------------------------------------------
@@ -58,6 +67,20 @@ function destroySandboxWindow()
 
 function createSandboxScene()
 {
+    // Destroy the scene if it already exists.
+    if ( isObject(SandboxScene) )
+        destroySandboxScene();
+    
+    // Create the scene.
+    new Scene(SandboxScene);
+            
+    // Sanity!
+    if ( !isObject(SandboxWindow) )
+    {
+        error( "Sandbox: Created scene but no window available." );
+        return;
+    }
+        
     // Set window to scene.
     setSceneToWindow();    
 }
