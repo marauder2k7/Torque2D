@@ -39,7 +39,6 @@ protected:
 public:
    EditorToyTool();
    virtual ~EditorToyTool();
-   virtual bool onAdd();
 
    virtual bool hasUndoManager() { return false; };
    const UndoManager& getUndoManager() { return mUndo; };
@@ -82,7 +81,10 @@ public:
 
    inline void setToolTexture(StringTableEntry texture) { if (texture != NULL)mTexture = StringTable->insert(texture); };
 
+   bool onAdd();
+
    DECLARE_CONOBJECT(EditorToyTool);
+
 
 };
 

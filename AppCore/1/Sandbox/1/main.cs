@@ -35,6 +35,8 @@ function Sandbox::create( %this )
         
     // Load GUI profiles.
     exec("./gui/guiProfiles.cs");
+	
+	Canvas.setCursor(DefaultCursor);
 
     // Create the sandbox window.
     CreateSandboxWindow();

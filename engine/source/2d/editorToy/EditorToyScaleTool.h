@@ -11,7 +11,7 @@ class EditorToyScaleTool : public EditorToyTool
 {
 protected:
 
-   typedef EditorToyScaleTool Parent;
+   typedef EditorToyTool Parent;
 
    enum ScaleState
    {

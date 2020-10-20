@@ -130,3 +130,25 @@ ConsoleMethodWithDocs(EditorToyScene, clearActiveTool, ConsoleVoid, 2, 2, ())
 
    object->clearActiveTool();
 }
+
+ConsoleMethodWithDocs(EditorToyScene, addTool, ConsoleBool, 3, 4, (tool [def]))
+{
+   EditorToyTool* tool = dynamic_cast<EditorToyTool*>(Sim::findObject(dAtoi(argv[2])));
+   if (!tool)
+   {
+      Con::warnf("EditorToyScene addTool invald tool");
+      return false;
+   }
+
+   bool dFault = false;
+   if (argc > 3)
+      dFault = dAtob(argv[3]);
+
+   if (!object->addTool(tool, dFault))
+   {
+      Con::warnf("EditorToy addTool - the tool is invalid");
+      return false;
+   }
+
+   return true;
+}

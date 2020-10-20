@@ -35,14 +35,13 @@ function AppCore::create( %this )
     // Set the canvas color
     Canvas.BackgroundColor = "CornflowerBlue";
     Canvas.UseBackgroundColor = true;
-    
-	ModuleDatabase.LoadExplicit( "Sandbox" );
 	
-    // Initialize audio
+	// Initialize audio
     initializeOpenAL();
 	
 	setNetPort(0);
-	
+    
+	ModuleDatabase.LoadExplicit( "Sandbox" );
 }
 
 //-----------------------------------------------------------------------------
