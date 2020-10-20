@@ -31,14 +31,6 @@ bool EditorToyTool::onAdd()
    if (!Parent::onAdd())
       return false;
 
-   StringTableEntry objName = getName();
-   if (objName && objName[0] && getClassRep())
-   {
-      Namespace *parent = getClassRep()->getNameSpace();
-      if (Con::linkNamespaces(parent->mName, objName))
-         mNameSpace = Con::lookupNamespace(objName);
-   }
-
    return true;
 }
 
