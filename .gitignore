@@ -63,10 +63,9 @@ Icon?
 
 # VS Generated files #
 ######################
-engine/compilers/VisualStudio 2017/.vs/
-engine/compilers/VisualStudio 2017/.vs/Torque 2D/v15/Browse.VC.db
-engine/compilers/VisualStudio 2017/.vs/Torque 2D/v15/Solution.VC.db-shm
-engine/compilers/VisualStudio 2017/.vs/Torque 2D/v15/Browse.VC.opendb
+engine/compilers/VisualStudio 2017/.vs/*
+engine/compilers/VisualStudio 2017/.vs/Torque 2D/*
+engine/compilers/VisualStudio 2017/.vs/Torque 2D/v15/*
 
 # Android project files #
 #########################
