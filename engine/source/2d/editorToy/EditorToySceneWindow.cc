@@ -420,18 +420,18 @@ void EditorToySceneWindow::setTargetCameraPosition(Vector2 center, F32 w, F32 h)
 
 //-----------------------------------------------------------------------
 
-void EditorToySceneWindow::setCurrentCameraArea(const RectF& camWindow)
+void EditorToySceneWindow::setCameraArea(const RectF& camWindow)
 {
    Point2F center = camWindow.point + (camWindow.extent * 0.5);
    F32 w = camWindow.extent.x;
    F32 h = camWindow.extent.y;
 
-   setCurrentCameraPosition(center, w, h);
+   setCameraPosition(center, w, h);
 }
 
 //-----------------------------------------------------------------------
 
-void EditorToySceneWindow::setCurrentCameraPosition(Vector2 center, F32 w, F32 h)
+void EditorToySceneWindow::setCameraPosition(Vector2 center, F32 w, F32 h)
 {
    F32 winAR = (F32)getExtent().x / (F32)getExtent().y;
    F32 sceneAR = w / h;
@@ -510,6 +510,25 @@ void EditorToySceneWindow::setEditScene(EditorToyScene* scene)
 {
    mScene = scene;
    mScene->setLastWindow(this);
+}
+
+bool EditorToySceneWindow::setTool(EditorToyTool * tool)
+{
+   if (mTool)
+      mTool->onDeactivate();
+
+   mTool = tool;
+   if (tool)
+   {
+      if (!tool->onActivate(this))
+      {
+         mTool = NULL;
+         return false;
+      }
+   }
+
+   return true;
+
 }
 
 //-----------------------------------------------------------------------

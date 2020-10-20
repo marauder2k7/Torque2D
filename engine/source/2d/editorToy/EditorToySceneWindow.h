@@ -14,6 +14,7 @@
 #endif // !_SCENEOBJECT_H_
 
 class EditorToyScene;
+class EditorToyTool;
 
 struct MouseStatus
 {
@@ -87,6 +88,8 @@ protected:
    
    EditorToyScene* mScene;
 
+   EditorToyTool* mTool;
+
 public:
 
    DECLARE_CONOBJECT(EditorToySceneWindow);
@@ -119,8 +122,8 @@ public:
    virtual void resetScene(void);
    virtual void setTargetCameraArea(const RectF& camWindow);
    virtual void setTargetCameraPosition(Vector2 center, F32 w, F32 h);
-   virtual void setCurrentCameraArea(const RectF& camWindow);
-   virtual void setCurrentCameraPosition(Vector2 center, F32 w, F32 h);
+   virtual void setCameraArea(const RectF& camWindow);
+   virtual void setCameraPosition(Vector2 center, F32 w, F32 h);
    virtual void resize(const Point2I &newPosition, const Point2I &newExtent);
 
    void setLayerMask(const U32 lyrMsk);
@@ -132,6 +135,8 @@ public:
 
    void setEditScene(EditorToyScene* scene);
    EditorToyScene* getEditScene() { return mScene; };
+   bool setTool(EditorToyTool* tool);
+   EditorToyTool* getTool() { return mTool; }
 
 };
 

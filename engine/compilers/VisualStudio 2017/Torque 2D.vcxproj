@@ -268,6 +268,7 @@
     <ClCompile Include="..\..\source\2d\core\Vector2.cc" />
     <ClCompile Include="..\..\source\2d\editorToy\EditorToyScene.cc" />
     <ClCompile Include="..\..\source\2d\editorToy\EditorToySceneWindow.cc" />
+    <ClCompile Include="..\..\source\2d\editorToy\EditorToyTool.cc" />
     <ClCompile Include="..\..\source\2d\experimental\composites\WaveComposite.cc" />
     <ClCompile Include="..\..\source\2d\gui\guiImageButtonCtrl.cc" />
     <ClCompile Include="..\..\source\2d\gui\guiSceneObjectCtrl.cc" />
@@ -718,6 +719,8 @@
     <ClInclude Include="..\..\source\2d\editorToy\EditorToySceneWindow.h" />
     <ClInclude Include="..\..\source\2d\editorToy\EditorToySceneWindow_ScriptBinding.h" />
     <ClInclude Include="..\..\source\2d\editorToy\EditorToyScene_ScriptBinding.h" />
+    <ClInclude Include="..\..\source\2d\editorToy\EditorToyTool.h" />
+    <ClInclude Include="..\..\source\2d\editorToy\EditorToyTool_ScriptBinding.h" />
     <ClInclude Include="..\..\source\2d\experimental\composites\WaveComposite.h" />
     <ClInclude Include="..\..\source\2d\experimental\composites\WaveComposite_ScriptBinding.h" />
     <ClInclude Include="..\..\source\2d\gui\guiImageButtonCtrl.h" />
