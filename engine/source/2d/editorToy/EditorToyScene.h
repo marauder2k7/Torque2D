@@ -100,11 +100,11 @@ public:
    void onObjSpatialChanged(SceneObject* obj);
 
    virtual bool onMouseEvent(EditorToySceneWindow* sceneWindow, const MouseStatus& mStatus);
-   virtual bool onKeyUp(EditorToySceneWindow* sceneWindow, const GuiEvent& mStatus);
-   virtual bool onKeyDown(EditorToySceneWindow* sceneWindow, const GuiEvent& mStatus);
-   virtual bool onKeyRepeat(EditorToySceneWindow* sceneWindow, const GuiEvent& mStatus);
-   virtual bool onRenderBackground(EditorToySceneWindow* sceneWindow);
-   virtual bool onRenderForeground(EditorToySceneWindow* sceneWindow);
+   virtual bool onKeyUp(EditorToySceneWindow* sceneWindow, const GuiEvent& gEvt);
+   virtual bool onKeyDown(EditorToySceneWindow* sceneWindow, const GuiEvent& gEvt);
+   virtual bool onKeyRepeat(EditorToySceneWindow* sceneWindow, const GuiEvent& gEvt);
+   virtual void onRenderBackground(EditorToySceneWindow* sceneWindow);
+   virtual void onRenderForeground(EditorToySceneWindow* sceneWindow);
 
    toolPtr getActiveTool() const { return mActiveTool; };
    bool setActiveTool(toolPtr tool);

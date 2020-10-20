@@ -257,6 +257,251 @@ void EditorToyScene::onObjSpatialChanged(SceneObject * obj)
    Con::executef(this, 2, "onObjectSpatialChanged", Con::getIntArg(obj->getId()));
 }
 
+bool EditorToyScene::onMouseEvent(EditorToySceneWindow * sceneWindow, const MouseStatus & mStatus)
+{
+
+   mLastWindow = sceneWindow;
+
+   mMousePos = mStatus.mousePt2D;
+   mCamPos = sceneWindow->getCameraPosition();
+   mCamZoom = sceneWindow->getCameraZoom();
+
+   EditorToyTool* tool = sceneWindow->getTool();
+   if (!tool)
+      tool = mActiveTool;
+
+   if (!tool)
+      return false;
+
+   bool bMouse = false;
+
+   switch (mStatus.mEvt)
+   {
+   case MouseStatus::UP:
+      bMouse = tool->onMouseUp(sceneWindow, mStatus);
+      break;
+   case MouseStatus::DOWN:
+      bMouse = tool->onMouseDown(sceneWindow, mStatus);
+      break;
+   case MouseStatus::MOVE:
+      bMouse = tool->onMouseMove(sceneWindow, mStatus);
+      break;
+   case MouseStatus::DRAGGED:
+      bMouse = tool->onMouseDragged(sceneWindow, mStatus);
+      break;
+   case MouseStatus::RIGHT_UP:
+      bMouse = tool->onRightMouseUp(sceneWindow, mStatus);
+      break;
+   case MouseStatus::RIGHT_DOWN:
+      bMouse = tool->onRightMouseDown(sceneWindow, mStatus);
+      break;
+   case MouseStatus::RIGHT_DRAGGED:
+      bMouse = tool->onRightMouseDragged(sceneWindow, mStatus);
+      break;
+   case MouseStatus::MIDDLE_UP:
+      bMouse = tool->onMiddleMouseUp(sceneWindow, mStatus);
+      break;
+   case MouseStatus::MIDDLE_DOWN:
+      bMouse = tool->onMiddleMouseDown(sceneWindow, mStatus);
+      break;
+   case MouseStatus::MIDDLE_DRAGGED:
+      bMouse = tool->onMiddleMouseDragged(sceneWindow, mStatus);
+      break;
+   case MouseStatus::WHEEL_UP:
+      bMouse = tool->onMouseWheelUp(sceneWindow, mStatus);
+      break;
+   case MouseStatus::WHEEL_DOWN:
+      bMouse = tool->onMouseWheelDown(sceneWindow, mStatus);
+      break;
+   }
+
+   return bMouse;
+
+}
+
+bool EditorToyScene::onKeyUp(EditorToySceneWindow * sceneWindow, const GuiEvent& gEvt)
+{
+   mLastWindow = sceneWindow;
+
+   EditorToyTool* tool = sceneWindow->getTool();
+   if (!tool)
+      tool = mActiveTool;
+
+   if (!tool)
+      return true;
+
+   return tool->onKeyUp(sceneWindow, gEvt);
+}
+
+bool EditorToyScene::onKeyDown(EditorToySceneWindow * sceneWindow, const GuiEvent& gEvt)
+{
+   mLastWindow = sceneWindow;
+
+   EditorToyTool* tool = sceneWindow->getTool();
+   if (!tool)
+      tool = mActiveTool;
+
+   if (!tool)
+      return true;
+
+   return tool->onKeyDown(sceneWindow, gEvt);
+}
+
+bool EditorToyScene::onKeyRepeat(EditorToySceneWindow * sceneWindow, const GuiEvent& gEvt)
+{
+   mLastWindow = sceneWindow;
+
+   EditorToyTool* tool = sceneWindow->getTool();
+   if (!tool)
+      tool = mActiveTool;
+
+   if (!tool)
+      return true;
+
+   return tool->onKeyRepeat(sceneWindow, gEvt);
+}
+
+void EditorToyScene::onRenderBackground(EditorToySceneWindow * sceneWindow)
+{
+   dglDrawRectFill(RectI(sceneWindow->localToGlobalCoord(Point2I(0, 0)), sceneWindow->getExtent()), mGridFillCol);
+
+   Point2F camStart = sceneWindow->getCamera().mSceneMin;
+   Point2F camEnd = sceneWindow->getCamera().mSceneMax;
+
+   Vector2 winMin;
+   Vector2 winMax;
+
+   sceneWindow->sceneToWindowPoint((Vector2)camStart, winMin);
+   sceneWindow->sceneToWindowPoint((Vector2)camEnd, winMax);
+
+   winMin = (Vector2)sceneWindow->localToGlobalCoord(Point2I(S32(winMin.x), S32(winMin.y)));
+   winMax = (Vector2)sceneWindow->localToGlobalCoord(Point2I(S32(winMax.x), S32(winMax.y)));
+
+   if (mGridVisible)
+   {
+      F32 snapX = getMax(mGridSnapX, FLT_EPSILON);
+      F32 snapY = getMax(mGridSnapY, FLT_EPSILON);
+
+      S32 maxGridLine = 128;
+
+      Point2F cam = camEnd - camStart;
+      while ((cam.x / snapX) > maxGridLine)
+      {
+         snapX *= 2.0f;
+         snapY *= 2.0f;
+      }
+
+      Vector2 step;
+
+      if (isGridSnapX())
+      {
+         camStart.x = snapX * ((S32)(camStart.x / snapX));
+         for (F32 i = camStart.x; i < camEnd.x; i += snapX)
+         {
+            step.Set(i, 0);
+            sceneWindow->sceneToWindowPoint(step, step);
+            step = (Vector2)sceneWindow->localToGlobalCoord(Point2I(S32(step.x), S32(step.y)));
+            dglDrawLine(S32(step.x), S32(winMin.y), S32(step.x), S32(winMax.y), mGridCol);
+         }
+      }
+
+      if (isGridSnapY())
+      {
+         camStart.y = snapY * ((S32)(camStart.y / snapY));
+         for (F32 i = camStart.y; i < camEnd.y; i += snapY)
+         {
+            step.Set(0, i);
+            sceneWindow->sceneToWindowPoint(step, step);
+            step = (Vector2)sceneWindow->localToGlobalCoord(Point2I(S32(step.x), S32(step.y)));
+            dglDrawLine(S32(winMin.x), S32(step.y), S32(winMax.x), S32(step.y), mGridCol);
+         }
+      }
+   }
+}
+
+void EditorToyScene::onRenderForeground(EditorToySceneWindow * sceneWindow)
+{
+
+   Point2F camStart = sceneWindow->getCamera().mSceneMin;
+   Point2F camEnd = sceneWindow->getCamera().mSceneMax;
+
+   Vector2 winMin;
+   Vector2 winMax;
+
+   sceneWindow->sceneToWindowPoint((Vector2)camStart, winMin);
+   sceneWindow->sceneToWindowPoint((Vector2)camEnd, winMax);
+
+   winMin = (Vector2)sceneWindow->localToGlobalCoord(Point2I(S32(winMin.x), S32(winMin.y)));
+   winMax = (Vector2)sceneWindow->localToGlobalCoord(Point2I(S32(winMax.x), S32(winMax.y)));
+
+   S32 line = 2;
+   ColorF lCol = mGridCol * 0.5f;
+   lCol.alpha = 0.5f;
+
+   if (mCameraVisible)
+   {
+      Vector2 camSize = Vector2(100.0f, 75.0f);
+      Vector2 camPos = Vector2(0.0f, 0.0f);
+
+      if (sceneWindow->getScene() != NULL)
+      {
+         const char* pos = sceneWindow->getScene()->getDataField(StringTable->insert("camPos"), NULL);
+         if (Utility::mGetStringElementCount(pos) == 2)
+            camPos = Utility::mGetStringElementVector(pos);
+
+         const char* size = sceneWindow->getScene()->getDataField(StringTable->insert("camSize"), NULL);
+         if (Utility::mGetStringElementCount(size) == 2)
+            camSize = Utility::mGetStringElementVector(size);
+      }
+
+      Vector2 upper = camPos - (camSize * 0.5f);
+      Vector2 lower = camPos + (camSize * 0.5f);
+
+      sceneWindow->sceneToWindowPoint(upper, upper);
+      sceneWindow->sceneToWindowPoint(lower, lower);
+
+      Point2I winUp = sceneWindow->localToGlobalCoord(Point2I((S32)upper.x, (S32)upper.y));
+      Point2I winLow = sceneWindow->localToGlobalCoord(Point2I((S32)lower.x, (S32)lower.y));
+      S32 width = winLow.x - winUp.x;
+      S32 height = winLow.y - winLow.y;
+
+      dglDrawRectFill(winUp, winUp + Point2I(line, height), lCol);
+      dglDrawRectFill(winUp, winUp + Point2I(width, line), lCol);
+      dglDrawRectFill(winLow, winLow - Point2I(line, height), lCol);
+      dglDrawRectFill(winLow, winLow - Point2I(width, line), lCol);
+
+      winUp.x += (S32)(0.1f * width);
+      winUp.y += (S32)(0.1f * height);
+      winLow.x -= (S32)(0.1f * width);
+      winLow.y -= (S32)(0.1f * height);
+
+      dglDrawRect(winUp, winLow, lCol);
+   }
+
+   if (mGuidesVisible)
+   {
+      Vector2 zPt;
+      sceneWindow->sceneToWindowPoint(Vector2(0.0f, 0.0f), zPt);
+      Point2I wZero = sceneWindow->localToGlobalCoord(Point2I((S32)zPt.x, (S32)zPt.y));
+
+      S32 halfLine = line >> 1;
+
+      if ((camStart.x < 0.0f) && (camEnd.x > 0.0f))
+         dglDrawRectFill(Point2I((S32)(wZero.x - halfLine), (S32)winMin.y), Point2I((S32)(wZero.x + halfLine), (S32)winMax.y), lCol);
+
+      if ((camStart.y < 0.0f) && (camEnd.y > 0.0f))
+         dglDrawRectFill(Point2I((S32)winMin.x, (S32)(wZero.y - halfLine)), Point2I((S32)winMax.x, (S32)(wZero.y + halfLine)), lCol);
+   }
+
+   EditorToyTool* tool = sceneWindow->getTool();
+   if (!tool)
+      tool = mActiveTool;
+
+   if (tool)
+      tool->onRenderScene(sceneWindow);
+
+}
+
 bool EditorToyScene::setActiveTool(toolPtr tool)
 {
    for (SimSet::iterator i = mTools.begin(); i != mTools.end(); i++)
@@ -347,4 +592,84 @@ bool EditorToyScene::setDefaultToolActive()
       return setActiveTool(mDefTool);
 
    return false;
+}
+
+void EditorToyScene::removeGuideX(F32 x)
+{
+   if (!hasGuidesX())
+      return;
+
+   S32 g = 0;
+   Vector<F32>::iterator i;
+   i = mGuidesX.begin();
+   for (g = 0; g < mGuidesX.size(); g++)
+   {
+      F32 pos = *i;
+      if (mIsEqual(pos, x))
+         break;
+         
+      i++;
+   }
+
+   if (g == mGuidesX.size() && g > 0)
+      i--;
+
+   mGuidesX.erase_fast(i);
+}
+
+void EditorToyScene::removeGuideY(F32 y)
+{
+   if (!hasGuidesY())
+      return;
+
+   S32 g = 0;
+   Vector<F32>::iterator i;
+   i = mGuidesY.begin();
+   for (g = 0; g < mGuidesY.size(); g++)
+   {
+      F32 pos = *i;
+      if (mIsEqual(pos, y))
+         break;
+
+      i++;
+   }
+
+   if (g == mGuidesY.size() && g > 0)
+      i--;
+
+   mGuidesY.erase_fast(i);
+}
+
+F32 EditorToyScene::getClosestGuideX(F32 x)
+{
+   if (!hasGuidesX())
+      return 0.0f;
+
+   F32 g = mGuidesX[0];
+   Vector<F32>::const_iterator i;
+   for (i = mGuidesX.begin(); i != mGuidesX.end(); i++)
+   {
+      F32 pos = *i;
+      if (mFabs(pos - x) < mFabs(g - x))
+         g = pos;
+   }
+
+   return g;
+}
+
+F32 EditorToyScene::getClosestGuideY(F32 y)
+{
+   if (!hasGuidesY())
+      return 0.0f;
+
+   F32 g = mGuidesY[0];
+   Vector<F32>::const_iterator i;
+   for (i = mGuidesY.begin(); i != mGuidesY.end(); i++)
+   {
+      F32 pos = *i;
+      if (mFabs(pos - y) < mFabs(g - y))
+         g = pos;
+   }
+
+   return g;
 }

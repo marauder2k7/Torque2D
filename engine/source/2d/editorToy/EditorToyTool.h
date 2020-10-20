@@ -66,9 +66,9 @@ public:
    virtual bool onMouseWheelUp(EditorToySceneWindow* sceneWin, const MouseStatus &mStatus) { return false; }
    virtual bool onMouseWheelDown(EditorToySceneWindow* sceneWin, const MouseStatus &mStatus) { return false; }
 
-   virtual bool onKeyUp(EditorToySceneWindow* sceneWin, const GuiEvent *gEvt) { return false; }
-   virtual bool onKeyDown(EditorToySceneWindow* sceneWin, const GuiEvent *gEvt) { return false; }
-   virtual bool onKeyRepeat(EditorToySceneWindow* sceneWin, const GuiEvent *gEvt) { return false; }
+   virtual bool onKeyUp(EditorToySceneWindow* sceneWin, const GuiEvent &gEvt) { return false; }
+   virtual bool onKeyDown(EditorToySceneWindow* sceneWin, const GuiEvent &gEvt) { return false; }
+   virtual bool onKeyRepeat(EditorToySceneWindow* sceneWin, const GuiEvent &gEvt) { return false; }
 
    virtual void onRenderScene(EditorToySceneWindow* sceneWin) {};
 
