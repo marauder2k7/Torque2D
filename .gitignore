@@ -6,6 +6,7 @@
 /tmp/*
 /preferences.cs
 /engine/**/preferences.cs
+/engine/compilers/VisualStudio 2017/.vs/
 *.dso
 *.edso
 *.user
