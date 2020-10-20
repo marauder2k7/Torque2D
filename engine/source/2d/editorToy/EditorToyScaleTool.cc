@@ -232,7 +232,7 @@ S32 EditorToyScaleTool::getScaleState(EditorToySceneWindow * sceneWindow, const 
 
 //-----------------------------------------------------------------------
 
-void EditorToyScaleTool::drawScaleNuts(EditorToySceneWindow * sceneWindow, const RectF& rect)
+void EditorToyScaleTool::drawScaleNuts(EditorToySceneWindow* sceneWindow, const RectF& rect)
 {
    Vector2 upper = Vector2(rect.point.x, rect.point.y + rect.extent.y);
    Vector2 lower = Vector2(rect.point.x + rect.extent.x, rect.point.y);
