@@ -63,9 +63,10 @@ Icon?
 
 # VS Generated files #
 ######################
-engine/compilers/VisualStudio 2017/.vs/*
-engine/compilers/VisualStudio 2017/.vs/Torque 2D/*
-engine/compilers/VisualStudio 2017/.vs/Torque 2D/v15/*
+engine/compilers/VisualStudio 2017/.vs/Torque 2D/v15/Browse.VC.db
+engine/compilers/VisualStudio 2017/.vs/Torque 2D/v15/Solution.VC.db
+engine/compilers/VisualStudio 2017/.vs/Torque 2D/v15/Solution.VC.db-shm
+engine/compilers/VisualStudio 2017/.vs/Torque 2D/v15/Solution.VC.db-wal
 
 # Android project files #
 #########################
@@ -82,12 +83,3 @@ engine/compilers/android-studio/app/src/main/obj/
 engine/compilers/android-studio/app/src/main/libs/
 engine/compilers/android-studio/app/src/main/game/
 engine/compilers/android-studio/app/.externalNativeBuild/
-
-
-
-engine/compilers/VisualStudio 2017/.vs/Torque 2D/v15/Solution.VC.db-shm
-engine/compilers/VisualStudio 2017/.vs/Torque 2D/v15/Browse.VC.db
-engine/compilers/VisualStudio 2017/.vs/Torque 2D/v15/Solution.VC.db
-engine/compilers/VisualStudio 2017/.vs/Torque 2D/v15/Browse.VC.db
-engine/compilers/VisualStudio 2017/.vs/Torque 2D/v15/Solution.VC.db-shm
-engine/compilers/VisualStudio 2017/.vs/Torque 2D/v15/Solution.VC.db-wal
