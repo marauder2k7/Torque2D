@@ -474,7 +474,7 @@ U32 WorldQuery::anyQueryAABB( const b2AABB& aabb )
 U32 WorldQuery::anyQueryArea(const Vector2& lower, const Vector2& upper)
 {
    b2AABB aabb;
-   aabb.lowerBound.Set(getMin((lower.x, lower.x), getMin(lower.x, upper.x));
+   aabb.lowerBound.Set(getMin(lower.x, lower.x), getMin(lower.x, upper.x));
    aabb.upperBound.Set(getMax(lower.x, upper.x), getMax(lower.x, upper.x));
 
    return anyQueryAABB(aabb);

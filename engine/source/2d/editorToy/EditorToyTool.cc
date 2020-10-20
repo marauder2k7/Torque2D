@@ -18,7 +18,7 @@ EditorToyTool::EditorToyTool() : SimObject(),
                                  mNutSize(5)
 {
    VECTOR_SET_ASSOCIATION(mNuts);
-   mTool = StringTable->insert("Editor Tool");
+   mTool = StringTable->insert("EditorToy Tool");
 }
 
 EditorToyTool::~EditorToyTool()
@@ -68,6 +68,10 @@ bool EditorToyTool::onAcquireObj(SceneObject* obj)
       return false;
 
    return true;
+}
+
+void EditorToyTool::onRelinquishObj(SceneObject * obj)
+{
 }
 
 void EditorToyTool::drawNut(Point2I pos)

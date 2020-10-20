@@ -37,12 +37,9 @@ protected:
    bool inNut(Point2I pt, S32 x, S32 y);
 
 public:
-   DECLARE_CONOBJECT(EditorToyTool);
-
    EditorToyTool();
    virtual ~EditorToyTool();
    virtual bool onAdd();
-
 
    virtual bool hasUndoManager() { return false; };
    const UndoManager& getUndoManager() { return mUndo; };
@@ -51,7 +48,7 @@ public:
 
    virtual bool onAcquireObj(SceneObject* obj);
 
-   virtual bool onRelinquishObj(SceneObject* obj) {};
+   virtual void onRelinquishObj(SceneObject* obj);
 
    virtual bool onMouseUp(EditorToySceneWindow* sceneWin, const MouseStatus &mStatus) { return false; }
    virtual bool onMouseDown(EditorToySceneWindow* sceneWin, const MouseStatus &mStatus) { return false; }
@@ -85,6 +82,7 @@ public:
 
    inline void setToolTexture(StringTableEntry texture) { if (texture != NULL)mTexture = StringTable->insert(texture); };
 
+   DECLARE_CONOBJECT(EditorToyTool);
 
 };
 
