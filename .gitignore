@@ -79,3 +79,5 @@ engine/compilers/android-studio/app/src/main/obj/
 engine/compilers/android-studio/app/src/main/libs/
 engine/compilers/android-studio/app/src/main/game/
 engine/compilers/android-studio/app/.externalNativeBuild/
+engine/compilers/VisualStudio 2017/.vs/Torque 2D/v15/Browse.VC.db
+engine/compilers/VisualStudio 2017/.vs/Torque 2D/v15/Solution.VC.db-shm
