@@ -58,6 +58,7 @@ class DInputDevice : public InputDevice
       static U8   smKeyboardCount;
       static U8   smMouseCount;
       static U8   smJoystickCount;
+      static U8   smTouchCount;
       static U8   smUnknownCount;
 
       static U8   smModifierKeys;

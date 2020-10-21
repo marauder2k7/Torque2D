@@ -35,6 +35,7 @@ LPDIRECTINPUT8 DInputDevice::smDInputInterface;
 U8    DInputDevice::smKeyboardCount;
 U8    DInputDevice::smMouseCount;
 U8    DInputDevice::smJoystickCount;
+U8    DInputDevice::smTouchCount;
 U8    DInputDevice::smUnknownCount;
 U8    DInputDevice::smModifierKeys;
 bool  DInputDevice::smKeyStates[256];
@@ -77,6 +78,11 @@ DInputDevice::DInputDevice( const DIDEVICEINSTANCE* dii )
          dSprintf( mName, 29, "joystick%d", mDeviceID );
          break;
 
+      case DI8DEVTYPESCREENPTR_TOUCH:
+         mDeviceType = ScreenTouchDeviceType;
+         mDeviceID   = smTouchCount++;
+         dSprintf(mName, 29, "touch%d", mDeviceID);
+         break;
       default:
          mDeviceType = UnknownDeviceType;
          mDeviceID   = smUnknownCount++;
