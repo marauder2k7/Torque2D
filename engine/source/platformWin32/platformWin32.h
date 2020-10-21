@@ -33,7 +33,7 @@
 
 //Luma:	add WINVER definition if it doesn't exist.. Is that our bad that it isn't on our systems already?
 #ifndef	WINVER
-#define WINVER  0x0500      /* version 5.0 */
+#define WINVER  0x0602      /* version 5.0 */
 #endif	//!WINVER
 
 

@@ -57,17 +57,44 @@ DInputDevice::DInputDevice( const DIDEVICEINSTANCE* dii )
 
    mPrevPOVPos       = 0;
 
+   int value = GetSystemMetrics(SM_DIGITIZER);
+   if (value & NID_READY)
+   {
+      Con::printf("digitizer found");
+   }
+   if (value & NID_MULTI_INPUT)
+   {
+      Con::printf("Multi-touch found");
+   }
+
+   if (value & NID_INTEGRATED_TOUCH)
+   {
+      Con::printf("Integrated-touch found");
+   }
+
+   if (value & NID_INTEGRATED_PEN)
+   {
+      Con::printf("Integrated Pen-touch found");
+   }
+
+   if (value & NID_EXTERNAL_PEN)
+   {
+      Con::printf("External Pen-touch found");
+   }
+
    switch ( GET_DIDEVICE_TYPE( mDeviceInstance.dwDevType ) )
    {
       case DI8DEVTYPE_KEYBOARD:
          mDeviceType = KeyboardDeviceType;
          mDeviceID   = smKeyboardCount++;
+         Con::printf("Keyboard Found.");
          dSprintf( mName, 29, "keyboard%d", mDeviceID );
          break;
 
       case DI8DEVTYPE_MOUSE:
          mDeviceType = MouseDeviceType;
          mDeviceID   = smMouseCount++;
+         Con::printf("Mouse Found.");
          dSprintf( mName, 29, "mouse%d", mDeviceID );
          break;
 
@@ -75,17 +102,21 @@ DInputDevice::DInputDevice( const DIDEVICEINSTANCE* dii )
       case DI8DEVTYPE_GAMEPAD:
          mDeviceType = JoystickDeviceType;
          mDeviceID   = smJoystickCount++;
+         Con::printf("Joystick/Gamepad Found.");
          dSprintf( mName, 29, "joystick%d", mDeviceID );
          break;
 
-      case DI8DEVTYPESCREENPTR_TOUCH:
+      case DI8DEVTYPESCREENPTR_UNKNOWN:
          mDeviceType = ScreenTouchDeviceType;
          mDeviceID   = smTouchCount++;
+         Con::printf("TouchDevice Found.");
          dSprintf(mName, 29, "touch%d", mDeviceID);
          break;
+
       default:
          mDeviceType = UnknownDeviceType;
          mDeviceID   = smUnknownCount++;
+         Con::printf("Unknown Device Found.");
          dSprintf( mName, 29, "unknown%d", mDeviceID );
          break;
    }

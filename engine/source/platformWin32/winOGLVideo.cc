@@ -716,6 +716,8 @@ DisplayDevice* OpenGLDevice::create()
       return NULL;
    }
 
+   RegisterTouchWindow(testWindow, 0);
+
    //------------------------------------------------------------------------------
    // Attempt to Grab a handle to the DeviceContext of our window.
    //------------------------------------------------------------------------------
@@ -807,6 +809,8 @@ DisplayDevice* OpenGLDevice::create()
                }
             }
          }
+
+         RegisterTouchWindow(testWindow, 0);
       }
       ChangeDisplaySettings( NULL, 0 );
    }
