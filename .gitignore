@@ -59,7 +59,9 @@ linkmap.txt
 .Spotlight-V100
 .Trashes
 Icon?
-*.db
+*.VC.db
+*.VC.db-shm
+*.VC.db-wal
 
 # VS Generated files #
 ######################
