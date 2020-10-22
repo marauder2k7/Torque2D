@@ -494,12 +494,12 @@ void EditorToySceneWindow::onRender(Point2I offset, const RectI &updateRect)
    dglSetViewport(updateRect);
 
    if (mScene)
-      mScene->onRenderBackground(this);
+      mScene->onRenderBack(this);
 
    Parent::onRender(offset, updateRect);
 
    if (mScene)
-      mScene->onRenderForeground(this);
+      mScene->onRenderFront(this);
 
    dglSetViewport(oldVp);
 }

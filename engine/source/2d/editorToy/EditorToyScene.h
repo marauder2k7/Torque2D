@@ -28,7 +28,10 @@ private:
    bool        mRotSnap;
    F32         mRotSnapThreshold;
    F32         mRotSnapAngle;
+
    bool        mGuidesVisible;
+   ColorI      mGuideCol;
+
    bool        mCameraVisible;
 
    Vector<F32> mGuidesX;
@@ -39,6 +42,7 @@ private:
    Vector2     mCamPos;
    Vector2     mMousePos;
    F32         mCamZoom;
+   ColorI      mCamColor;
 
    SimSet      mTools;
    toolPtr     mActiveTool;
@@ -103,8 +107,8 @@ public:
    virtual bool onKeyUp(EditorToySceneWindow* sceneWindow, const GuiEvent& gEvt);
    virtual bool onKeyDown(EditorToySceneWindow* sceneWindow, const GuiEvent& gEvt);
    virtual bool onKeyRepeat(EditorToySceneWindow* sceneWindow, const GuiEvent& gEvt);
-   virtual void onRenderBackground(EditorToySceneWindow* sceneWindow);
-   virtual void onRenderForeground(EditorToySceneWindow* sceneWindow);
+   virtual void onRenderBack(EditorToySceneWindow* sceneWindow);
+   virtual void onRenderFront(EditorToySceneWindow* sceneWindow);
 
    toolPtr getActiveTool() const { return mActiveTool; };
    bool setActiveTool(toolPtr tool);
@@ -137,8 +141,8 @@ public:
    inline bool getSnapX() const { return mSnapX; };
    inline bool getSnapY() const { return mSnapY; };
    inline F32 getSnapThreshold() const { return mGridSnapThreshold; };
-   inline ColorI setGridColor() const { return mGridCol; };
-   inline ColorI setFillColor() const { return mGridFillCol; };
+   inline ColorI getGridColor() const { return mGridCol; };
+   inline ColorI getFillColor() const { return mGridFillCol; };
 
    inline bool getRotSnap() const { return mRotSnap; };
    inline F32 getRotThreshold() const { return mRotSnapThreshold; };

@@ -82,6 +82,7 @@ public:
    inline void setToolTexture(StringTableEntry texture) { if (texture != NULL)mTexture = StringTable->insert(texture); };
 
    bool onAdd();
+   void onRemove();
 
    DECLARE_CONOBJECT(EditorToyTool);
 

@@ -66,7 +66,6 @@ ModuleDatabase.loadGroup("gameBase");
 //Load server
 ModuleDatabase.loadExplicit("ServerToy");
 
-
 //-----------------------------------------------------------------------------
 
 function onExit()

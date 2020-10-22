@@ -34,6 +34,11 @@ bool EditorToyTool::onAdd()
    return true;
 }
 
+void EditorToyTool::onRemove()
+{
+   Parent::onRemove();
+}
+
 bool EditorToyTool::onActivate(EditorToySceneWindow* sceneWin)
 {
    if (mActive)

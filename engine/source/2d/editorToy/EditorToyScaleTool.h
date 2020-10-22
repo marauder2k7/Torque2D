@@ -16,10 +16,10 @@ protected:
    enum ScaleState
    {
       ScaleNone = 0,
-      ScaleLeft = 1,
-      ScaleRight = 2,
       ScaleTop = 4,
-      ScaleBottom = 8
+      ScaleBottom = 8,
+      ScaleLeft = 1,
+      ScaleRight = 2
    };
 
    U32 mScaleState;
@@ -27,8 +27,7 @@ protected:
    virtual void scale(EditorToyScene* scene, Vector2 size, 
                      Vector2 pos, Vector2 mPoint, 
                      bool uniform, bool keepAr, F32 ar, 
-                     Vector2& newSize, Vector2& newPos, 
-                     bool& flipX, bool& flipY);
+                     Vector2& newSize, Vector2& newPos);
 
 public:
    EditorToyScaleTool();

@@ -57,29 +57,12 @@ DInputDevice::DInputDevice( const DIDEVICEINSTANCE* dii )
 
    mPrevPOVPos       = 0;
 
+   // Check for a digitizer and see if we have one.
+
    int value = GetSystemMetrics(SM_DIGITIZER);
    if (value & NID_READY)
    {
       Con::printf("digitizer found");
-   }
-   if (value & NID_MULTI_INPUT)
-   {
-      Con::printf("Multi-touch found");
-   }
-
-   if (value & NID_INTEGRATED_TOUCH)
-   {
-      Con::printf("Integrated-touch found");
-   }
-
-   if (value & NID_INTEGRATED_PEN)
-   {
-      Con::printf("Integrated Pen-touch found");
-   }
-
-   if (value & NID_EXTERNAL_PEN)
-   {
-      Con::printf("External Pen-touch found");
    }
 
    switch ( GET_DIDEVICE_TYPE( mDeviceInstance.dwDevType ) )
@@ -87,26 +70,24 @@ DInputDevice::DInputDevice( const DIDEVICEINSTANCE* dii )
       case DI8DEVTYPE_KEYBOARD:
          mDeviceType = KeyboardDeviceType;
          mDeviceID   = smKeyboardCount++;
-         Con::printf("Keyboard Found.");
          dSprintf( mName, 29, "keyboard%d", mDeviceID );
          break;
 
       case DI8DEVTYPE_MOUSE:
          mDeviceType = MouseDeviceType;
          mDeviceID   = smMouseCount++;
-         Con::printf("Mouse Found.");
          dSprintf( mName, 29, "mouse%d", mDeviceID );
+         Con::printf("FoundDevice %s input device.", mName);
          break;
 
       case DI8DEVTYPE_JOYSTICK:
       case DI8DEVTYPE_GAMEPAD:
          mDeviceType = JoystickDeviceType;
          mDeviceID   = smJoystickCount++;
-         Con::printf("Joystick/Gamepad Found.");
          dSprintf( mName, 29, "joystick%d", mDeviceID );
          break;
 
-      case DI8DEVTYPESCREENPTR_UNKNOWN:
+      case DI8DEVTYPE_SCREENPOINTER:
          mDeviceType = ScreenTouchDeviceType;
          mDeviceID   = smTouchCount++;
          Con::printf("TouchDevice Found.");
@@ -116,7 +97,6 @@ DInputDevice::DInputDevice( const DIDEVICEINSTANCE* dii )
       default:
          mDeviceType = UnknownDeviceType;
          mDeviceID   = smUnknownCount++;
-         Con::printf("Unknown Device Found.");
          dSprintf( mName, 29, "unknown%d", mDeviceID );
          break;
    }
@@ -142,6 +122,7 @@ void DInputDevice::init()
    smKeyboardCount      = 0;
    smMouseCount         = 0;
    smJoystickCount      = 0;
+   smTouchCount         = 0;
    smUnknownCount       = 0;
    smModifierKeys       = 0;
 }

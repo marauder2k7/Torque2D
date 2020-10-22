@@ -18,12 +18,14 @@ EditorToyScene::EditorToyScene() :  SimObject(),
                                     mSnapX(true),
                                     mSnapY(true),
                                     mGridCol(128, 128, 128, 128),
-                                    mGridFillCol(128, 128, 128, 255),
+                                    mGridFillCol(0, 0, 0, 255),
                                     mGridSnapThreshold(1.0f),
                                     mGuidesVisible(true),
+                                    mGuideCol(255,255,0,255),
                                     mCameraVisible(true),
                                     mDesignRes(1024, 768),
                                     mCamPos(0.0f, 0.0f),
+                                    mCamColor(255,0,255,255),
                                     mMousePos(0.0f,0.0f),
                                     mCamZoom(0.0f),
                                     mActiveTool(NULL),
@@ -361,7 +363,7 @@ bool EditorToyScene::onKeyRepeat(EditorToySceneWindow * sceneWindow, const GuiEv
    return tool->onKeyRepeat(sceneWindow, gEvt);
 }
 
-void EditorToyScene::onRenderBackground(EditorToySceneWindow * sceneWindow)
+void EditorToyScene::onRenderBack(EditorToySceneWindow * sceneWindow)
 {
    dglDrawRectFill(RectI(sceneWindow->localToGlobalCoord(Point2I(0, 0)), sceneWindow->getExtent()), mGridFillCol);
 
@@ -419,7 +421,7 @@ void EditorToyScene::onRenderBackground(EditorToySceneWindow * sceneWindow)
    }
 }
 
-void EditorToyScene::onRenderForeground(EditorToySceneWindow * sceneWindow)
+void EditorToyScene::onRenderFront(EditorToySceneWindow * sceneWindow)
 {
 
    Point2F camStart = sceneWindow->getCamera().mSceneMin;
@@ -435,8 +437,6 @@ void EditorToyScene::onRenderForeground(EditorToySceneWindow * sceneWindow)
    winMax = (Vector2)sceneWindow->localToGlobalCoord(Point2I(S32(winMax.x), S32(winMax.y)));
 
    S32 line = 2;
-   ColorF lCol = mGridCol * 0.5f;
-   lCol.alpha = 0.5f;
 
    if (mCameraVisible)
    {
@@ -465,17 +465,17 @@ void EditorToyScene::onRenderForeground(EditorToySceneWindow * sceneWindow)
       S32 width = winLow.x - winUp.x;
       S32 height = winLow.y - winLow.y;
 
-      dglDrawRectFill(winUp, winUp + Point2I(line, height), lCol);
-      dglDrawRectFill(winUp, winUp + Point2I(width, line), lCol);
-      dglDrawRectFill(winLow, winLow - Point2I(line, height), lCol);
-      dglDrawRectFill(winLow, winLow - Point2I(width, line), lCol);
+      dglDrawRectFill(winUp, winUp + Point2I(line, height), mCamColor);
+      dglDrawRectFill(winUp, winUp + Point2I(width, line), mCamColor);
+      dglDrawRectFill(winLow, winLow - Point2I(line, height), mCamColor);
+      dglDrawRectFill(winLow, winLow - Point2I(width, line), mCamColor);
 
       winUp.x += (S32)(0.1f * width);
       winUp.y += (S32)(0.1f * height);
       winLow.x -= (S32)(0.1f * width);
       winLow.y -= (S32)(0.1f * height);
 
-      dglDrawRect(winUp, winLow, lCol);
+      dglDrawRect(winUp, winLow, mCamColor);
    }
 
    if (mGuidesVisible)
@@ -487,10 +487,10 @@ void EditorToyScene::onRenderForeground(EditorToySceneWindow * sceneWindow)
       S32 halfLine = line >> 1;
 
       if ((camStart.x < 0.0f) && (camEnd.x > 0.0f))
-         dglDrawRectFill(Point2I((S32)(wZero.x - halfLine), (S32)winMin.y), Point2I((S32)(wZero.x + halfLine), (S32)winMax.y), lCol);
+         dglDrawRectFill(Point2I((S32)(wZero.x - halfLine), (S32)winMin.y), Point2I((S32)(wZero.x + halfLine), (S32)winMax.y), mGuideCol);
 
       if ((camStart.y < 0.0f) && (camEnd.y > 0.0f))
-         dglDrawRectFill(Point2I((S32)winMin.x, (S32)(wZero.y - halfLine)), Point2I((S32)winMax.x, (S32)(wZero.y + halfLine)), lCol);
+         dglDrawRectFill(Point2I((S32)winMin.x, (S32)(wZero.y - halfLine)), Point2I((S32)winMax.x, (S32)(wZero.y + halfLine)), mGuideCol);
    }
 
    EditorToyTool* tool = sceneWindow->getTool();

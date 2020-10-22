@@ -24,13 +24,16 @@ EditorToyScaleTool::~EditorToyScaleTool()
 
 //-----------------------------------------------------------------------
 
-void EditorToyScaleTool::scale(EditorToyScene * scene, Vector2 size, Vector2 pos, Vector2 mPoint, bool uniform, bool keepAr, F32 ar, Vector2 & newSize, Vector2 & newPos, bool & flipX, bool & flipY)
+void EditorToyScaleTool::scale(EditorToyScene* scene, Vector2 size, Vector2 pos, Vector2 mPoint, bool uniform, bool keepAr, F32 ar, Vector2& newSize, Vector2& newPos)
 {
    AssertFatal(scene, "No valid scene");
 
    Vector2 mPt = mPoint;
 
    F32 snap = scene->getSnapThreshold();
+
+   if (uniform)
+      newPos = pos;
 
    if (scene->getSnapX())
    {
@@ -93,48 +96,8 @@ void EditorToyScaleTool::scale(EditorToyScene * scene, Vector2 size, Vector2 pos
    {
       newSize = size;
       newPos = pos;
-      flipX = flipY = false;
 
       return;
-   }
-
-   flipX = flipY = false;
-   if (newSize.x < 0.0f)
-   {
-      if (mScaleState & ScaleLeft)
-      {
-         mScaleState &= ~ScaleLeft;
-         mScaleState |= ScaleRight;
-      }
-
-      else if (mScaleState & ScaleRight)
-      {
-         mScaleState &= ~ScaleRight;
-         mScaleState |= ScaleLeft;
-      }
-
-      flipX = true;
-      newSize.x = -newSize.x;
-
-   }
-
-   if (newSize.y < 0.0f)
-   {
-      if (mScaleState & ScaleTop)
-      {
-         mScaleState &= ~ScaleTop;
-         mScaleState |= ScaleBottom;
-      }
-
-      else if (mScaleState & ScaleBottom)
-      {
-         mScaleState &= ~ScaleBottom;
-         mScaleState |= ScaleTop;
-      }
-
-      flipY = true;
-      newSize.y = -newSize.y;
-
    }
 
    if (keepAr)
@@ -176,9 +139,6 @@ void EditorToyScaleTool::scale(EditorToyScene * scene, Vector2 size, Vector2 pos
       }
 
    }
-
-   if (uniform)
-      newPos = pos;
 
 }
 
