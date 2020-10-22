@@ -175,7 +175,6 @@ private:
 
    Vector<UndoObject> mObjs;
 
-   // We need this so we can send notifications of objects changing.
    EditorToyScene* mScene;
 
 public:
@@ -211,13 +210,11 @@ public:
 
       Con::executef(1, "refreshTreeView");
 
-      // Call undo on quiet sub actions [KNM | 08/10/11 | ITGB-152]
       UndoAction::undo();
    };
 
    virtual void redo()
    {
-      // Call redo on quiet sub actions [KNM | 08/10/11 | ITGB-152]
       UndoAction::redo();
 
       for (S32 i = 0; i < mObjs.size(); i++)
