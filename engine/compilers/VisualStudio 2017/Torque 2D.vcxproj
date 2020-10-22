@@ -269,6 +269,7 @@
     <ClCompile Include="..\..\source\2d\editorToy\EditorToyScaleTool.cc" />
     <ClCompile Include="..\..\source\2d\editorToy\EditorToyScene.cc" />
     <ClCompile Include="..\..\source\2d\editorToy\EditorToySceneWindow.cc" />
+    <ClCompile Include="..\..\source\2d\editorToy\EditorToySelectTool.cc" />
     <ClCompile Include="..\..\source\2d\editorToy\EditorToyTool.cc" />
     <ClCompile Include="..\..\source\2d\experimental\composites\WaveComposite.cc" />
     <ClCompile Include="..\..\source\2d\gui\guiImageButtonCtrl.cc" />
@@ -721,6 +722,7 @@
     <ClInclude Include="..\..\source\2d\editorToy\EditorToySceneWindow.h" />
     <ClInclude Include="..\..\source\2d\editorToy\EditorToySceneWindow_ScriptBinding.h" />
     <ClInclude Include="..\..\source\2d\editorToy\EditorToyScene_ScriptBinding.h" />
+    <ClInclude Include="..\..\source\2d\editorToy\EditorToySelectTool.h" />
     <ClInclude Include="..\..\source\2d\editorToy\EditorToyTool.h" />
     <ClInclude Include="..\..\source\2d\editorToy\EditorToyTool_ScriptBinding.h" />
     <ClInclude Include="..\..\source\2d\experimental\composites\WaveComposite.h" />

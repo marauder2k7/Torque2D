@@ -1489,6 +1489,9 @@
     <ClCompile Include="..\..\source\2d\editorToy\EditorToyScaleTool.cc">
       <Filter>2d\editorToy</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\2d\editorToy\EditorToySelectTool.cc">
+      <Filter>2d\editorToy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\audio\audio.h">
@@ -3319,6 +3322,9 @@
       <Filter>2d\editorToy</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\2d\editorToy\EditorToyScaleTool.h">
+      <Filter>2d\editorToy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\2d\editorToy\EditorToySelectTool.h">
       <Filter>2d\editorToy</Filter>
     </ClInclude>
   </ItemGroup>
