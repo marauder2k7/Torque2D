@@ -985,7 +985,14 @@ case WM_SETCURSOR:
       SetCursor(NULL);
    break;
 case WM_LBUTTONDOWN:
-   mouseButtonEvent(SI_MAKE, KEY_BUTTON0);
+   if ((GetMessageExtraInfo() & MOUSEEVENTF_MASK) != MOUSEEVENTF_FROMTOUCH)
+   {
+      mouseButtonEvent(SI_MAKE, KEY_BUTTON0);
+   }
+   else
+   {
+      Con::printf("from pen");
+   }
    break;
 case WM_MBUTTONDOWN:
    mouseButtonEvent(SI_MAKE, KEY_BUTTON2);

@@ -208,8 +208,6 @@ public:
             mScene->acquireObj(object);
       }
 
-      Con::executef(1, "refreshTreeView");
-
       UndoAction::undo();
    };
 
@@ -225,8 +223,6 @@ public:
 
          mScene->moveToRecycleBin(object);
       }
-
-      Con::executef(1, "refreshTreeView");
    }
 };
 

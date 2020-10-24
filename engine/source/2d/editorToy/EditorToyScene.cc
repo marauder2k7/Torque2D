@@ -230,7 +230,6 @@ void EditorToyScene::deleteAcquired()
    else
       delete undo;
 
-   Con::executef(1, "refreshTreeView");
 }
 
 void EditorToyScene::onObjChanged()

@@ -39,7 +39,6 @@ protected:
 
    RectI                mDragRect;
 
-   bool                 mContainSelect;
    bool                 mUndoSelect;
    
 
@@ -70,14 +69,12 @@ public:
    inline void setHoverStrokeSize(F32 size)        { mHoverStrokeSize = size; };
    inline void setHoverFillCol(ColorI fillCol)     { mHoverFillCol = fillCol; };
    inline void setMultiSelect(bool sel)            { mMultiSelect = sel; };
-   inline void setContainSelect(bool cont)         { mContainSelect = cont; };
 
    inline bool getUndoSelect()                     { return mUndoSelect; };
    inline ColorI getHoverStrokeCol()               { return mHoverStrokeCol; };
    inline F32 getHoverStrokeSize()                 { return mHoverStrokeSize; };
    inline ColorI getHoverFillCol()                 { return mHoverFillCol; };
    inline bool getMultiSelect()                    { return mMultiSelect; };
-   inline bool getContainSelect()                  { return mContainSelect; };
 };
 
 #endif // !_EDITORTOYSELECTTOOL_H_
