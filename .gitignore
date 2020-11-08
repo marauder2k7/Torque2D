@@ -27,7 +27,6 @@ Torque2D_DEBUG.exe
 Torque2DGame.app
 Torque2DGame_Debug.app
 linkmap.txt
-**/.vs/**
 
 # Compiled source #
 ###################
@@ -60,7 +59,52 @@ linkmap.txt
 .Spotlight-V100
 .Trashes
 Icon?
-*.db
+*.VC.db
+*.VC.db-shm
+*.VC.db-wal
+
+# VS Generated files #
+######################
+
+# Files built by Visual Studio
+*_i.c
+*_p.c
+*_h.h
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.pch
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+# Visual C++ cache files
+ipch/
+*.aps
+*.ncb
+*.opendb
+*.opensdf
+*.sdf
+*.cachefile
+*.VC.db
+*.VC.VC.opendb
 
 # Android project files #
 #########################
@@ -77,4 +121,3 @@ engine/compilers/android-studio/app/src/main/obj/
 engine/compilers/android-studio/app/src/main/libs/
 engine/compilers/android-studio/app/src/main/game/
 engine/compilers/android-studio/app/.externalNativeBuild/
-engine/compilers/VisualStudio 2017/Torque 2D.vcxproj
