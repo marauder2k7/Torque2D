@@ -101,7 +101,7 @@
       <AdditionalIncludeDirectories>../../Lib/MSPlatformSDK/Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>COMCTL32.LIB;COMDLG32.LIB;USER32.LIB;ADVAPI32.LIB;GDI32.LIB;RPCRT4.LIB;WINMM.LIB;WS2_32.LIB;vfw32.lib;Imm32.lib;shell32.lib;shlwapi.lib;ole32.lib;M:\Github\Torque2D\engine\Link\Debug\glad_DEBUG.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>COMCTL32.LIB;COMDLG32.LIB;USER32.LIB;ADVAPI32.LIB;GDI32.LIB;RPCRT4.LIB;WINMM.LIB;WS2_32.LIB;vfw32.lib;Imm32.lib;shell32.lib;shlwapi.lib;ole32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>../../../Torque2D_DEBUG.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>../../Lib/unicode;../../lib/MSPlatformSDK/Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -1325,6 +1325,9 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="glad.vcxproj">
+      <Project>{d4937e8b-7186-4730-97b8-8543bb6734d3}</Project>
+    </ProjectReference>
     <ProjectReference Include="libogg.vcxproj">
       <Project>{15cbfeff-7965-41f5-b4e2-21e8795c9159}</Project>
       <Private>false</Private>

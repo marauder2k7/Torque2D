@@ -62,6 +62,7 @@ Icon?
 *.VC.db
 *.VC.db-shm
 *.VC.db-wal
+*.aps
 
 # VS Generated files #
 ######################
