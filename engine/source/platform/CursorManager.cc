@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "platform/platformInput.h"
-#include "platform/platformVideo.h"
+#include "graphics/dgl.h"
 #include "platform/event.h"
 #include "console/console.h"
 

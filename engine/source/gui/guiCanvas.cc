@@ -27,7 +27,7 @@
 #include "platform/event.h"
 #include "platform/platform.h"
 #include "platform/platformInput.h"
-#include "platform/platformVideo.h"
+#include "graphics/dgl.h"
 #include "gui/guiTypes.h"
 #include "gui/guiControl.h"
 #include "gui/guiCanvas.h"
@@ -111,9 +111,7 @@ GuiCanvas::~GuiCanvas()
 
 bool GuiCanvas::onAdd()
 {
-   DGLDevice *newDGL = new DGLDevice;
-   //DGL *newDGL = eDGL;
-   newDGL->init();
+
    bool parentRet = Parent::onAdd();
    return parentRet;
 }
@@ -1374,7 +1372,7 @@ void GuiCanvas::swapBuffers()
    PROFILE_START(SwapBuffers);
    //flip the surface
    if(!mRenderFront)
-      Video::swapBuffers();
+      DGL->swapBuffers();
    PROFILE_END();
 }
 

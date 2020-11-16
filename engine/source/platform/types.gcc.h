@@ -55,12 +55,19 @@ typedef unsigned long long  U64;
 
 //--------------------------------------
 // Identify the Operating System
-#if defined(__WIN32__) || defined(_WIN32)
+#if defined(_WIN64)
+#  define TORQUE_OS_STRING "Win64"
+#  define TORQUE_OS_WIN
+#  define TORQUE_OS_WIN64
+#  include "platform/types.win.h"
+#elif defined(__WIN32__) || defined(_WIN32)
 #  define TORQUE_OS_STRING "Win32"
+#  define TORQUE_OS_WIN
 #  define TORQUE_OS_WIN32
 #  define TORQUE_SUPPORTS_NASM
 #  define TORQUE_SUPPORTS_GCC_INLINE_X86_ASM
-#  include "platform/types.win32.h"
+#  include "platform/types.win.h"
+
 #elif defined(__ANDROID__)
 #ifndef TORQUE_OS_ANDROID
 		#define TORQUE_OS_ANDROID
@@ -70,11 +77,11 @@ typedef unsigned long long  U64;
 #  define TORQUE_OS_STRING "Emscripten"
 #  define TORQUE_OS_EMSCRIPTEN
 #  include "platform/types.posix.h"
-#elif defined(linux)
+#elif defined(linux) || defined(LINUX)
 #  define TORQUE_OS_STRING "Linux"
 #  define TORQUE_OS_LINUX
-#  define TORQUE_SUPPORTS_NASM
-#  define TORQUE_SUPPORTS_GCC_INLINE_X86_ASM
+//#  define TORQUE_SUPPORTS_NASM
+//#  define TORQUE_SUPPORTS_GCC_INLINE_X86_ASM
 #  include "platform/types.posix.h"
 
 #elif defined(__OpenBSD__)
@@ -116,9 +123,14 @@ typedef unsigned long long  U64;
 
 //--------------------------------------
 // Identify the CPU
-#if defined(i386)
+#if defined(i386) || defined(__i386) || defined(__i386__)
 #  define TORQUE_CPU_STRING "Intel x86"
 #  define TORQUE_CPU_X86
+#  define TORQUE_LITTLE_ENDIAN
+
+#elif defined(__x86_64__)
+#  define TORQUE_CPU_STRING "Intel x64"
+#  define TORQUE_CPU_X64
 #  define TORQUE_LITTLE_ENDIAN
 
 #elif defined(__amd64__)
@@ -151,6 +163,7 @@ typedef unsigned long long  U64;
 #else
 #  error "GCC: Unsupported Target CPU"
 #endif
+
 
 
 #endif // INCLUDED_TYPES_GCC_H

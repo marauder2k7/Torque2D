@@ -83,7 +83,7 @@ private:
 
 public:
     static bool mDGLRender;
-    static GLenum mTextureCompressionHint;
+    //static GLenum mTextureCompressionHint;
 
 public:
     static void create();

@@ -26,12 +26,17 @@ enum DGLPrimitiveType
 {
    DGLPT_FIRST = 0,
    DGLPointList = 0,
+   DGLLineList,
+   DGLLineStrip,
+   DGLLineLoop,
    DGLTriangleList,
    DGLTriangleStrip,
+   DGLTriangleFan,
+   DGLQuads,
    DGLPT_COUNT
 };
 
-enum DGLMatrixMode
+enum DGLMatrixType
 {
    DGLMM_FIRST = 0,
    DGLMatrixMode = 0,
@@ -39,6 +44,80 @@ enum DGLMatrixMode
    DGLProjection,
    DGLTexture,
    DGLMM_COUNT
+};
+
+enum DGLTextureFilter
+{
+   DGLTextureFilter_FIRST = 0,
+   DGLTextureFilterNone = 0,
+   DGLTextureFilterNearest,
+   DGLTextureFilterLinear,
+   DGLTextureFilter_COUNT
+};
+
+enum DGLClamp
+{
+   DGLClamp_FIRST = 0,
+   DGLClampDef,
+   DGLClampRepeat,
+   DGLClampEdge,
+   DGLClamp_COUNT
+};
+
+/// The supported blend modes.
+enum DGLBlend
+{
+   DGLBlend_FIRST = 0,
+   DGLBlendZero = 0, /// (0, 0, 0, 0)
+   DGLBlendOne, /// (1, 1, 1, 1)
+   DGLBlendSrcColor, /// (Rs, Gs, Bs, As)
+   DGLBlendInvSrcColor, /// (1 - Rs, 1 - Gs, 1 - Bs, 1 - As)
+   DGLBlendSrcAlpha, /// (As, As, As, As)
+   DGLBlendInvSrcAlpha, /// ( 1 - As, 1 - As, 1 - As, 1 - As)
+   DGLBlendDestAlpha, /// (Ad Ad Ad Ad)
+   DGLBlendInvDestAlpha, /// (1 - Ad 1 - Ad 1 - Ad 1 - Ad)
+   DGLBlendDestColor, /// (Rd, Gd, Bd, Ad)
+   DGLBlendInvDestColor, /// (1 - Rd, 1 - Gd, 1 - Bd, 1 - Ad)
+   DGLBlendSrcAlphaSat, /// (f, f, f, 1) where f = min(As, 1 - Ad)
+   DGLBlend_COUNT
+};
+
+enum DGLRenderState
+{
+   DGLRS_FIRST = 0,
+   DGLRSBlend,
+   DGLRSCullFace,
+   DGLRSAlphaTest,
+   DGLRSDepthTest,
+   DGLRSScissorTest,
+   DGLRSLighting,
+   DGLRSClipPlane0,
+   DGLRSClipPlane1,
+   DGLRSClipPlane2,
+   DGLRSClipPlane3,
+   DGLRSDebug,
+   DGLRSDebugSync,
+   DGLRSTexture2D,
+   DGLRS_COUNT
+};
+
+enum DGLClientState
+{
+   DGLCS_FIRST = 0,
+   DGLCSColorArray,
+   DGLCSVertexArray,
+   DGLCSTextCoordArray,
+   DGLCS_COUNT
+};
+
+enum DGLBufferBit
+{
+   DGLBB_FIRST = 0,
+   DGLBBColorBB,
+   DGLBBDepthBB,
+   DGLBBAccumBB,
+   DGLBBStencilBB,
+   DGLBB_COUNT
 };
 
 #endif

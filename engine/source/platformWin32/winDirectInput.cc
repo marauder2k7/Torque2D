@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "platformWin32/platformWin32.h"
-#include "platform/platformVideo.h"
+#include "graphics/dgl.h"
 #include "platformWin32/winDirectInput.h"
 #include "platformWin32/winDInputDevice.h"
 #include "platform/event.h"

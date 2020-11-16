@@ -24,8 +24,7 @@
 #include "platform/platform.h"
 #include "platformWin32/winWindow.h"
 #include "platformWin32/platformGL.h"
-#include "platform/platformVideo.h"
-#include "platformWin32/winOGLVideo.h"
+#include "graphics/dgl.h"
 #include "platform/event.h"
 #include "console/console.h"
 #include "platformWin32/winConsole.h"
@@ -706,9 +705,9 @@ static LRESULT PASCAL WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
    case WM_ACTIVATEAPP:
       if ((bool) wParam)
       {         
-         Video::reactivate();
+         DGLDevice::reactivate();
 
-         if ( Video::isFullScreen() )
+         if (DGLDevice::isFullScreen() )
             hideTheTaskbar();
 
          // HACK:  Windows 98 (after switching from fullscreen to windowed mode)
@@ -727,7 +726,7 @@ static LRESULT PASCAL WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
          if ( lParam == 0 )
             sgKeyboardStateDirty = true;
          
-         Video::deactivate();
+         DGLDevice::deactivate();
          restoreTheTaskbar();
 
       }
@@ -1135,30 +1134,6 @@ static void InitWindowClass()
 }
 
 //--------------------------------------
-Resolution Video::getDesktopResolution()
-{
-   Resolution  Result;
-   RECT        clientRect;
-   HWND        hDesktop  = GetDesktopWindow();
-   HDC         hDeskDC   = GetDC( hDesktop );
-
-   // Retrieve Resolution Information.
-   Result.bpp  = winState.desktopBitsPixel = GetDeviceCaps( hDeskDC, BITSPIXEL );
-   Result.w    = winState.desktopWidth     = GetDeviceCaps( hDeskDC, HORZRES );
-   Result.h    = winState.desktopHeight    = GetDeviceCaps( hDeskDC, VERTRES );
-
-   // Release Device Context.
-   ReleaseDC( hDesktop, hDeskDC );
-
-   SystemParametersInfo(SPI_GETWORKAREA, 0, &clientRect, 0);
-   winState.desktopClientWidth = clientRect.right;
-   winState.desktopClientHeight = clientRect.bottom;
-
-   // Return Result;
-   return Result;
-}
-
-//--------------------------------------
 HWND CreateOpenGLWindow( U32 width, U32 height, bool fullScreen, bool allowSizing )
 {
    S32 windowStyle = WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
@@ -1418,10 +1393,6 @@ static void InitWindow(const Point2I &initialSize)
 //--------------------------------------
 static void InitOpenGL()
 {
-   // The OpenGL initialization stuff has been mostly moved to the display
-   // devices' activate functions. BH
-
-   DisplayDevice::init();
 
    bool fullScreen = Con::getBoolVariable( "$pref::Video::fullScreen" );
 
@@ -1442,10 +1413,10 @@ static void InitOpenGL()
 
 
    // If no device is specified, see which ones we have...
-   if ( !Video::setDevice( Con::getVariable( "$pref::Video::displayDevice" ), width, height, bpp, fullScreen ) )
+   if ( !DGL->setDevice( Con::getVariable( "$pref::Video::displayDevice" ), width, height, bpp, fullScreen ) )
    {
       // First, try the default OpenGL device:
-      if ( !Video::setDevice( "OpenGL", width, height, bpp, fullScreen ) )
+      if ( !DGL->setDevice( "OpenGL", width, height, bpp, fullScreen ) )
       {             
          AssertFatal( false, "Could not find a compatible display device!" );
           return;
@@ -1464,7 +1435,6 @@ void Platform::init()
       Input::init();
    InitInput();   // in case DirectInput falls through
    InitWindowClass();
-   Video::getDesktopResolution();
    //installRedBookDevices();
 
    sgDoubleByteEnabled = GetSystemMetrics( SM_DBCSENABLED );
@@ -1477,7 +1447,7 @@ void Platform::shutdown()
    sgQueueEvents = false;   
    setMouseLock( false );
    Audio::OpenALShutdown();
-   Video::destroy();
+   DGLDevice::destroy();
    Input::destroy();
    WinConsole::destroy();
 }
@@ -1569,14 +1539,12 @@ void Platform::initWindow(const Point2I &initialSize, const char *name)
 
    Con::printSeparator();
    Con::printf("Video Initialization:");
-   Video::init();
+   DGLDevice::init();
+   //Video::init();
+
+   DGL->create();
 
    PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE);
-   if ( Video::installDevice( OpenGLDevice::create() ) )
-      Con::printf( "   Accelerated OpenGL display device detected." );
-   else
-      Con::printf( "   Accelerated OpenGL display device not detected." );
-   Con::printf( "" );
 
    gWindowCreated = true;
 #ifdef UNICODE

@@ -23,7 +23,7 @@
 #ifndef _GLENUMTRANSLATE_H_
 #define _GLENUMTRANSLATE_H_
 
-#include "graphics/dgl.h"
+#include "graphics/gl/dglglDevice.h"
 #include "graphics/dglEnums.h"
 
 namespace DGLGLEnumTranslate
@@ -32,7 +32,13 @@ namespace DGLGLEnumTranslate
 };
 
 extern GLenum DGLGLPrimitiveType[DGLPT_COUNT];
-extern GLenum DGLGLMatrixMode[DGLMM_COUNT];
+extern GLenum DGLGLTextureFilter[DGLTextureFilter_COUNT];
+extern GLenum DGLGLBlend[DGLBlend_COUNT];
+extern GLenum DGLGLMatrixType[DGLMM_COUNT];
+extern GLenum DGLGLRenderState[DGLRS_COUNT];
+extern GLenum DGLGLClientState[DGLCS_COUNT];
+extern GLenum DGLGLBufferBit[DGLBB_COUNT];
+extern GLenum DGLGLClamp[DGLClamp_COUNT];
 
 
 #endif //_GLENUMTRANSLATE_H_

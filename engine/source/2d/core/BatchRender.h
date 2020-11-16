@@ -35,6 +35,11 @@
 #include "2d/scene/DebugStats.h"
 #endif
 
+#ifndef _DGL_H_
+#include "graphics/dgl.h"
+#endif // !_DGL_H_
+
+
 #ifndef _TEXTURE_MANAGER_H_
 #include "graphics/TextureManager.h"
 #endif
@@ -100,8 +105,8 @@ private:
     U32                 mColorCount;
 
     bool                mBlendMode;
-    GLenum              mSrcBlendFactor;
-    GLenum              mDstBlendFactor;
+    DGLBlend            mSrcBlendFactor;
+    DGLBlend            mDstBlendFactor;
     ColorF              mBlendColor;
     F32                 mAlphaTestMode;
 
@@ -136,7 +141,7 @@ public:
     inline bool getStrictOrderMode( void ) const { return mStrictOrderMode; }
 
     /// Turns-on blend mode with the specified blend factors and color.
-    inline void setBlendMode( GLenum srcFactor, GLenum dstFactor, const ColorF& blendColor = ColorF(1.0f, 1.0f, 1.0f, 1.0f))
+    inline void setBlendMode(DGLBlend srcFactor, DGLBlend dstFactor, const ColorF& blendColor = ColorF(1.0f, 1.0f, 1.0f, 1.0f))
     {
         // Ignore no change.
         if (    mBlendMode &&

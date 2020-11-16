@@ -23,7 +23,7 @@
 #include "graphics/TextureManager.h"
 
 #include "platform/platformAssert.h"
-#include "platform/platformGL.h"
+#include "graphics/dgl.h"
 #include "platform/platform.h"
 #include "collection/vector.h"
 #include "io/resource/resourceManager.h"
@@ -44,7 +44,7 @@ bool TextureManager::mDGLRender = true;
 bool TextureManager::mForce16BitTexture = false;
 bool TextureManager::mAllowTextureCompression = false;
 bool TextureManager::mDisableTextureSubImageUpdates = false;
-GLenum TextureManager::mTextureCompressionHint = GL_FASTEST;
+//GLenum TextureManager::mTextureCompressionHint = GL_FASTEST;
 S32 TextureManager::mBitmapResidentSize = 0;
 S32 TextureManager::mTextureResidentSize = 0;
 S32 TextureManager::mTextureResidentWasteSize = 0;
@@ -194,7 +194,7 @@ void TextureManager::killManager()
     // Post zombie event.
     postTextureEvent(BeginZombification);
 
-    Vector<GLuint> deleteNames(4096);
+    Vector<U32> deleteNames(4096);
 
     TextureObject* probe = TextureDictionary::TextureObjectChain;
     while (probe) 
@@ -216,7 +216,7 @@ void TextureManager::killManager()
     }
 
     // Delete all textures.
-    glDeleteTextures(deleteNames.size(), deleteNames.address());
+    DGL->DeleteTextures(deleteNames.size(), deleteNames.address());
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -354,7 +354,7 @@ void TextureManager::freeTexture( TextureObject* pTextureObject )
 {
     if((mDGLRender || mManagerState == Resurrecting) && pTextureObject->mGLTextureName)
     {
-        glDeleteTextures(1, (const GLuint*)&pTextureObject->mGLTextureName);
+        DGL->DeleteTextures(1, (const U32*)&pTextureObject->mGLTextureName);
 
         // Adjust metrics.
         mTextureResidentCount--;
@@ -683,15 +683,15 @@ void TextureManager::refresh( TextureObject* pTextureObject )
             bits);
     }
 
-    const GLuint filter = pTextureObject->getFilter();
+    const DGLTextureFilter filter = pTextureObject->getFilter();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
 
-    GLenum glClamp;
+    DGLClamp glClamp;
     if ( pTextureObject->getClamp() )
-        glClamp = dglDoesSupportEdgeClamp() ? GL_CLAMP_TO_EDGE : GL_CLAMP;
+        glClamp = DGL->smEdgeClamp ? DGLClampEdge : DGLClampDef;
     else
-        glClamp = GL_REPEAT;
+        glClamp = DGLClampRepeat;
 
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, glClamp );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, glClamp );
@@ -752,7 +752,7 @@ void TextureManager::createGLName( TextureObject* pTextureObject )
     AssertISV( pTextureObject->mGLTextureName == 0, "GL texture name already exists." );
 
     // Generate texture name.
-    glGenTextures(1, &pTextureObject->mGLTextureName);
+    DGL->LoadTexture(1, pTextureObject->mGLTextureName);
 
     // Fetch source/dest formats.
     U32 sourceFormat, destFormat, byteFormat, texelSize;
@@ -802,7 +802,7 @@ TextureObject* TextureManager::registerTexture(const char* pTextureKey, GBitmap*
         // Remove any texture name.
         if ( pTextureObject->mGLTextureName != 0 )
         {
-            glDeleteTextures(1, (const GLuint*)&pTextureObject->mGLTextureName);
+            DGL->DeleteTextures(1, (const U32*)&pTextureObject->mGLTextureName);
             pTextureObject->mGLTextureName = 0;
 
             // Adjust metrics.
@@ -954,11 +954,11 @@ void TextureManager::dumpMetrics( void )
     TextureObject* pProbe = TextureDictionary::TextureObjectChain;
     while (pProbe != NULL) 
     {
-        GLboolean isTextureResident = false;
+        bool isTextureResident = false;
         if ( pProbe->mGLTextureName != 0 )
         {
             textureResidentCount++;
-            glAreTexturesResident( 1, &pProbe->mGLTextureName, &isTextureResident );
+            DGL->AreTexturesLoaded( 1, &pProbe->mGLTextureName, &isTextureResident );
         }
 
         textureResidentSize += pProbe->mTextureResidentSize;
@@ -1009,7 +1009,7 @@ F32 TextureManager::getResidentFraction()
     U32 resident = 0;
     U32 total    = 0;
 
-    Vector<GLuint> names;
+    Vector<U32> names;
 
     TextureObject* pProbe = TextureDictionary::TextureObjectChain;
     while (pProbe != NULL) 
@@ -1026,12 +1026,12 @@ F32 TextureManager::getResidentFraction()
     if (total == 0)
         return 1.0f;
 
-    Vector<GLboolean> isResident;
+    Vector<bool> isResident;
     isResident.setSize(names.size());
 
-    glAreTexturesResident(names.size(), names.address(), isResident.address());
+    DGL->AreTexturesLoaded(names.size(), names.address(), isResident.address());
     for (U32 i = 0; i < (U32)names.size(); i++)
-        if (isResident[i] == GL_TRUE)
+        if (isResident[i] == true)
             resident++;
 
     return (F32(resident) / F32(total));

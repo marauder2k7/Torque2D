@@ -153,8 +153,8 @@ SceneObject::SceneObject() :
 
     /// Render blending.
     mBlendMode(true),
-    mSrcBlendFactor(GL_SRC_ALPHA),
-    mDstBlendFactor(GL_ONE_MINUS_SRC_ALPHA),
+    mSrcBlendFactor(DGLBlendSrcAlpha),
+    mDstBlendFactor(DGLBlendInvSrcAlpha),
     mBlendColor(ColorF(1.0f,1.0f,1.0f,1.0f)),
     mAlphaTest(-1.0f),
 
@@ -4176,15 +4176,15 @@ EnumTable collisionShapeTypeTable(sizeof(collisionShapeTypeLookup) / sizeof(Enum
 
 static EnumTable::Enums srcBlendFactorLookup[] =
                 {
-                { GL_ZERO,                  "ZERO"                  },
-                { GL_ONE,                   "ONE"                   },
-                { GL_DST_COLOR,             "DST_COLOR"             },
-                { GL_ONE_MINUS_DST_COLOR,   "ONE_MINUS_DST_COLOR"   },
-                { GL_SRC_ALPHA,             "SRC_ALPHA"             },
-                { GL_ONE_MINUS_SRC_ALPHA,   "ONE_MINUS_SRC_ALPHA"   },
-                { GL_DST_ALPHA,             "DST_ALPHA"             },
-                { GL_ONE_MINUS_DST_ALPHA,   "ONE_MINUS_DST_ALPHA"   },
-                { GL_SRC_ALPHA_SATURATE,    "SRC_ALPHA_SATURATE"    },
+                { DGLBlendZero,           "ZERO"                  },
+                { DGLBlendOne,            "ONE"                   },
+                { DGLBlendDestColor,      "DST_COLOR"             },
+                { DGLBlendInvDestColor,   "ONE_MINUS_DST_COLOR"   },
+                { DGLBlendSrcAlpha,       "SRC_ALPHA"             },
+                { DGLBlendInvSrcAlpha,    "ONE_MINUS_SRC_ALPHA"   },
+                { DGLBlendDestAlpha,      "DST_ALPHA"             },
+                { DGLBlendInvDestAlpha,   "ONE_MINUS_DST_ALPHA"   },
+                { DGLBlendSrcAlphaSat,    "SRC_ALPHA_SATURATE"    },
                 };
 
 EnumTable srcBlendFactorTable(sizeof(srcBlendFactorLookup) / sizeof(EnumTable::Enums), &srcBlendFactorLookup[0]);
@@ -4193,14 +4193,14 @@ EnumTable srcBlendFactorTable(sizeof(srcBlendFactorLookup) / sizeof(EnumTable::E
 
 static EnumTable::Enums dstBlendFactorLookup[] =
                 {
-                { GL_ZERO,                  "ZERO" },
-                { GL_ONE,                   "ONE" },
-                { GL_SRC_COLOR,             "SRC_COLOR" },
-                { GL_ONE_MINUS_SRC_COLOR,   "ONE_MINUS_SRC_COLOR" },
-                { GL_SRC_ALPHA,             "SRC_ALPHA" },
-                { GL_ONE_MINUS_SRC_ALPHA,   "ONE_MINUS_SRC_ALPHA" },
-                { GL_DST_ALPHA,             "DST_ALPHA" },
-                { GL_ONE_MINUS_DST_ALPHA,   "ONE_MINUS_DST_ALPHA" },
+                { DGLBlendZero,          "ZERO"                   },
+                { DGLBlendOne,           "ONE"                    },
+                { DGLBlendSrcColor,      "SRC_COLOR"              },
+                { DGLBlendInvSrcColor,   "ONE_MINUS_SRC_COLOR"    },
+                { DGLBlendSrcAlpha,      "SRC_ALPHA"              },
+                { DGLBlendInvSrcAlpha,   "ONE_MINUS_SRC_ALPHA"    },
+                { DGLBlendDestAlpha,     "DST_ALPHA"              },
+                { DGLBlendInvDestAlpha,   "ONE_MINUS_DST_ALPHA"   },
                 };
 
 EnumTable dstBlendFactorTable(sizeof(dstBlendFactorLookup) / sizeof(EnumTable::Enums), &dstBlendFactorLookup[0]);
@@ -4292,7 +4292,7 @@ S32 SceneObject::getSrcBlendFactorEnum(const char* label)
 
 //-----------------------------------------------------------------------------
 
-const char* SceneObject::getSrcBlendFactorDescription(const GLenum factor)
+const char* SceneObject::getSrcBlendFactorDescription(const DGLBlend factor)
 {
     // Search for Mnemonic.
     for (U32 i = 0; i < (sizeof(srcBlendFactorLookup) / sizeof(EnumTable::Enums)); i++)
@@ -4326,7 +4326,7 @@ S32 SceneObject::getDstBlendFactorEnum(const char* label)
 
 //-----------------------------------------------------------------------------
 
-const char* SceneObject::getDstBlendFactorDescription(const GLenum factor)
+const char* SceneObject::getDstBlendFactorDescription(const DGLBlend factor)
 {
     // Search for Mnemonic.
     for(U32 i = 0; i < (sizeof(dstBlendFactorLookup) / sizeof(EnumTable::Enums)); i++)

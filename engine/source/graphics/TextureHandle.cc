@@ -135,7 +135,7 @@ U32 TextureHandle::getGLName( void ) const
 
 //-----------------------------------------------------------------------------
 
-void TextureHandle::setFilter( const GLuint filter )
+void TextureHandle::setFilter( const DGLTextureFilter filter )
 {
     // Finish if no object.
     if (object == NULL  )

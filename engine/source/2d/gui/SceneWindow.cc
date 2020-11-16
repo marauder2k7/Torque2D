@@ -1660,22 +1660,32 @@ void SceneWindow::onRender( Point2I offset, const RectI& updateRect )
     }
 
     // Setup new logical coordinate system.
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
+    //glMatrixMode(GL_PROJECTION);
+    //glPushMatrix();
+    //glLoadIdentity();
+    DGL->setMatrix(DGLProjection);
+    DGL->PushMatrix();
+    DGL->LoadIdentity();
 
     // Set orthographic projection.
-    glOrtho( sceneMin.x, sceneMax.x, sceneMin.y, sceneMax.y, 0.0f, MAX_LAYERS_SUPPORTED );
+    //glOrtho( sceneMin.x, sceneMax.x, sceneMin.y, sceneMax.y, 0.0f, MAX_LAYERS_SUPPORTED );
+    DGL->SetOrthoState(sceneMin.x, sceneMax.x, sceneMin.y, sceneMax.y, 0.0f, MAX_LAYERS_SUPPORTED);
 
     // Set ModelView.
     //glMatrixMode(GL_MODELVIEW);
+    //glPushMatrix();
+    //glLoadIdentity();
     DGL->SetModelViewMatrix();
-    glPushMatrix();
-    glLoadIdentity();
+    DGL->PushMatrix();
+    DGL->LoadIdentity();
+
 
     // Disable Alpha Test by default
-    glDisable( GL_ALPHA_TEST );    
-    glDisable( GL_DEPTH_TEST );
+    //glDisable( GL_ALPHA_TEST );    
+    //glDisable( GL_DEPTH_TEST );
+
+    DGL->DisableState(DGLRSAlphaTest);
+    DGL->DisableState(DGLRSDepthTest);
 
     // Get Debug Stats.
     DebugStats& debugStats = pScene->getDebugStats();
@@ -1696,15 +1706,21 @@ void SceneWindow::onRender( Point2I offset, const RectI& updateRect )
     {
         // Enable the scissor.
         const RectI& clipRect = DGL->GetClipRect();
-        glEnable(GL_SCISSOR_TEST );
-        glScissor( clipRect.point.x, Platform::getWindowSize().y - (clipRect.point.y + clipRect.extent.y), clipRect.len_x(), clipRect.len_y() );
+        //glEnable(GL_SCISSOR_TEST );
+        //glScissor( clipRect.point.x, Platform::getWindowSize().y - (clipRect.point.y + clipRect.extent.y), clipRect.len_x(), clipRect.len_y() );
 
+        DGL->EnableState(DGLRSScissorTest);
+        DGL->ScissorTest(clipRect.point.x, Platform::getWindowSize().y - (clipRect.point.y + clipRect.extent.y), clipRect.len_x(), clipRect.len_y());
         // Clear the background.
-        glClearColor( mBackgroundColor.red, mBackgroundColor.green, mBackgroundColor.blue, mBackgroundColor.alpha );
-        glClear(GL_COLOR_BUFFER_BIT);
+        //glClearColor( mBackgroundColor.red, mBackgroundColor.green, mBackgroundColor.blue, mBackgroundColor.alpha );
+        //glClear(GL_COLOR_BUFFER_BIT);
+
+        DGL->ClearColor(mBackgroundColor.red, mBackgroundColor.green, mBackgroundColor.blue, mBackgroundColor.alpha);
+        DGL->ClearBuffer(DGLBBColorBB);
 
         // Disable the scissor.
-        glDisable( GL_SCISSOR_TEST );
+        //glDisable( GL_SCISSOR_TEST );
+        DGL->DisableState(DGLRSScissorTest);
     }
 
     // Render View.
@@ -1712,13 +1728,17 @@ void SceneWindow::onRender( Point2I offset, const RectI& updateRect )
 
     // Restore Matrices.
     //glMatrixMode(GL_MODELVIEW);
-    DGL->SetModelViewMatrix();
-    glPopMatrix();
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
+    //glPopMatrix();
+    //glMatrixMode(GL_PROJECTION);
+    //glPopMatrix();
     //glMatrixMode(GL_MODELVIEW);
-    DGL->SetModelViewMatrix();
 
+    DGL->SetModelViewMatrix();
+    DGL->PopMatrix();
+    DGL->setMatrix(DGLProjection);
+    DGL->PopMatrix();
+    DGL->SetModelViewMatrix();
+    
     // Render the metrics.
     renderMetricsOverlay( offset, updateRect );
 
@@ -1758,13 +1778,18 @@ void SceneWindow::renderMetricsOverlay( Point2I offset, const RectI& updateRect 
     Resource<GFont>& font = mProfile->mFont;    
 
     // Blending for banner background.
-    glEnable        ( GL_BLEND );
-    glBlendFunc     ( GL_SRC_ALPHA , GL_ONE_MINUS_SRC_ALPHA );
+    //glEnable        ( GL_BLEND );
+    //glBlendFunc     ( GL_SRC_ALPHA , GL_ONE_MINUS_SRC_ALPHA );
+
+    DGL->EnableState(DGLRSBlend);
+    DGL->setBlendFunc(DGLBlendSrcAlpha, DGLBlendInvSrcAlpha);
 
     // Set banner background color.
     const ColorI& fillColor = mProfile->mFillColor;
     const F32 colorScale = 1.0f / 255.0f;
-    glColor4f( fillColor.red * colorScale, fillColor.green * colorScale, fillColor.blue * colorScale, fillColor.alpha * colorScale );
+    //glColor4f( fillColor.red * colorScale, fillColor.green * colorScale, fillColor.blue * colorScale, fillColor.alpha * colorScale );
+
+    DGL->SetColor(fillColor.red * colorScale, fillColor.green * colorScale, fillColor.blue * colorScale, fillColor.alpha * colorScale);
 
     // Fetch debug scene object.
     SceneObject* pDebugSceneObject = pScene->getDebugSceneObject();
@@ -1787,21 +1812,28 @@ void SceneWindow::renderMetricsOverlay( Point2I offset, const RectI& updateRect 
     // Calculate Debug Banner Offset.
     Point2I bannerOffset = updateRect.point + Point2I(8,8);
 
-    static GLfloat sWindowVertices[] = {
-        (GLfloat)updateRect.point.x, (GLfloat)updateRect.point.y,
-        (GLfloat)updateRect.point.x + updateRect.extent.x, (GLfloat)updateRect.point.y,
-        (GLfloat)updateRect.point.x, (GLfloat)updateRect.point.y + bannerHeight + 16,
-        (GLfloat)updateRect.point.x + updateRect.extent.x, (GLfloat)updateRect.point.y + bannerHeight + 16
+    static F32 sWindowVertices[] = {
+        (F32)updateRect.point.x, (F32)updateRect.point.y,
+        (F32)updateRect.point.x + updateRect.extent.x, (F32)updateRect.point.y,
+        (F32)updateRect.point.x, (F32)updateRect.point.y + bannerHeight + 16,
+        (F32)updateRect.point.x + updateRect.extent.x, (F32)updateRect.point.y + bannerHeight + 16
     };
     
-    glVertexPointer(2, GL_FLOAT, 0, sWindowVertices);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glDisableClientState(GL_VERTEX_ARRAY);
+    //glVertexPointer(2, GL_FLOAT, 0, sWindowVertices);
+    //glEnableClientState(GL_VERTEX_ARRAY);
+    //glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    //glDisableClientState(GL_VERTEX_ARRAY);
+
+    DGL->SetVertexPoint(2, 0, sWindowVertices);
+    DGL->EnableClientState(DGLCSVertexArray);
+    DGL->DrawArrays(DGLTriangleStrip, 0, 4);
+    DGL->DisableClientState(DGLCSVertexArray);
 
     // Disable Banner Blending.
-    glDisable       ( GL_BLEND );
-        
+    //glDisable       ( GL_BLEND );
+
+    DGL->DisableState(DGLRSBlend);
+    
     // Set Debug Text color.
     DGL->SetBitmapModulation( mProfile->mFontColor );
 

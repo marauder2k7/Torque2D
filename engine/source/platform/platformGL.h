@@ -35,4 +35,9 @@
 #elif defined(TORQUE_OS_EMSCRIPTEN)
 #include "platformEmscripten/platformGL.h"
 #endif
+
+namespace PlatformGL
+{
+   void setVSync(const int i);
+}
 #endif

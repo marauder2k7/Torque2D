@@ -205,6 +205,12 @@
     <Filter Include="graphics\gl">
       <UniqueIdentifier>{d020a318-8a02-4a83-bb65-a68146805317}</UniqueIdentifier>
     </Filter>
+    <Filter Include="graphics\gl\glad">
+      <UniqueIdentifier>{3edf8383-b8b5-4cfe-912a-ee617ae83e3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="graphics\gl\win">
+      <UniqueIdentifier>{18a35b16-7b46-4ab8-843c-6617260dcaca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\audio\audio.cc">
@@ -354,9 +360,6 @@
     <ClCompile Include="..\..\source\platform\platformString.cc">
       <Filter>platform</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\platform\platformVideo.cc">
-      <Filter>platform</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\platform\menus\popupMenu.cc">
       <Filter>platform\menus</Filter>
     </ClCompile>
@@ -390,12 +393,6 @@
     <ClCompile Include="..\..\source\platformWin32\winFont.cc">
       <Filter>platformWin32</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\platformWin32\winGL.cc">
-      <Filter>platformWin32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\platformWin32\winGLSpecial.cc">
-      <Filter>platformWin32</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\platformWin32\winInput.cc">
       <Filter>platformWin32</Filter>
     </ClCompile>
@@ -406,9 +403,6 @@
       <Filter>platformWin32</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\platformWin32\winMemory.cc">
-      <Filter>platformWin32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\platformWin32\winOGLVideo.cc">
       <Filter>platformWin32</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\platformWin32\winOpenAL.cc">
@@ -433,9 +427,6 @@
       <Filter>platformWin32</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\platformWin32\winVFS.cc">
-      <Filter>platformWin32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\platformWin32\winVideo.cc">
       <Filter>platformWin32</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\platformWin32\winWindow.cc">
@@ -1483,6 +1474,18 @@
     <ClCompile Include="..\..\source\graphics\gl\dglglInit.cc">
       <Filter>graphics\gl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\graphics\gl\dglglDevice.cc">
+      <Filter>graphics\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\graphics\gl\glad\gladGL.cc">
+      <Filter>graphics\gl\glad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\platformWin32\platformGLWin.cc">
+      <Filter>platformWin32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\graphics\gl\win\dglGlDevice.win.cc">
+      <Filter>graphics\gl\win</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\audio\audio.h">
@@ -1617,15 +1620,6 @@
     <ClInclude Include="..\..\source\platform\event.h">
       <Filter>platform</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\platform\GLCoreFunc.h">
-      <Filter>platform</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\platform\GLExtFunc.h">
-      <Filter>platform</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\platform\GLUFunc.h">
-      <Filter>platform</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\platform\platform.h">
       <Filter>platform</Filter>
     </ClInclude>
@@ -1656,9 +1650,6 @@
     <ClInclude Include="..\..\source\platform\platformVFS.h">
       <Filter>platform</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\platform\platformVideo.h">
-      <Filter>platform</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\platform\types.codewarrior.h">
       <Filter>platform</Filter>
     </ClInclude>
@@ -1675,9 +1666,6 @@
       <Filter>platform</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\platform\types.visualc.h">
-      <Filter>platform</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\platform\types.win32.h">
       <Filter>platform</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\platform\typesPPC.h">
@@ -1703,15 +1691,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\platform\threads\thread.h">
       <Filter>platform\threads</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\platformWin32\gl_types.h">
-      <Filter>platformWin32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\platformWin32\GLWinExtFunc.h">
-      <Filter>platformWin32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\platformWin32\GLWinFunc.h">
-      <Filter>platformWin32</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\platformWin32\platformGL.h">
       <Filter>platformWin32</Filter>
@@ -1744,12 +1723,6 @@
       <Filter>platformWin32</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\platformWin32\winFont.h">
-      <Filter>platformWin32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\platformWin32\winOGLVideo.h">
-      <Filter>platformWin32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\platformWin32\winVideo.h">
       <Filter>platformWin32</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\platformWin32\nativeDialogs\win32DirectoryResolver.h">
@@ -2856,9 +2829,6 @@
     <ClInclude Include="..\..\source\console\output_ScriptBinding.h">
       <Filter>console</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\platform\platformVideo_ScriptBinding.h">
-      <Filter>platform</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\game\version_ScriptBinding.h">
       <Filter>game</Filter>
     </ClInclude>
@@ -3004,9 +2974,6 @@
     <ClInclude Include="..\..\source\graphics\dglMac_Scriptbinding.h">
       <Filter>graphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\platformWin32\winOGLVideo_ScriptBinding.h">
-      <Filter>platformWin32</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\platformWin32\winInput_ScriptBinding.h">
       <Filter>platformWin32</Filter>
     </ClInclude>
@@ -3014,9 +2981,6 @@
       <Filter>2d\core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\platformWin32\winExec_ScriptBinding.h">
-      <Filter>platformWin32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\platformWin32\winGLSpecial_ScriptBinding.h">
       <Filter>platformWin32</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\platformWin32\winConsole_ScriptBinding.h">
@@ -3321,6 +3285,21 @@
     </ClInclude>
     <ClInclude Include="..\..\source\graphics\gl\dglglInit.h">
       <Filter>graphics\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\graphics\gl\dglglDevice.h">
+      <Filter>graphics\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\graphics\gl\glad\gladGL.h">
+      <Filter>graphics\gl\glad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\graphics\gl\glad\gladWGL.h">
+      <Filter>graphics\gl\glad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\platform\types.win.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\graphics\dglStructs.h">
+      <Filter>graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

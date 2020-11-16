@@ -29,7 +29,7 @@
 
 #ifndef _PLATFORMGL_H_
 #include "platform/platformAssert.h"
-#include "platform/platformGL.h"
+#include "graphics/dgl.h"
 #endif
 
 //-----------------------------------------------------------------------------
@@ -162,7 +162,7 @@ public:
 
     void setClamp( const bool clamp );
 
-    void setFilter( const GLuint filter );
+    void setFilter( const DGLTextureFilter filter );
 
     void clear( void ) { unlock(); }
 

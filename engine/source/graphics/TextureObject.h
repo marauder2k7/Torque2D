@@ -63,13 +63,13 @@ private:
     S32                 mRefCount;
 
     StringTableEntry    mTextureKey;
-    GLuint              mGLTextureName;
+    U32                 mGLTextureName;
     GBitmap*            mpBitmap;
     U32                 mTextureWidth;
     U32                 mTextureHeight;
     U32                 mBitmapWidth;
     U32                 mBitmapHeight;
-    GLuint              mFilter;
+    DGLTextureFilter    mFilter;
     bool                mClamp;
 
     TextureHandle::TextureHandleType mHandleType;
@@ -88,20 +88,20 @@ public:
         mTextureHeight( 0 ),
         mBitmapWidth( 0 ),
         mBitmapHeight( 0 ),
-        mFilter( GL_NEAREST ),
+        mFilter(DGLTextureFilterNone),
         mClamp( false ),
         mHandleType( TextureHandle::InvalidTexture )
     {
     }
 
     inline StringTableEntry getTextureKey( void ) { return mTextureKey; }
-    inline GLuint getGLTextureName( void ) { return mGLTextureName; }
+    inline U32 getGLTextureName( void ) { return mGLTextureName; }
     inline const GBitmap* getBitmap( void ) { return mpBitmap; }
     inline U32 getTextureWidth( void ) { return mTextureWidth; }
     inline U32 getTextureHeight( void ) { return mTextureHeight; }
     inline U32 getBitmapWidth( void ) { return mBitmapWidth; }
     inline U32 getBitmapHeight( void ) { return mBitmapHeight; }
-    inline GLuint getFilter( void ) { return mFilter; }
+    inline DGLTextureFilter getFilter( void ) { return mFilter; }
     inline bool getClamp( void ) { return mClamp; }
     
     inline S32 getTextureResidentSize( void ) const { return mTextureResidentSize; }

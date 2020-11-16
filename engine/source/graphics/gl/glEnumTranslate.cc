@@ -20,23 +20,83 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "platform/platform.h"
 #include "graphics/gl/glEnumTranslate.h"
-#include "graphics/gl/dglglInit.h"
 
 GLenum DGLGLPrimitiveType[DGLPT_COUNT];
+GLenum DGLGLTextureFilter[DGLTextureFilter_COUNT];
+GLenum DGLGLBlend[DGLBlend_COUNT];
 GLenum DGLGLMatrixMode[DGLMM_COUNT];
+GLenum DGLGLRenderState[DGLRS_COUNT];
+GLenum DGLGLClientState[DGLCS_COUNT];
+GLenum DGLGLBufferBit[DGLBB_COUNT];
+GLenum DGLGLClamp[DGLClamp_COUNT];
 
 void DGLGLEnumTranslate::init()
 {
-   // Primitives
-   DGLGLPrimitiveType[DGLPointList] = GL_POINTS;
-   DGLGLPrimitiveType[DGLTriangleList] = GL_TRIANGLES;
-   DGLGLPrimitiveType[DGLTriangleStrip] = GL_TRIANGLE_STRIP;
 
+   // Primitives
+   DGLGLPrimitiveType[DGLPointList]       = GL_POINTS;
+   DGLGLPrimitiveType[DGLLineList]        = GL_LINES;
+   DGLGLPrimitiveType[DGLLineLoop]        = GL_LINE_LOOP;
+   DGLGLPrimitiveType[DGLTriangleList]    = GL_TRIANGLES;
+   DGLGLPrimitiveType[DGLTriangleStrip]   = GL_TRIANGLE_STRIP;
+   DGLGLPrimitiveType[DGLTriangleFan]     = GL_TRIANGLE_FAN;
+   DGLGLPrimitiveType[DGLQuads]           = GL_QUADS;
+
+   // Texture Filter
+   DGLGLTextureFilter[DGLTextureFilterNone]     = GL_NEAREST;
+   DGLGLTextureFilter[DGLTextureFilterNearest]  = GL_NEAREST;
+   DGLGLTextureFilter[DGLTextureFilterLinear]   = GL_LINEAR;
+
+   // Blend
+   DGLGLBlend[DGLBlendZero]               = GL_ZERO;
+   DGLGLBlend[DGLBlendOne]                = GL_ONE;
+   DGLGLBlend[DGLBlendSrcColor]           = GL_SRC_COLOR;
+   DGLGLBlend[DGLBlendInvSrcColor]        = GL_ONE_MINUS_SRC_COLOR;
+   DGLGLBlend[DGLBlendSrcAlpha]           = GL_SRC_ALPHA;
+   DGLGLBlend[DGLBlendInvSrcAlpha]        = GL_ONE_MINUS_SRC_ALPHA;
+   DGLGLBlend[DGLBlendDestAlpha]          = GL_DST_ALPHA;
+   DGLGLBlend[DGLBlendInvDestAlpha]       = GL_ONE_MINUS_DST_ALPHA;
+   DGLGLBlend[DGLBlendDestColor]          = GL_DST_COLOR;
+   DGLGLBlend[DGLBlendInvDestColor]       = GL_ONE_MINUS_DST_COLOR;
+   DGLGLBlend[DGLBlendSrcAlphaSat]        = GL_SRC_ALPHA_SATURATE;
 
    // Matrix Mode
-   DGLGLMatrixMode[DGLMatrixMode] = GL_MATRIX_MODE;
-   DGLGLMatrixMode[DGLModelView] = GL_MODELVIEW;
-   DGLGLMatrixMode[DGLProjection] = GL_PROJECTION;
-   DGLGLMatrixMode[DGLTexture] = GL_TEXTURE;
+   DGLGLMatrixType[DGLMatrixMode]         = GL_MATRIX_MODE;
+   DGLGLMatrixType[DGLModelView]          = GL_MODELVIEW;
+   DGLGLMatrixType[DGLProjection]         = GL_PROJECTION;
+   DGLGLMatrixType[DGLTexture]            = GL_TEXTURE;
+
+   // Render States
+   DGLGLRenderState[DGLRSBlend]           = GL_BLEND;
+   DGLGLRenderState[DGLRSCullFace]        = GL_CULL_FACE;
+   DGLGLRenderState[DGLRSAlphaTest]       = GL_ALPHA_TEST;
+   DGLGLRenderState[DGLRSDepthTest]       = GL_DEPTH_TEST;
+   DGLGLRenderState[DGLRSScissorTest]     = GL_SCISSOR_TEST;
+   DGLGLRenderState[DGLRSLighting]        = GL_LIGHTING;
+   DGLGLRenderState[DGLRSClipPlane0]      = GL_CLIP_PLANE0;
+   DGLGLRenderState[DGLRSClipPlane1]      = GL_CLIP_PLANE1;
+   DGLGLRenderState[DGLRSClipPlane2]      = GL_CLIP_PLANE2;
+   DGLGLRenderState[DGLRSClipPlane3]      = GL_CLIP_PLANE3;
+   DGLGLRenderState[DGLRSDebug]           = GL_DEBUG_OUTPUT;
+   DGLGLRenderState[DGLRSDebugSync]       = GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB;
+   DGLGLRenderState[DGLRSTexture2D]       = GL_TEXTURE_2D;
+
+   // Client States
+   DGLGLClientState[DGLCSColorArray]      = GL_COLOR_ARRAY;
+   DGLGLClientState[DGLCSVertexArray]     = GL_VERTEX_ARRAY;
+   DGLGLClientState[DGLCSTextCoordArray]  = GL_TEXTURE_COORD_ARRAY;
+
+   // Buffer Bit
+   DGLGLBufferBit[DGLBBAccumBB]           = GL_ACCUM_BUFFER_BIT;
+   DGLGLBufferBit[DGLBBColorBB]           = GL_COLOR_BUFFER_BIT;
+   DGLGLBufferBit[DGLBBStencilBB]         = GL_STENCIL_BUFFER_BIT;
+   DGLGLBufferBit[DGLBBDepthBB]           = GL_DEPTH_BUFFER_BIT;
+
+   // Clamp method
+   DGLGLClamp[DGLClampDef]                = GL_CLAMP;
+   DGLGLClamp[DGLClampEdge]               = GL_CLAMP_TO_EDGE;
+   DGLGLClamp[DGLClampRepeat]             = GL_REPEAT;
+
 }

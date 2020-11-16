@@ -33,6 +33,8 @@
 #include "graphics/dglEnums.h"
 #endif
 
+#include "graphics/dglStructs.h"
+
 /*class TextureObject;
 class GFont;
 class MatrixF;
@@ -80,15 +82,64 @@ class Point3F;*/
     friend class Point3F;
 
  public:
+
+    const char* mDeviceName;
+
     DGLDevice();
-    virtual void init();
 
     static DGLDevice *get() { return smDGL; }
 
+    /// Video class funcions
+    // Creation of device funtions.
+    static void init();
+    static void destroy();                               // clean up and shut down
+    static bool installDevice(DGLDevice *dev);
+    static bool setDevice( const char *renderName, 
+                           U32 width, U32 height, 
+                           U32 bpp, bool fullScreen);    // set the current display device
+    virtual bool activate(U32 width, U32 height, U32 bpp, bool fullScreen) = 0;
+    static const char* getDriverInfo();                  // get info about the current display device driver
+    static const char* getDeviceList();                  // get a tab-separated list of all the installed display devices
+
  private:
-    static DGLDevice * smDGL;
+    static DGLDevice             * smDGL;
+    static Vector<DGLDevice *>   smDeviceList;
+    static DGLDevice*            smCurrentDevice;
+    static bool                  smCritical;
+    
+
+ protected:
+    static DGLVideoMode    smCurrentRes;
+    Vector<DGLVideoMode>   mVideoModes;
+
+    static bool            smIsFullScreen;
+    bool                   mFullScreenOnly;
+
+    static bool            smDisableVsync;
 
  public:
+    static bool smNeedResurrect;
+    static bool smEdgeClamp;
+
+    virtual void shutdown() = 0;
+
+    virtual bool setScreenMode(U32 width, U32 height, U32 bpp, bool fullScreen, bool forceIt = false, bool repaint = true) = 0;
+    virtual bool setResolution(U32 width, U32 height, U32 bpp);
+    virtual bool toggleFullScreen();
+    virtual void swapBuffers() = 0;
+    virtual bool getGammaCorrection(F32 &g) = 0;
+    virtual bool setGammaCorrection(F32 g) = 0;
+    virtual bool getVerticalSync() = 0;
+    virtual bool setVerticalSync(bool on) = 0;
+    virtual void create() = 0;
+    bool prevRes();
+    bool nextRes();
+    const char* getResolutionList();
+    bool isFullScreenOnly() { return(mFullScreenOnly); }
+
+    static DGLVideoMode getResolution();
+    static bool       isFullScreen();
+
     /// @defgroup dgl_bitmap_mod Bitmap Modulation
     /// @ingroup dgl
     /// These functions control a modulation color that is used to modulate all drawn objects
@@ -133,33 +184,33 @@ class Point3F;*/
     /// @param texObject texture object to be drawn
     /// @param in_rAt where to draw the texture in 2d coordinates
     /// @param in_flip enumerated constant representing any flipping to be done about the x and/or y axis
-    void DrawBitmap(TextureObject* texObject,
+    virtual void DrawBitmap(TextureObject* texObject,
        const Point2I& in_rAt,
        const U32      in_flip = GFlip_None);
     /// Draws a power-of-two bitmap that is tiled. Requires a POT bitmap to draw properly.
     /// @param texObject texture object to be drawn
     /// @param in_rTile rectangle where the texture will be drawn in 2d coordinates
     /// @param in_flip enumerated constant representing any flipping to be done about the x and/or y axis
-    void DrawBitmapTile(TextureObject* texObject,
+    virtual void DrawBitmapTile(TextureObject* texObject,
        const RectI&   in_rTile,
        const U32      in_flip = GFlip_None,
-       F32			 fSpin = 0.0f,
+       F32			    fSpin = 0.0f,
        bool           bSilhouette = false);
     /// Draws a bitmap that is stretched
     /// @param texObject texture object to be drawn
     /// @param in_rStretch rectangle where the texture will be drawn in 2d coordinates
     /// @param in_flip enumerated constant representing any flipping to be done about the x and/or y axis
-    void DrawBitmapStretch(TextureObject* texObject,
+    virtual void DrawBitmapStretch(TextureObject* texObject,
        const RectI&   in_rStretch,
        const U32      in_flip = GFlip_None,
-       F32			 fSpin = 0.0f,
+       F32			    fSpin = 0.0f,
        bool           bSilhouette = false);
     /// Draws a sub region of a texture
     /// @param texObject texture object to be drawn
     /// @param in_rAt point where the texture is to be drawn
     /// @param in_rSubRegion portion of the texture to be drawn
     /// @param in_flip enumerated constant representing any flipping to be done about the x and/or y axis
-    void DrawBitmapSR(TextureObject* texObject,
+    virtual void DrawBitmapSR(TextureObject* texObject,
        const Point2I& in_rAt,
        const RectI&   in_rSubRegion,
        const U32      in_flip = GFlip_None);
@@ -168,11 +219,11 @@ class Point3F;*/
     /// @param in_rStretch rectangle where the texture object will be drawn
     /// @param in_rSubRegion sub region of the texture that will be applied over the stretch region of the screen
     /// @param in_flip enumerated constant representing any flipping to be done about the x and/or y axis
-    void DrawBitmapStretchSR(TextureObject* texObject,
+    virtual void DrawBitmapStretchSR(TextureObject* texObject,
        const RectI&   in_rStretch,
        const RectI&   in_rSubRegion,
        const U32      in_flip = GFlip_None,
-       F32			   fSpin = 0.0f,
+       F32			    fSpin = 0.0f,
        bool           bSilhouette = false);
     /// @}
     /// @defgroup dgl_text Text Functions
@@ -208,103 +259,120 @@ class Point3F;*/
     /// @{
 
     /// draws a line from x1,y1 to x2,y2 in the specified color
-    void DrawLine(S32 x1, S32 y1, S32 x2, S32 y2, const ColorI &color);
+    virtual void DrawLine(S32 x1, S32 y1, S32 x2, S32 y2, const ColorI &color);
     /// draws a line from startPt to endPt in specified color
-    void DrawLine(const Point2I &startPt, const Point2I &endPt, const ColorI &color);
+    virtual void DrawLine(const Point2I &startPt, const Point2I &endPt, const ColorI &color);
     /// draws an UNTEXTURED filled triangle with the three points which should be given in counterclockwise order
-    void DrawTriangleFill(const Point2I& pt1, const Point2I& pt2, const Point2I& pt3, const ColorI& color);
+    virtual void DrawTriangleFill(const Point2I& pt1, const Point2I& pt2, const Point2I& pt3, const ColorI& color);
     /// draws a wireframe rectangle from upperL to lowerR in specified color and optional line width
-    void DrawRect(const Point2I &upperL, const Point2I &lowerR, const ColorI &color, const float &lineWidth = 1.0f);
+    virtual void DrawRect(const Point2I &upperL, const Point2I &lowerR, const ColorI &color, const float &lineWidth = 1.0f);
     /// draws a wireframe rectangle in "rect" in specified color and optional line width
-    void DrawRect(const RectI &rect, const ColorI &color, const float &lineWidth = 1.0f);
+    virtual void DrawRect(const RectI &rect, const ColorI &color, const float &lineWidth = 1.0f);
     /// draws an UNTEXTURED filled rectangle from upperL to lowerR in specified color
-    void DrawRectFill(const Point2I &upperL, const Point2I &lowerR, const ColorI &color);
+    virtual void DrawRectFill(const Point2I &upperL, const Point2I &lowerR, const ColorI &color);
     /// draws an UNTEXTURED filled rectangle in "rect" in specified color
-    void DrawRectFill(const RectI &rect, const ColorI &color);
+    virtual void DrawRectFill(const RectI &rect, const ColorI &color);
     /// draws an UNTEXTURED filled quad in specified color
-    void DrawQuadFill(const Point2I &point1, const Point2I &point2, const Point2I &point3, const Point2I &point4, const ColorI &color);
+    virtual void DrawQuadFill(const Point2I &point1, const Point2I &point2, const Point2I &point3, const Point2I &point4, const ColorI &color);
     /// draws a square, with center point "screenPoint", width of "width" on an angle of "spinAngle" in 2d
-    void Draw2DSquare(const Point2F &screenPoint, F32 width, F32 spinAngle);
+    virtual void Draw2DSquare(const Point2F &screenPoint, F32 width, F32 spinAngle);
     /// draws a square, with center point "position", width of "width" on an angle of "spinAngle" in 3d
-    void DrawBillboard(const Point3F &position, F32 width, F32 spinAngle);
+    virtual void DrawBillboard(const Point3F &position, F32 width, F32 spinAngle);
     /// Draws a wireframe cube around "center" with size "extent"
-    void WireCube(const Point3F &extent, const Point3F &center);
+    virtual void WireCube(const Point3F &extent, const Point3F &center);
     /// Draws a solid cube around "center" with size "extent"
-    void SolidCube(const Point3F &extent, const Point3F & enter);
+    virtual void SolidCube(const Point3F &extent, const Point3F & enter);
     /// Draws an unfilled circle using line segments
-    void DrawCircle(const Point2I &center, const F32 radius, const ColorI &color, const F32 &lineWidth = 1.0f);
+    virtual void DrawCircle(const Point2I &center, const F32 radius, const ColorI &color, const F32 &lineWidth = 1.0f);
     /// Draws a filled circle
-    void DrawCircleFill(const Point2I &center, const F32 radius, const ColorI &color);
+    virtual void DrawCircleFill(const Point2I &center, const F32 radius, const ColorI &color);
     /// @}
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- //
-    // Matrix functions
+    //------------------------------------------------------------------------------------------
+    // RENDER FUNCTIONS
+    // Pass these off to the api's.
+    //------------------------------------------------------------------------------------------
+    virtual void EnableState(DGLRenderState rs) = 0;
+    virtual void DisableState(DGLRenderState rs) = 0;
+    virtual void EnableClientState(DGLClientState cs) = 0;
+    virtual void DisableClientState(DGLClientState cs) = 0;
+    virtual void setBlendFunc(DGLBlend sFactor, DGLBlend dFactor) = 0;
+    virtual void SetOrthoState(F32 wMin, F32 wMax, F32 hMin, F32 hMax, F32 mNear, U32 mFar) = 0;
+    virtual void SetVertexPoint(U32 size, U32 stride, const void *pointer) = 0;
+    virtual void ClearBuffer(DGLBufferBit bit) = 0;
+    virtual void ClearColor(F32 r, F32 g, F32 b, F32 a) = 0;
+    virtual void ScissorTest(S32 x, S32 y, S32 width, S32 height) = 0;
+    virtual void SetColorF(F32 r, F32 g, F32 b, F32 a) = 0;
+    virtual void SetColorI(U32 r, U32 g, U32 b, U32 a) = 0;
+    virtual void SetLineWidth(F32 width) = 0;
 
-    /// @defgroup dgl_matrix Matrix Functions
-    /// @ingroup dgl
-    /// These functions manipulate the current matrix.  The current matrix could be modelivew, projection, or texture
-    /// @note Make sure you specify which matrix you want to manipulate with a call to glMatrixMode(enum matrix); before calling dglLoadMatrix() or dglMultMatrix()
-    /// @{
+    //------------------------------------------------------------------------------------------
+    // DRAW ARRAY FUNCTIONS
+    // Pass these off to the api's.
+    //------------------------------------------------------------------------------------------
+    virtual void DrawArrays(DGLPrimitiveType type, U32 first, U32 count) = 0;
 
+    //------------------------------------------------------------------------------------------
+    // TEXTURE FUNCTIONS
+    // Pass these off to the api's.
+    //------------------------------------------------------------------------------------------
+    virtual void AreTexturesLoaded(S32 size, const U32* addr, bool isLoad) = 0;
+    virtual void LoadTexture(U32 n, U32 glName) = 0;
+    virtual void DeleteTextures(U32 n, const U32* glName) = 0;
+
+    //------------------------------------------------------------------------------------------
+    // MATRIX FUNCTIONS
+    // Pass these off to the api's.
+    //------------------------------------------------------------------------------------------
+    virtual void setMatrix(DGLMatrixType type) = 0;
     /// loads matrix "m" into the current matrix mode
-    void LoadMatrix(const MatrixF *m);
-
-    void SetModelViewMatrix();
-    void SetProjMatrix();
+    virtual void LoadMatrix(const MatrixF *m) = 0;
+    /// Set model view matrix
+    virtual void SetModelViewMatrix() = 0;
+    /// Set projection matrix
+    virtual void SetProjMatrix() = 0;
     /// multiplies the current transformation matrix by matrix "m"
-    void MultMatrix(const MatrixF *m);
+    virtual void MultMatrix(const MatrixF *m) = 0;
     /// returns the current modelview matrix
-    void GetModelview(MatrixF *m);
+    virtual void GetModelview(MatrixF *m) = 0;
     /// returns the current projection matrix
-    void GetProjection(MatrixF *m);
+    virtual void GetProjection(MatrixF *m) = 0;
     /// @}
+    virtual void PopMatrix() = 0;
+    virtual void PushMatrix() = 0;
+    virtual void LoadIdentity() = 0;
+    //------------------------------------------------------------------------------------------
+    // CAMERA FUNCTIONS
+    // Pass these off to the api's.
+    //------------------------------------------------------------------------------------------
+    // Variables 
+    static F64    frustLeft, frustRight, frustBottom, frustTop, frustNear, frustFar;
+    static RectI  viewPort;
+    static F32    pixelScale;
+    static F32    worldToScreenScale;
+    static bool   isOrtho;
+    RectI         sgCurrentClipRect;
 
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- //
-    // Camera functions
-    /// @defgroup dgl_camera_func Camera functions
-    /// @ingroup dgl
-    /// @{
-
-    /// Returns the pixel scale, namely:
-    ///
-    /// viewPort.extent.x / 640.0
-    F32 GetPixelScale();
+    /// Get the pixel scale
+    F32 GetPixelScale() { return pixelScale; }
     /// The scale factor of a world unit to a screen unit
-    F32 GetWorldToScreenScale();
+    F32 GetWorldToScreenScale() { return worldToScreenScale; }
     /// Returns the screen length of a line of distance "radius" that is "dist" units away from the camera that is perpendicular to the line of sight, namely:
-    ///
-    /// (radius / dist) * worldToScreenScale
-    F32 ProjectRadius(F32 dist, F32 radius);
-    /// @}
-
-    /// @defgroup dgl_view Viewing Volume Functions
-    /// @ingroup dgl
-    /// These functions set up the view cube of the window.
-    /// @{
-
+    F32 ProjectRadius(F32 dist, F32 radius) { return (radius / dist) * worldToScreenScale; }
     /// sets the viewport for the window
-    void SetViewport(const RectI &aViewPort);
+    virtual void SetViewport(const RectI &aViewPort) = 0;
     /// gets the current viewport of the window
     void GetViewport(RectI* outViewport);
     /// Sets the viewing frustrum.  This effectively creates the view volume and sets up the 6 clipping planes (near, far, left, right, top, bottom)
-    /// @param left This is the position of the left vertical clipping plane
-    /// @param right This is the position of the right vertical clipping plane
-    /// @param top This is the position of the top horizontal clipping plane
-    /// @param bottom This is the position of the bottom horizontal clipping plane
-    /// @param nearDist This is the distance between the eye and the near clipping plane
-    /// @param farDist This is the distance between the eye and the far clipping plane
-    /// @param ortho (optional, default is false) If left false, calling this function will create a projection viewing volume.  If true, it will be orthographic
-    void SetFrustum(F64 left, F64 right, F64 bottom, F64 top, F64 nearDist, F64 farDist, bool ortho = false);
+    virtual void SetFrustum(F64 left, F64 right, F64 bottom, F64 top, F64 nearDist, F64 farDist, bool ortho = false) = 0;
     /// Returns the parameters for the current viewing frustrum
-    /// @see dglSetFrustrum
-    void GetFrustum(F64 *left, F64 *right, F64 *bottom, F64 *top, F64 *nearDist, F64 *farDist);
+    virtual void GetFrustum(F64 *left, F64 *right, F64 *bottom, F64 *top, F64 *nearDist, F64 *farDist) = 0;
     /// returns whether or not the coordinate system is orthographic (if it is not projected)
-    bool IsOrtho();
+    bool IsOrtho() { return isOrtho; }
     /// Sets up an orthographical viewport and clipping region.  This is best used for guis
     /// @param clipRect The bounds of the coordinate system
-    void SetClipRect(const RectI &clipRect);
+    virtual void SetClipRect(const RectI &clipRect) = 0;
     /// Gets the last clip rect specified by a call to dglSetClipRect
-    /// @see dglSetClipRect
-    const RectI& GetClipRect();
+    const RectI& GetClipRect() { return sgCurrentClipRect; }
     /// @}
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- //
@@ -317,7 +385,7 @@ class Point3F;*/
     // Debug functions
     /// Checks to see if all states are "canonical"
     /// @see dglSetCanonicalState
-    bool IsInCanonicalState();
+    virtual bool IsInCanonicalState();
 
     /// Sets states to a "canonical" state
     /// @note a "canonical" state is described as:
@@ -333,7 +401,7 @@ class Point3F;*/
     ///  winding : clockwise ?
     ///
     ///  cullface : disabled
-    void SetCanonicalState();
+    virtual void SetCanonicalState();
 
     /// Gets the current state of all transformation matrices
     /// @param mvDepth Number of "pushes" made to the modelview matrix without balancing "pops"
@@ -344,7 +412,7 @@ class Point3F;*/
     /// @param t1Matrix The current texture 1 matrix, should be a 4-element array
     /// @param vp The current viewport, should be a 4-element array
     /// @see dglCheckState
-    void GetTransformState(S32* mvDepth,
+    virtual void GetTransformState(S32* mvDepth,
        S32* pDepth,
        S32* t0Depth,
        F32* t0Matrix,
@@ -354,49 +422,39 @@ class Point3F;*/
 
     /// Checks to see that the given information matches the current transform state
     /// @see dglGetTransformState
-    bool CheckState(const S32 mvDepth, const S32 pDepth,
+    virtual bool CheckState(const S32 mvDepth, const S32 pDepth,
        const S32 t0Depth, const F32* t0Matrix,
        const S32 t1Depth, const F32* t1Matrix,
        const S32* vp);
 
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- //
-    // Advanced hardware functionality.
-
-#if defined TORQUE_OS_IOS || defined TORQUE_OS_ANDROID
-
-    //Luma: Add some additional commands here so that it works in all cases
-    extern GLfloat gVertexFloats[8];
-    extern GLfloat gTextureVerts[8];
-    // uses memory insted of heap memory. PUAP optimization
-#define DrawTextureQuadiPhone( vX1, vY1, vX2, vY2, vX3, vY3, vX4, vY4, tX1, tY1, tX2, tY2, tX3, tY3, tX4, tY4 ) \
-gVertexFloats[0] = (GLfloat)(vX1);							\
-gVertexFloats[1] = (GLfloat)(vY1);							\
-gVertexFloats[2] = (GLfloat)(vX2);							\
-gVertexFloats[3] = (GLfloat)(vY2);							\
-gVertexFloats[4] = (GLfloat)(vX3);							\
-gVertexFloats[5] = (GLfloat)(vY3);							\
-gVertexFloats[6] = (GLfloat)(vX4);							\
-gVertexFloats[7] = (GLfloat)(vY4);							\
-gTextureVerts[0] = (GLfloat)(tX1);							\
-gTextureVerts[1] = (GLfloat)(tY1);							\
-gTextureVerts[2] = (GLfloat)(tX2);							\
-gTextureVerts[3] = (GLfloat)(tY2);							\
-gTextureVerts[4] = (GLfloat)(tX3);							\
-gTextureVerts[5] = (GLfloat)(tY3);							\
-gTextureVerts[6] = (GLfloat)(tX4);							\
-gTextureVerts[7] = (GLfloat)(tY4);							\
-glDisableClientState(GL_COLOR_ARRAY);						\
-glDisableClientState(GL_POINT_SIZE_ARRAY_OES);				\
-glEnableClientState(GL_VERTEX_ARRAY);						\
-glEnableClientState(GL_TEXTURE_COORD_ARRAY);				\
-glVertexPointer(2, GL_FLOAT, 0, gVertexFloats);				\
-glTexCoordPointer(2, GL_FLOAT, 0, gTextureVerts);			\
-glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-#endif
-
 };
+
+//------------------------------------------------------------------------------
+inline bool DGLDevice::setResolution(U32 width, U32 height, U32 bpp)
+{
+   return setScreenMode(width, height, bpp, smIsFullScreen);
+}
+
+
+//------------------------------------------------------------------------------
+inline bool DGLDevice::toggleFullScreen()
+{
+   return setScreenMode(smCurrentRes.w, smCurrentRes.h, smCurrentRes.bpp, !smIsFullScreen);
+}
+
+
+//------------------------------------------------------------------------------
+inline DGLVideoMode DGLDevice::getResolution()
+{
+   return smCurrentRes;
+}
+
+
+//------------------------------------------------------------------------------
+inline bool DGLDevice::isFullScreen()
+{
+   return smIsFullScreen;
+}
 
 #endif // _H_DGL
 

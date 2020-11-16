@@ -23,7 +23,7 @@
 #include "math/mPoint.h"
 #include "graphics/TextureManager.h"
 #include "graphics/dgl.h"
-
+#include "game/gameInterface.h"
 #include "graphics/gl/dglglInit.h"
 
 #include "graphics/gColor.h"
@@ -41,30 +41,204 @@
 
 #include <vector>
 
-
 namespace {
 
 ColorI sg_bitmapModulation(255, 255, 255, 255);
 ColorI sg_textAnchorColor(255, 255, 255, 255);
 ColorI sg_stackColor(255, 255, 255, 255);
 ColorF colorAlphaW(1.0f, 1.0f, 1.0f, 0.0f);
-RectI sgCurrentClipRect;
 
 } // namespace {}
 
-DGLDevice * DGLDevice::smDGL = NULL;
+DGLDevice * DGLDevice::smCurrentDevice = NULL;
+
+bool DGLDevice::smDisableVsync = true;
 
 DGLDevice::DGLDevice()
 {
-   smDGL = this;
+   VECTOR_SET_ASSOCIATION(mVideoModes);
+   mDeviceName = NULL;
+   AssertFatal(smCurrentDevice == NULL, "Already a GFXDevice created! Bad!");
+   smCurrentDevice = this;
 }
 
 void DGLDevice::init()
 {
+   Con::printSeparator();
+   Con::printf("DGL Device Initialization:");
+   Con::printSeparator();
 
+   smCurrentRes = DGLVideoMode(0, 0, 0);
+   smIsFullScreen = false;
+
+   destroy();
+}
+
+//------------------------------------------------------------------------------
+
+void DGLDevice::destroy()
+{
+   if (smCurrentDevice)
+   {
+      smCritical = true;
+      smCurrentDevice->shutdown();
+      smCritical = false;
+   }
+
+   smCurrentDevice = NULL;
+
+   for (U32 i = 0; i < (U32)smDeviceList.size(); i++)
+      delete smDeviceList[i];
+
+   smDeviceList.clear();
+}
+
+bool DGLDevice::installDevice(DGLDevice * dev)
+{
+   if (dev)
+   {
+      smDeviceList.push_back(dev);
+      return true;
+   }
+   return false;
+}
+
+bool DGLDevice::setDevice(const char * renderName, U32 width, U32 height, U32 bpp, bool fullScreen)
+{
+   S32 deviceIndex = NO_DEVICE;
+   S32 iOpenGL = -1;
+   S32 iD3D = -1;
+
+   bool bOpenglRender = true; //(bool)(dStricmp(renderName,"OpenGL") == 0);
+   bool bD3DRender = false; //(bool)(dStricmp(renderName,"D3D") == 0);
+   bool bAllowD3D = false; //Con::getBoolVariable("$pref::Video::allowD3D");
+   bool bAllowOpengl = true; //Con::getBoolVariable("$pref::Video::allowOpenGL");
+
+
+   for (S32 i = 0; i < smDeviceList.size(); i++)
+   {
+      if (dStrcmp(smDeviceList[i]->mDeviceName, renderName) == 0)
+         deviceIndex = i;
+
+      if (dStrcmp(smDeviceList[i]->mDeviceName, "OpenGL") == 0)
+         iOpenGL = i;
+      if (dStrcmp(smDeviceList[i]->mDeviceName, "D3D") == 0)
+         iD3D = i;
+   }
+
+   if (deviceIndex == NO_DEVICE)
+   {
+      Con::warnf(ConsoleLogEntry::General, "\"%s\" display device not found!", renderName);
+      return false;
+   }
+
+   // Change the display device:
+   if (smDeviceList[deviceIndex] == NULL)
+      return false;
+
+
+   if (smCurrentDevice && smCurrentDevice != smDeviceList[deviceIndex])
+   {
+      Con::printf("Deactivating the previous display device...");
+      Game->textureKill();
+      smNeedResurrect = true;
+      smCurrentDevice->shutdown();
+   }
+   if (iOpenGL != -1 && !bAllowOpengl)
+   {
+      // change to D3D, delete OpenGL in the recursive call
+      if (bOpenglRender)
+      {
+         U32 w, h, d;
+
+         if (fullScreen)
+            dSscanf(Con::getVariable("$pref::Video::resolution"), "%d %d %d", &w, &h, &d);
+         else
+            dSscanf(Con::getVariable("$pref::Video::windowedRes"), "%d %d %d", &w, &h, &d);
+
+         return setDevice("D3D", w, h, d, fullScreen);
+      }
+      else
+      {
+         delete smDeviceList[iOpenGL];
+         smDeviceList.erase(iOpenGL);
+      }
+   }
+   else if (iD3D != -1 && !bAllowD3D)
+   {
+      // change to OpenGL, delete D3D in the recursive call
+      if (bD3DRender)
+      {
+         U32 w, h, d;
+         if (fullScreen)
+            dSscanf(Con::getVariable("$pref::Video::resolution"), "%d %d %d", &w, &h, &d);
+         else
+            dSscanf(Con::getVariable("$pref::Video::windowedRes"), "%d %d %d", &w, &h, &d);
+
+         return setDevice("OpenGL", w, h, d, fullScreen);
+      }
+      else
+      {
+         delete smDeviceList[iD3D];
+         smDeviceList.erase(iD3D);
+      }
+   }
+   else if (iD3D != -1 && bOpenglRender &&
+      !Con::getBoolVariable("$pref::Video::preferOpenGL") &&
+      !Con::getBoolVariable("$pref::Video::appliedPref"))
+   {
+      U32 w, h, d;
+      if (fullScreen)
+         dSscanf(Con::getVariable("$pref::Video::resolution"), "%d %d %d", &w, &h, &d);
+      else
+         dSscanf(Con::getVariable("$pref::Video::windowedRes"), "%d %d %d", &w, &h, &d);
+      Con::setBoolVariable("$pref::Video::appliedPref", true);
+
+      return setDevice("D3D", w, h, d, fullScreen);
+   }
+   else
+      Con::setBoolVariable("$pref::Video::appliedPref", true);
+
+   Con::printf("Activating the %s display device...", renderName);
+   smCurrentDevice = smDeviceList[deviceIndex];
+
+   smCritical = true;
+   bool result = smCurrentDevice->activate(width, height, bpp, fullScreen);
+   smCritical = false;
+
+   smDGL = smCurrentDevice;
+
+   if (result)
+   {
+      if (smNeedResurrect)
+      {
+         Game->textureResurrect();
+         smNeedResurrect = false;
+      }
+      //if (sgOriginalGamma != -1.0 || getGammaCorrection(sgOriginalGamma))
+         //setGammaCorrection(sgOriginalGamma + sgGammaCorrection);
+      Con::evaluate("resetCanvas();");
+   }
+}
+
+void DGLDevice::GetFrustum(F64 *left, F64 *right, F64 *bottom, F64 *top, F64 *nearPlane, F64 *farPlane)
+{
+   *left = frustLeft;
+   *right = frustRight;
+   *bottom = frustBottom;
+   *top = frustTop;
+   *nearPlane = frustNear;
+   *farPlane = frustFar;
+}
+
+void DGLDevice::GetViewport(RectI* outViewport)
+{
+   AssertFatal(outViewport != NULL, "Error, bad point in GetViewport");
+   *outViewport = viewPort;
 }
 
 //--------------------------------------------------------------------------
+
 void DGLDevice::SetBitmapModulation(const ColorF& in_rColor)
 {
    ColorF c = in_rColor;
@@ -102,7 +276,8 @@ void DGLDevice::DrawBlendBox(RectI &bounds, ColorF &c1, ColorF &c2, ColorF &c3, 
    F32 t = (F32)(bounds.point.y + 1);
    F32 b = (F32)(bounds.point.y + bounds.extent.y - 2);
 
-   glEnable(GL_BLEND);
+   // Gl draw function
+   /*glEnable(GL_BLEND);
    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
    glDisable(GL_TEXTURE_2D);
 
@@ -209,7 +384,7 @@ void DGLDevice::DrawBlendBox(RectI &bounds, ColorF &c1, ColorF &c2, ColorF &c3, 
    glColor4fv(c4.address());
    glVertex2f(r + 1, b);
 
-   glEnd();
+   glEnd();*/
 }
 
 /// Function to draw a set of boxes blending throughout an array of colors
@@ -224,6 +399,7 @@ void DGLDevice::DrawBlendRangeBox(RectI &bounds, bool vertical, U8 numColors, Co
    F32 x_inc = F32((r - l) / (numColors - 1));
    F32 y_inc = F32((b - t) / (numColors - 1));
 
+   /*
    glEnable(GL_BLEND);
    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
    glDisable(GL_TEXTURE_2D);
@@ -282,23 +458,24 @@ void DGLDevice::DrawBlendRangeBox(RectI &bounds, bool vertical, U8 numColors, Co
       }
    }
    glEnd();
+   */
 }
 
 
 //--------------------------------------------------------------------------
 void DGLDevice::DrawBitmapStretchSR(TextureObject* texture,
-                       const RectI&   dstRect,
-                       const RectI&   srcRect,
-                       const U32   in_flip,
-                       F32			 fSpin,
-                       bool				bSilhouette)
+                                    const RectI&   dstRect,
+                                    const RectI&   srcRect,
+                                    const U32      in_flip,
+                                    F32			   fSpin,
+                                    bool				bSilhouette)
 {	
    AssertFatal(texture != NULL, "GSurface::drawBitmapStretchSR: NULL Handle");
    if(!dstRect.isValidRect())
       return;
    AssertFatal(srcRect.isValidRect() == true,
                "GSurface::drawBitmapStretchSR: routines assume normal rects");
-
+   /*
    glDisable(GL_LIGHTING);
 
    glEnable(GL_TEXTURE_2D);
@@ -382,7 +559,6 @@ void DGLDevice::DrawBitmapStretchSR(TextureObject* texture,
              sg_bitmapModulation.blue,
              sg_bitmapModulation.alpha);
 
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
 
     GLfloat verts[] = {
         (GLfloat)scrPoints[0].x, (GLfloat)scrPoints[0].y,
@@ -408,28 +584,13 @@ void DGLDevice::DrawBitmapStretchSR(TextureObject* texture,
     
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-#else
-   glBegin(GL_TRIANGLE_FAN);
-      glTexCoord2f(texLeft, texBottom);
-      glVertex2f(scrPoints[2].x, scrPoints[2].y);
-
-      glTexCoord2f(texRight, texBottom);
-      glVertex2f(scrPoints[3].x, scrPoints[3].y);
-
-      glTexCoord2f(texRight, texTop);
-      glVertex2f(scrPoints[1].x, scrPoints[1].y);
-
-      glTexCoord2f(texLeft, texTop);
-      glVertex2f(scrPoints[0].x, scrPoints[0].y);
-   glEnd();
-#endif
    if (bSilhouette)
    {
       glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, ColorF(0.0f, 0.0f, 0.0f, 0.0f).address());
    }
 
    glDisable(GL_BLEND);
-   glDisable(GL_TEXTURE_2D);
+   glDisable(GL_TEXTURE_2D);*/
 }
 
 void DGLDevice::DrawBitmap(TextureObject* texture, const Point2I& in_rAt, const U32 in_flip)
@@ -588,7 +749,7 @@ U32 DGLDevice::DrawTextN(GFont*          font,
    currentColor      = sg_bitmapModulation;
 
    FrameTemp<TextVertex> vert(4*n);
-
+   /*
    glDisable(GL_LIGHTING);
 
    glEnable(GL_TEXTURE_2D);
@@ -760,7 +921,7 @@ U32 DGLDevice::DrawTextN(GFont*          font,
 
    glDisable(GL_BLEND);
    glDisable(GL_TEXTURE_2D);
-
+   */
    pt.x += ptDraw.x; // DAW: Account for the fact that we removed the drawing point from the text start at the beginning.
 
    AssertFatal(pt.x >= ptDraw.x, "How did this happen?");
@@ -802,7 +963,7 @@ U32 DGLDevice::DrawTextN(GFont*          font,
    currentColor      = sg_bitmapModulation;
 
    FrameTemp<TextVertex> vert(4*n);
-
+   /*
    glDisable(GL_LIGHTING);
 
    glEnable(GL_TEXTURE_2D);
@@ -967,7 +1128,7 @@ U32 DGLDevice::DrawTextN(GFont*          font,
 
    glDisable(GL_BLEND);
    glDisable(GL_TEXTURE_2D);
-
+   */
    pt.x += ptDraw.x; // DAW: Account for the fact that we removed the drawing point from the text start at the beginning.
 
    AssertFatal(pt.x >= ptDraw.x, "How did this happen?");
@@ -982,12 +1143,12 @@ U32 DGLDevice::DrawTextN(GFont*          font,
 
 void DGLDevice::DrawLine(S32 x1, S32 y1, S32 x2, S32 y2, const ColorI &color)
 {
+   /*
    glEnable(GL_BLEND);
    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
    glDisable(GL_TEXTURE_2D);
 
    glColor4ub(color.red, color.green, color.blue, color.alpha);
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
     GLfloat verts[] = {
         (GLfloat)(x1 + 0.5f), (GLfloat)(y1 + 0.5f),
         (GLfloat)(x2 + 0.5f), (GLfloat)(y2 + 0.5f),
@@ -996,15 +1157,8 @@ void DGLDevice::DrawLine(S32 x1, S32 y1, S32 x2, S32 y2, const ColorI &color)
     glVertexPointer(2, GL_FLOAT, 0, verts );
     
     glDrawArrays(GL_LINES, 0, 2);//draw last two
-#else
-   glBegin(GL_LINES);
-   glVertex2f((F32)x1 + 0.5f,  (F32)y1 + 0.5f);
-   glVertex2f((F32)x2 + 0.5f,    (F32)y2 + 0.5f);
-   glEnd();
-    //glBegin(GL_POINTS);
-    //glVertex2f((F32)x2 + 0.5, (F32)y2 + 0.5);
-    //glEnd();
-#endif
+
+*/
 }
 
 void DGLDevice::DrawLine(const Point2I &startPt, const Point2I &endPt, const ColorI &color)
@@ -1014,12 +1168,12 @@ void DGLDevice::DrawLine(const Point2I &startPt, const Point2I &endPt, const Col
 
 void DGLDevice::DrawTriangleFill(const Point2I &pt1, const Point2I &pt2, const Point2I &pt3, const ColorI &color)
 {
+   /*
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_TEXTURE_2D);
 
 	glColor4ub(color.red, color.green, color.blue, color.alpha);
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
 	GLfloat vertices[] = {
 		(GLfloat)pt1.x, (GLfloat)pt1.y,
 		(GLfloat)pt2.x, (GLfloat)pt2.y,
@@ -1030,17 +1184,12 @@ void DGLDevice::DrawTriangleFill(const Point2I &pt1, const Point2I &pt2, const P
 	glEnableClientState(GL_VERTEX_ARRAY);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
-#else
-	glBegin(GL_TRIANGLES);
-	glVertex2f((GLfloat)pt1.x, (GLfloat)pt1.y);
-	glVertex2f((GLfloat)pt2.x, (GLfloat)pt2.y);
-	glVertex2f((GLfloat)pt3.x, (GLfloat)pt3.y);
-	glEnd();
-#endif
+*/
 }
 
 void DGLDevice::DrawRect(const Point2I &upperL, const Point2I &lowerR, const ColorI &color, const float &lineWidth)
 {
+   /*
    glEnable(GL_BLEND);
    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
    glDisable(GL_TEXTURE_2D);
@@ -1048,7 +1197,6 @@ void DGLDevice::DrawRect(const Point2I &upperL, const Point2I &lowerR, const Col
    glLineWidth(lineWidth);
 
    glColor4ub(color.red, color.green, color.blue, color.alpha);
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
     GLfloat verts[] = {
         (GLfloat)(upperL.x), (GLfloat)(upperL.y),
         (GLfloat)(lowerR.x), (GLfloat)(upperL.y),
@@ -1058,14 +1206,7 @@ void DGLDevice::DrawRect(const Point2I &upperL, const Point2I &lowerR, const Col
     
     glVertexPointer(2, GL_FLOAT, 0, verts );
     glDrawArrays(GL_LINE_LOOP, 0, 4 );//draw last two
-#else
-   glBegin(GL_LINE_LOOP);
-      glVertex2f((F32)upperL.x + 0.5f, (F32)upperL.y + 0.5f);
-      glVertex2f((F32)lowerR.x + 0.5f, (F32)upperL.y + 0.5f);
-      glVertex2f((F32)lowerR.x + 0.5f, (F32)lowerR.y + 0.5f);
-      glVertex2f((F32)upperL.x + 0.5f, (F32)lowerR.y + 0.5f);
-   glEnd();
-#endif
+*/
 }
 
 // the fill convention for lined rects is that they outline the rectangle border of the
@@ -1082,12 +1223,12 @@ void DGLDevice::DrawRect(const RectI &rect, const ColorI &color, const float &li
 
 void DGLDevice::DrawRectFill(const Point2I &upperL, const Point2I &lowerR, const ColorI &color)
 {
+   /*
    glEnable(GL_BLEND);
    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
    glDisable(GL_TEXTURE_2D);
 
    glColor4ub(color.red, color.green, color.blue, color.alpha);
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
     GLfloat vertices[] = {
         (GLfloat)upperL.x, (GLfloat)upperL.y,
         (GLfloat)upperL.x, (GLfloat)lowerR.y,
@@ -1099,9 +1240,6 @@ void DGLDevice::DrawRectFill(const Point2I &upperL, const Point2I &lowerR, const
     glEnableClientState(GL_VERTEX_ARRAY);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-#else
-   glRecti((S32)upperL.x, (S32)upperL.y, (S32)lowerR.x, (S32)lowerR.y);
-#endif
 }
 void DGLDevice::DrawRectFill(const RectI &rect, const ColorI &color)
 {
@@ -1129,6 +1267,7 @@ void DGLDevice::DrawQuadFill(const Point2I &point1, const Point2I &point2, const
 	glEnableClientState(GL_VERTEX_ARRAY);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+   */
 }
 
 void DGLDevice::Draw2DSquare( const Point2F &screenPoint, F32 width, F32 spinAngle )
@@ -1150,8 +1289,7 @@ void DGLDevice::Draw2DSquare( const Point2F &screenPoint, F32 width, F32 spinAng
       rotMatrix.mulP( points[i] );
       points[i] += offset;
    }
-
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
+   /*
     GLfloat verts[] = {
         0.0, 0.0,
         1.0, 0.0,
@@ -1174,21 +1312,7 @@ void DGLDevice::Draw2DSquare( const Point2F &screenPoint, F32 width, F32 spinAng
     glVertexPointer(2, GL_FLOAT, 0, verts);
     glTexCoordPointer(2, GL_FLOAT, 0, texVerts);
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-#else
-   glBegin(GL_TRIANGLE_FAN);
-      glTexCoord2f(0.0, 0.0);
-      glVertex2fv(points[0]);
-
-      glTexCoord2f(0.0, 1.0);
-      glVertex2fv(points[1]);
-
-      glTexCoord2f(1.0, 1.0);
-      glVertex2fv(points[2]);
-
-      glTexCoord2f(1.0, 0.0);
-      glVertex2fv(points[3]);
-   glEnd();
-#endif
+*/
 }
 
 void DGLDevice::DrawBillboard( const Point3F &position, F32 width, F32 spinAngle )
@@ -1215,8 +1339,7 @@ void DGLDevice::DrawBillboard( const Point3F &position, F32 width, F32 spinAngle
       points[i] += position;
    }
 
-
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
+/*
     GLfloat verts[] = {
         0.0, 1.0,
         0.0, 0.0,
@@ -1239,21 +1362,7 @@ void DGLDevice::DrawBillboard( const Point3F &position, F32 width, F32 spinAngle
     glVertexPointer(2, GL_FLOAT, 0, verts);
     glTexCoordPointer(2, GL_FLOAT, 0, texVerts);
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-#else
-   glBegin(GL_TRIANGLE_FAN);
-      glTexCoord2f(0.0, 1.0);
-      glVertex3fv(points[0]);
-
-      glTexCoord2f(0.0, 0.0);
-      glVertex3fv(points[1]);
-
-      glTexCoord2f(1.0, 0.0);
-      glVertex3fv(points[2]);
-
-      glTexCoord2f(1.0, 1.0);
-      glVertex3fv(points[3]);
-   glEnd();
-#endif
+*/
 }
 
 void DGLDevice::WireCube(const Point3F & extent, const Point3F & center)
@@ -1269,14 +1378,14 @@ void DGLDevice::WireCube(const Point3F & extent, const Point3F & center)
       { 0, 2, 6, 4 }, { 0, 2, 3, 1 }, { 0, 1, 5, 4 },
       { 3, 2, 6, 7 }, { 7, 6, 4, 5 }, { 3, 7, 5, 1 }
    };
+   
+   //glDisable(GL_CULL_FACE);
+   DisableState(DGLRSCullFace);
 
-   glDisable(GL_CULL_FACE);
-
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
 //PUAP -Mat untested
    for (S32 i = 0; i < 6; i++)
    {
-       GLfloat verts[] = {
+       F32 verts[] = {
            0, 0, 0,
            0, 0, 0,
            0, 0, 0,
@@ -1293,23 +1402,13 @@ void DGLDevice::WireCube(const Point3F & extent, const Point3F & center)
           verts[++j] = cubePoints[idx].y * extent.y + center.y;
           verts[++j] = cubePoints[idx].z * extent.z + center.z;
       }
-       glVertexPointer(3, GL_FLOAT, 0, verts);
-       glDrawArrays(GL_LINE_LOOP, 0, 4);
+       //glVertexPointer(3, GL_FLOAT, 0, verts);
+       //glDrawArrays(GL_LINE_LOOP, 0, 4);
+
+       SetVertexPoint(3, 0, verts);
+       DrawArrays(DGLLineLoop, 0, 4);
    }
-#else
-   for (S32 i = 0; i < 6; i++)
-   {
-      glBegin(GL_LINE_LOOP);
-      for(int vert = 0; vert < 4; vert++)
-      {
-         int idx = cubeFaces[i][vert];
-         glVertex3f(cubePoints[idx].x * extent.x + center.x,
-            cubePoints[idx].y * extent.y + center.y,
-            cubePoints[idx].z * extent.z + center.z);
-      }
-      glEnd();
-   }
-#endif
+
 }
 
 
@@ -1326,12 +1425,10 @@ void DGLDevice::SolidCube(const Point3F & extent, const Point3F & center)
       { 0, 2, 6, 4 }, { 0, 2, 3, 1 }, { 0, 1, 5, 4 },
       { 3, 2, 6, 7 }, { 7, 6, 4, 5 }, { 3, 7, 5, 1 }
    };
-
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
-//PUAP -Mat untested
+   
    for (S32 i = 0; i < 6; i++)
    {
-       GLfloat verts[] = {
+       F32 verts[] = {
            0, 0, 0,
            0, 0, 0,
            0, 0, 0,
@@ -1348,23 +1445,13 @@ void DGLDevice::SolidCube(const Point3F & extent, const Point3F & center)
           verts[++j] = cubePoints[idx].y * extent.y + center.y;
           verts[++j] = cubePoints[idx].z * extent.z + center.z;
       }
-       glVertexPointer(3, GL_FLOAT, 0, verts);
-       glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+       //glVertexPointer(3, GL_FLOAT, 0, verts);
+       //glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+       SetVertexPoint(3, 0, verts);
+       DrawArrays(DGLTriangleFan, 0, 4);
    }
-#else
-   for (S32 i = 0; i < 6; i++)
-   {
-      glBegin(GL_TRIANGLE_FAN);
-      for(int vert = 0; vert < 4; vert++)
-      {
-         int idx = cubeFaces[i][vert];
-         glVertex3f(cubePoints[idx].x * extent.x + center.x,
-            cubePoints[idx].y * extent.y + center.y,
-            cubePoints[idx].z * extent.z + center.z);
-      }
-      glEnd();
-   }
-#endif
+
 }
 
 //Draws an unfilled circle with line segments.
@@ -1382,36 +1469,38 @@ void DGLDevice::DrawCircle(const Point2I &center, const F32 radius, const ColorI
 	F32 x = adjustedRadius;//we start at angle = 0 
 	F32 y = 0;
 
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable(GL_TEXTURE_2D);
+   EnableState(DGLRSBlend);
+   setBlendFunc(DGLBlendSrcAlpha, DGLBlendInvSrcAlpha);
+   DisableState(DGLRSTexture2D);
 
-	glLineWidth(lineWidth);
+   SetLineWidth(lineWidth);
 
-	glColor4ub(color.red, color.green, color.blue, color.alpha);
+   SetColorI(color.red, color.green, color.blue, color.alpha);
 
-	vector<GLfloat> verts;
-	for (int ii = 0; ii < num_segments; ii++)
-	{
-		verts.push_back(GLfloat(x + center.x));
-		verts.push_back(GLfloat(y + center.y));
+   vector<F32> verts;
+   for (int ii = 0; ii < num_segments; ii++)
+   {
+      verts.push_back(F32(x + center.x));
+      verts.push_back(F32(y + center.y));
 
-		//apply the rotation matrix
-		t = x;
-		x = c * x - s * y;
-		y = s * t + c * y;
-	}
-	verts.push_back(GLfloat(verts[0]));
-	verts.push_back(GLfloat(verts[1]));
+      //apply the rotation matrix
+      t = x;
+      x = c * x - s * y;
+      y = s * t + c * y;
+   }
+   verts.push_back(F32(verts[0]));
+   verts.push_back(F32(verts[1]));
 
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(2, GL_FLOAT, 0, verts.data());
-	glDrawArrays(GL_LINE_LOOP, 0, num_segments + 1);//draw last two
-	glDisableClientState(GL_VERTEX_ARRAY);
+   EnableClientState(DGLCSVertexArray);
+   SetVertexPoint(2, 0, verts.data());
+   DrawArrays(DGLLineLoop, 0, num_segments + 1);
+   DisableClientState(DGLCSVertexArray);
+
 }
 
 void DGLDevice::DrawCircleFill(const Point2I &center, const F32 radius, const ColorI &color)
 {
+   
 	const S32 num_segments = (const S32)round(10 * sqrtf(radius));
 	F32 theta = 2 * 3.1415926f / F32(num_segments);
 	F32 c = cosf(theta);//precalculate the sine and cosine
@@ -1420,7 +1509,7 @@ void DGLDevice::DrawCircleFill(const Point2I &center, const F32 radius, const Co
 
 	F32 x = radius;//we start at angle = 0 
 	F32 y = 0;
-
+   /*
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_TEXTURE_2D);
@@ -1447,83 +1536,47 @@ void DGLDevice::DrawCircleFill(const Point2I &center, const F32 radius, const Co
 	glVertexPointer(2, GL_FLOAT, 0, verts.data());
 	glDrawArrays(GL_TRIANGLE_FAN, 0, num_segments+2);
 	glDisableClientState(GL_VERTEX_ARRAY);
-}
 
-void DGLDevice::SetClipRect(const RectI &clipRect)
-{
-   glMatrixMode(GL_PROJECTION);
-   glLoadIdentity();
+   */
 
-   U32 screenHeight = Platform::getWindowSize().y;
+   EnableState(DGLRSBlend);
+   setBlendFunc(DGLBlendSrcAlpha, DGLBlendInvSrcAlpha);
+   DisableState(DGLRSTexture2D);
 
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID)
-   glOrthof(clipRect.point.x, clipRect.point.x + clipRect.extent.x,
-           clipRect.extent.y, 0,
-           0, 1);
-#else
-   glOrtho(clipRect.point.x, clipRect.point.x + clipRect.extent.x,
-           clipRect.extent.y, 0,
-           0, 1);
-#endif
+   SetColorI(color.red, color.green, color.blue, color.alpha);
 
-   glTranslatef(0.0f, (F32)-clipRect.point.y, 0.0f);
+   vector<F32> verts;
+   verts.push_back(F32(center.x));
+   verts.push_back(F32(center.y));
+   for (int ii = 0; ii < num_segments; ii++)
+   {
+      verts.push_back(F32(x + center.x));
+      verts.push_back(F32(y + center.y));
 
-   SetModelViewMatrix();
-   //glMatrixMode(GL_MODELVIEW);
-   glLoadIdentity();
+      //apply the rotation matrix
+      t = x;
+      x = c * x - s * y;
+      y = s * t + c * y;
+   }
+   verts.push_back(F32(verts[2]));
+   verts.push_back(F32(verts[3]));
 
-   glViewport(clipRect.point.x, screenHeight - (clipRect.point.y + clipRect.extent.y),
-              clipRect.extent.x, clipRect.extent.y);
+   EnableClientState(DGLCSVertexArray);
+   SetVertexPoint(2, 0, verts.data());
+   DrawArrays(DGLTriangleFan, 0, num_segments + 1);
+   DisableClientState(DGLCSVertexArray);
 
-   sgCurrentClipRect = clipRect;
-}
-
-const RectI& DGLDevice::GetClipRect()
-{
-   return sgCurrentClipRect;
 }
 
 bool DGLDevice::PointToScreen( Point3F &point3D, Point3F &screenPoint )
 {
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
+   /*
    GLfloat       glMV[16];
    GLfloat       glPR[16];
    GLint          glVP[4];
 
    glGetFloatv(GL_PROJECTION_MATRIX, glPR);
    glGetFloatv(GL_MODELVIEW_MATRIX, glMV);
-
-   RectI viewport;
-   dglGetViewport(&viewport);
-
-   glVP[0] = viewport.point.x;
-   glVP[1] = viewport.point.y + viewport.extent.y;
-   glVP[2] = viewport.extent.x;
-   glVP[3] = -viewport.extent.y;
-
-   MatrixF mv;
-   dglGetModelview(&mv);
-   MatrixF pr;
-   dglGetProjection(&pr);
-
-   F64 x, y, z;
-// PUAP -Mat untested
-   int result = gluProject( point3D.x, point3D.y, point3D.z, (const F64 *)&glMV, (const F64 *)&glPR, (const GLint *)&glVP, &x, &y, &z );
-
-   screenPoint.x = x;
-   screenPoint.y = y;
-   screenPoint.z = z;
-
-
-   return (result == GL_TRUE);
-#else
-   GLdouble       glMV[16];
-   GLdouble       glPR[16];
-   GLint          glVP[4];
-
-
-   glGetDoublev(GL_PROJECTION_MATRIX, glPR);
-   glGetDoublev(GL_MODELVIEW_MATRIX, glMV);
 
    RectI viewport;
    GetViewport(&viewport);
@@ -1539,15 +1592,16 @@ bool DGLDevice::PointToScreen( Point3F &point3D, Point3F &screenPoint )
    GetProjection(&pr);
 
    F64 x, y, z;
-   int result = gluProject( (GLdouble)point3D.x, (GLdouble)point3D.y, (GLdouble)point3D.z, (const F64 *)&glMV, (const F64 *)&glPR, (const GLint *)&glVP, &x, &y, &z );
-   screenPoint.x = (F32)x;
-   screenPoint.y = (F32)y;
-   screenPoint.z = (F32)z;
+// PUAP -Mat untested
+   int result = gluProject( point3D.x, point3D.y, point3D.z, (const F64 *)&glMV, (const F64 *)&glPR, (const GLint *)&glVP, &x, &y, &z );
+
+   screenPoint.x = x;
+   screenPoint.y = y;
+   screenPoint.z = z;
 
 
    return (result == GL_TRUE);
-#endif
-    
+    */
 }
 
 
@@ -1555,7 +1609,7 @@ bool DGLDevice::PointToScreen( Point3F &point3D, Point3F &screenPoint )
 bool DGLDevice::IsInCanonicalState()
 {
    bool ret = true;
-
+   /*
    // Canonical state:
    //  BLEND disabled
    //  TEXTURE_2D disabled on both texture units.
@@ -1633,12 +1687,14 @@ bool DGLDevice::IsInCanonicalState()
    if (dglDoesSupportFogCoord())
       ret &= glIsEnabled(GL_FOG_COORDINATE_ARRAY_EXT) == GL_FALSE;
 #endif
+*/
    return ret;
 }
 
 
 void DGLDevice::SetCanonicalState()
 {
+   /*
 #if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
 // PUAP -Mat removed unsupported textureARB and Fog stuff
    glDisable(GL_BLEND);
@@ -1687,6 +1743,8 @@ void DGLDevice::SetCanonicalState()
    if (dglDoesSupportFogCoord())
       glDisableClientState(GL_FOG_COORDINATE_ARRAY_EXT);
 #endif
+
+*/
 }
 
 void DGLDevice::GetTransformState(S32* mvDepth,
@@ -1697,6 +1755,7 @@ void DGLDevice::GetTransformState(S32* mvDepth,
                           F32* t1Matrix,
                           S32* vp)
 {
+   /*
    glGetIntegerv(GL_MODELVIEW_STACK_DEPTH, (GLint*)mvDepth);
    glGetIntegerv(GL_PROJECTION_STACK_DEPTH, (GLint*)pDepth);
 
@@ -1723,7 +1782,7 @@ void DGLDevice::GetTransformState(S32* mvDepth,
       for (U32 i = 0; i < 16; i++)
          t1Matrix[i] = 0;
    }
-
+   */
    RectI v;
    GetViewport(&v);
    vp[0] = v.point.x;
@@ -1738,6 +1797,7 @@ bool DGLDevice::CheckState(const S32 mvDepth, const S32 pDepth,
                    const S32 t1Depth, const F32* t1Matrix,
                    const S32* vp)
 {
+   /*
    GLint md, pd;
    RectI v;
 
@@ -1782,6 +1842,7 @@ bool DGLDevice::CheckState(const S32 mvDepth, const S32 pDepth,
             (v.point.y  == vp[1]) &&
             (v.extent.x == vp[2]) &&
             (v.extent.y == vp[3])));
+    */
 }
 
 #if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
@@ -1789,3 +1850,79 @@ GLfloat gVertexFloats[8];
 GLfloat gTextureVerts[8];
 #endif
 
+//------------------------------------------------------------------------------
+bool DGLDevice::prevRes()
+{
+   U32 resIndex;
+   for (resIndex = mVideoModes.size() - 1; resIndex > 0; resIndex--)
+   {
+      if (mVideoModes[resIndex].bpp == smCurrentRes.bpp
+         && mVideoModes[resIndex].w <= smCurrentRes.w
+         && mVideoModes[resIndex].h != smCurrentRes.h)
+         break;
+   }
+
+   if (mVideoModes[resIndex].bpp == smCurrentRes.bpp)
+      return(setResolution(mVideoModes[resIndex].w, mVideoModes[resIndex].h, mVideoModes[resIndex].bpp));
+
+   return(false);
+}
+
+
+//------------------------------------------------------------------------------
+bool DGLDevice::nextRes()
+{
+   U32 resIndex;
+   for (resIndex = 0; resIndex < (U32)mVideoModes.size() - 1; resIndex++)
+   {
+      if (mVideoModes[resIndex].bpp == smCurrentRes.bpp
+         && mVideoModes[resIndex].w >= smCurrentRes.w
+         && mVideoModes[resIndex].h != smCurrentRes.h)
+         break;
+   }
+
+   if (mVideoModes[resIndex].bpp == smCurrentRes.bpp)
+      return(setResolution(mVideoModes[resIndex].w, mVideoModes[resIndex].h, mVideoModes[resIndex].bpp));
+
+   return(false);
+}
+
+
+//------------------------------------------------------------------------------
+// This function returns a string containing all of the available resolutions for this device
+// in the format "<bit depth> <width> <height>", separated by tabs.
+//
+const char* DGLDevice::getResolutionList()
+{
+   if (Con::getBoolVariable("$pref::Video::clipHigh", false))
+      for (S32 i = mVideoModes.size() - 1; i >= 0; --i)
+         if (mVideoModes[i].w > 1152 || mVideoModes[i].h > 864)
+            mVideoModes.erase(i);
+
+   if (Con::getBoolVariable("$pref::Video::only16", false))
+      for (S32 i = mVideoModes.size() - 1; i >= 0; --i)
+         if (mVideoModes[i].bpp == 32)
+            mVideoModes.erase(i);
+
+   U32 resCount = mVideoModes.size();
+   if (resCount > 0)
+   {
+      char* tempBuffer = new char[resCount * 15];
+      tempBuffer[0] = 0;
+      for (U32 i = 0; i < resCount; i++)
+      {
+         char newString[15];
+         dSprintf(newString, sizeof(newString), "%d %d %d\t", mVideoModes[i].w, mVideoModes[i].h, mVideoModes[i].bpp);
+         dStrcat(tempBuffer, newString);
+      }
+      tempBuffer[dStrlen(tempBuffer) - 1] = 0;
+
+      char* returnString = Con::getReturnBuffer(dStrlen(tempBuffer) + 1);
+      dStrcpy(returnString, tempBuffer);
+      delete[] tempBuffer;
+
+      return returnString;
+   }
+
+   return NULL;
+}

@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2013 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,28 +20,35 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _TYPESPOSIX_H_
-#define _TYPESPOSIX_H_
+#ifndef _TYPESWIN32_H_
+#define _TYPESWIN32_H_
 
 
-#define FN_CDECL     ///< Calling convention
+#define FN_CDECL __cdecl            ///< Calling convention
 
 // size_t is needed to overload new
 // size_t tends to be OS and compiler specific and may need to 
 // be if/def'ed in the future
-#include <stddef.h>
-typedef size_t   dsize_t;
+
+#ifdef _WIN64
+typedef unsigned long long  dsize_t;
+#else
+typedef unsigned int  dsize_t;
+#endif // _WIN64
 
 
-/** Platform dependent file date-time structure.  The defination of this structure
-  * will likely be different for each OS platform.
-  */
-typedef S32 FileTime;
+/// Platform dependent file date-time structure.  The definition of this structure
+/// will likely be different for each OS platform.
+struct FileTime
+{
+   U32 v1;
+   U32 v2;
+};
 
 
 #ifndef NULL
-#  define NULL (0)
+#  define NULL 0
 #endif
 
 
-#endif //_TYPESPOSIX_H_
+#endif //_TYPESWIN32_H_

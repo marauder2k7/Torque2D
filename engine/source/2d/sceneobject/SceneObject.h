@@ -625,8 +625,8 @@ public:
     static const char* getCollisionShapeTypeDescription(const b2Shape::Type collisionShapeType);
     static S32 getSrcBlendFactorEnum(const char* label);
     static S32 getDstBlendFactorEnum(const char* label);
-    static const char* getSrcBlendFactorDescription(const GLenum factor);
-    static const char* getDstBlendFactorDescription(const GLenum factor);
+    static const char* getSrcBlendFactorDescription(const DGLBlend factor);
+    static const char* getDstBlendFactorDescription(const DGLBlend factor);
 
     /// Declare Console Object.
     DECLARE_CONOBJECT( SceneObject );
@@ -748,8 +748,8 @@ protected:
 
     /// Render blending.
     static bool             writeBlendMode( void* obj, StringTableEntry pFieldName ) { return static_cast<SceneObject*>(obj)->getBlendMode() == false; }
-    static bool             writeSrcBlendFactor( void* obj, StringTableEntry pFieldName ) { return static_cast<SceneObject*>(obj)->getSrcBlendFactor() != GL_SRC_ALPHA; }
-    static bool             writeDstBlendFactor( void* obj, StringTableEntry pFieldName ) { return static_cast<SceneObject*>(obj)->getDstBlendFactor() != GL_ONE_MINUS_SRC_ALPHA; }
+    static bool             writeSrcBlendFactor( void* obj, StringTableEntry pFieldName ) { return static_cast<SceneObject*>(obj)->getSrcBlendFactor() != DGLBlendSrcAlpha; }
+    static bool             writeDstBlendFactor( void* obj, StringTableEntry pFieldName ) { return static_cast<SceneObject*>(obj)->getDstBlendFactor() != DGLBlendInvSrcAlpha; }
     static bool             writeBlendColor( void* obj, StringTableEntry pFieldName ) { return static_cast<SceneObject*>(obj)->getBlendColor() != ColorF(1.0f, 1.0f, 1.0f, 1.0f); }
     static bool             writeAlphaTest( void* obj, StringTableEntry pFieldName ) { return static_cast<SceneObject*>(obj)->getAlphaTest() >= 0.0f; }
 

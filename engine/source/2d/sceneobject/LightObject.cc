@@ -69,9 +69,6 @@ void LightObject::sceneRender(const SceneRenderState * sceneRenderState, const S
    Scene* scene = getScene();
    b2World* mWorld = scene->getWorld();
 
-
-   
-
    glEnable(GL_BLEND);
    glDisable(GL_TEXTURE_2D);
    glPushMatrix();

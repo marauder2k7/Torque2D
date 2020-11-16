@@ -29,7 +29,7 @@
     @param hint \GL_DONT_CARE\, \GL_FASTEST\, or \GL_NICEST\. (Please refer to an OpenGL text for information on what these mean).
     @return No return value
 */
-ConsoleFunctionWithDocs(setOpenGLTextureCompressionHint, ConsoleVoid, 2, 2,  ( hint ))
+/*ConsoleFunctionWithDocs(setOpenGLTextureCompressionHint, ConsoleVoid, 2, 2,  ( hint ))
 {
     GLenum newHint        = GL_DONT_CARE;
     const char* newString = "GL_DONT_CARE";
@@ -51,7 +51,7 @@ ConsoleFunctionWithDocs(setOpenGLTextureCompressionHint, ConsoleVoid, 2, 2,  ( h
     if (dglDoesSupportTextureCompression())
         glHint(GL_TEXTURE_COMPRESSION_HINT_ARB, TextureManager::mTextureCompressionHint);
 #endif
-}
+}*/
 
 //--------------------------------------------------------------------------------------------------------------------
 

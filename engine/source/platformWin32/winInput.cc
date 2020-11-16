@@ -22,7 +22,7 @@
 
 #include "platformWin32/platformWin32.h"
 #include "platform/platformInput.h"
-#include "platform/platformVideo.h"
+#include "graphics/dgl.h"
 #include "platformWin32/winDirectInput.h"
 #include "platform/event.h"
 #include "console/console.h"

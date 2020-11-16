@@ -399,7 +399,7 @@ ConsoleFunctionWithDocs( createCanvas, ConsoleBool, 2, 2, ( WindowTitle ))
     Platform::initWindow(Point2I(MIN_RESOLUTION_X, MIN_RESOLUTION_Y), argv[1]);
 
 
-    if (!Video::getResolutionList())
+    if (!DGL->getResolutionList())
         return false;
 
     // create the canvas, and add it to the manager
