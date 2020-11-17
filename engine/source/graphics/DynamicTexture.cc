@@ -49,7 +49,8 @@ void DynamicTexture::setSize( const U32 texelWidth, const U32 texelHeight )
     // Generate new bitmap.
     // NOTE: Any previous bitmap would be allocated to the texture handle therefore destroyed
     // when the texture handle is modified.
-    mpBitmap = new GBitmap( texelWidth, texelHeight, false, GBitmap::RGBA );
+    // set this to 32bit texture, because why not. 
+    mpBitmap = new GBitmap( texelWidth, texelHeight, false, DGLFormatR8G8B8A8 );
 
     // Set texture against bitmap.
     mTextureHandle.set( mTextureKey, mpBitmap, TextureHandle::BitmapKeepTexture );

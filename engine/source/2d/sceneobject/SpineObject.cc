@@ -823,21 +823,21 @@ void SpineObject::prepareSpineForRender()
 			// Not using Premultiplied Alpha
 			switch (slot->data->blendMode) {
 			case SP_BLEND_MODE_ADDITIVE:
-				setSrcBlendFactor(GL_SRC_ALPHA);
-				setDstBlendFactor(GL_ONE);
+				setSrcBlendFactor(DGLBlendSrcAlpha);
+				setDstBlendFactor(DGLBlendOne);
 				break;
 			case SP_BLEND_MODE_MULTIPLY:
-				setSrcBlendFactor(GL_DST_COLOR);
-				setDstBlendFactor(GL_ONE_MINUS_SRC_ALPHA);
+				setSrcBlendFactor(DGLBlendDestColor);
+				setDstBlendFactor(DGLBlendInvSrcAlpha);
 				break;
 			case SP_BLEND_MODE_SCREEN:
-				setSrcBlendFactor(GL_ONE);
-				setDstBlendFactor(GL_ONE_MINUS_SRC_COLOR);
+				setSrcBlendFactor(DGLBlendOne);
+				setDstBlendFactor(DGLBlendInvSrcColor);
 				break;
 			case SP_BLEND_MODE_NORMAL:
 			default:
-				setSrcBlendFactor(GL_SRC_ALPHA);
-				setDstBlendFactor(GL_ONE_MINUS_SRC_ALPHA);
+				setSrcBlendFactor(DGLBlendSrcAlpha);
+				setDstBlendFactor(DGLBlendInvSrcAlpha);
 				break;
 			}
 		}
@@ -845,21 +845,21 @@ void SpineObject::prepareSpineForRender()
 			// Setup for Premultiplied Alpha
 			switch (slot->data->blendMode) {
 			case SP_BLEND_MODE_ADDITIVE:
-				setSrcBlendFactor(GL_ONE);
-				setDstBlendFactor(GL_ONE);
+				setSrcBlendFactor(DGLBlendOne);
+				setDstBlendFactor(DGLBlendOne);
 				break;
 			case SP_BLEND_MODE_MULTIPLY:
-				setSrcBlendFactor(GL_DST_COLOR);
-				setDstBlendFactor(GL_ONE_MINUS_SRC_ALPHA);
+				setSrcBlendFactor(DGLBlendDestColor);
+				setDstBlendFactor(DGLBlendInvSrcAlpha);
 				break;
 			case SP_BLEND_MODE_SCREEN:
-				setSrcBlendFactor(GL_ONE);
-				setDstBlendFactor(GL_ONE_MINUS_SRC_COLOR);
+				setSrcBlendFactor(DGLBlendOne);
+				setDstBlendFactor(DGLBlendInvSrcColor);
 				break;
 			case SP_BLEND_MODE_NORMAL:
 			default:
-				setSrcBlendFactor(GL_ONE);
-				setDstBlendFactor(GL_ONE_MINUS_SRC_ALPHA);
+				setSrcBlendFactor(DGLBlendOne);
+				setDstBlendFactor(DGLBlendInvSrcAlpha);
 				break;
 			}
 		}

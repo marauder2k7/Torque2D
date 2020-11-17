@@ -1080,24 +1080,18 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
       F32 top = (F32)(r.extent.y / 2 + r.point.y - 4);
       F32 bottom = (F32)(top + 8);
 
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
-// PUAP -Mat untested
-       glColor4ub(mProfile->mFontColor.red,mProfile->mFontColor.green,mProfile->mFontColor.blue, 255);
-	   GLfloat verts[] = {
-         left, top,
-         right, top,
-         middle, bottom,
-	   };
-	   glVertexPointer(2, GL_FLOAT, 0, verts);	   
-	   glDrawArrays(GL_TRIANGLES, 0, 4);
-#else
-      glBegin(GL_TRIANGLES);
-         glColor3i(mProfile->mFontColor.red,mProfile->mFontColor.green,mProfile->mFontColor.blue);
-         glVertex2fv( Point3F(left,top,0) );
-         glVertex2fv( Point3F(right,top,0) );
-         glVertex2fv( Point3F(middle,bottom,0) );
-      glEnd();
-#endif
+      DGL->SetColorI(mProfile->mFontColor.red, mProfile->mFontColor.green, mProfile->mFontColor.blue, 255);
+
+      F32 verts[]{
+      left,top,
+      right,top,
+      middle,bottom,
+      };
+
+      DGL->EnableClientState(DGLCSVertexArray);
+      DGL->SetVertexPoint(2, 0, verts);
+      DGL->DrawArrays(DGLTriangleList, 0, 4);
+      DGL->DisableClientState(DGLCSVertexArray);
    }
 }
 

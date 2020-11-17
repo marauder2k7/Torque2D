@@ -3790,7 +3790,7 @@ ConsoleMethodWithDocs(SceneObject, getBlendMode, ConsoleBool, 2, 2, ())
 ConsoleMethodWithDocs(SceneObject, setSrcBlendFactor, ConsoleVoid, 3, 3, (srcBlend))
 {
     // Fetch source blend factor.
-    GLenum blendFactor = SceneObject::getSrcBlendFactorEnum(argv[2]);
+    S32 blendFactor = SceneObject::getSrcBlendFactorEnum(argv[2]);
 
     object->setSrcBlendFactor( blendFactor );
 }
@@ -3814,7 +3814,7 @@ ConsoleMethodWithDocs(SceneObject, getSrcBlendFactor, ConsoleString, 2, 2, ())
 ConsoleMethodWithDocs(SceneObject, setDstBlendFactor, ConsoleVoid, 3, 3, (dstBlend))
 {
     // Fetch destination blend factor.
-    GLenum blendFactor = SceneObject::getDstBlendFactorEnum(argv[2]);
+    S32 blendFactor = SceneObject::getDstBlendFactorEnum(argv[2]);
 
     object->setDstBlendFactor( blendFactor );
 }

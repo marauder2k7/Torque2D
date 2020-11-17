@@ -796,7 +796,7 @@ ConsoleMethodWithDocs(ParticleAssetEmitter, getBlendMode, ConsoleBool, 2, 2, ())
 ConsoleMethodWithDocs(ParticleAssetEmitter, setSrcBlendFactor, ConsoleVoid, 3, 3, (srcBlend))
 {
     // Fetch source blend factor.
-    const  GLenum blendFactor = SceneObject::getSrcBlendFactorEnum(argv[2]);
+    const  S32 blendFactor = SceneObject::getSrcBlendFactorEnum(argv[2]);
 
     object->setSrcBlendFactor( blendFactor );
 }
@@ -820,7 +820,7 @@ ConsoleMethodWithDocs(ParticleAssetEmitter, getSrcBlendFactor, ConsoleString, 2,
 ConsoleMethodWithDocs(ParticleAssetEmitter, setDstBlendFactor, ConsoleVoid, 3, 3, (dstBlend))
 {
     // Fetch destination blend factor.
-    const GLenum blendFactor = SceneObject::getDstBlendFactorEnum(argv[2]);
+    const S32 blendFactor = SceneObject::getDstBlendFactorEnum(argv[2]);
 
     object->setDstBlendFactor( blendFactor );
 }

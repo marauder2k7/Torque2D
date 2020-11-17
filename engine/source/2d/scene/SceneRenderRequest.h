@@ -26,6 +26,9 @@
 #ifndef _SCENE_RENDER_FACTORIES_H_
 #include "2d/scene/SceneRenderFactories.h"
 #endif
+#ifndef _DGL_H_
+#include "graphics/dgl.h"
+#endif // !_DGL_H_
 
 #ifndef _VECTOR2_H_
 #include "2d/core/Vector2.h"
@@ -99,8 +102,8 @@ public:
         mRenderGroup = StringTable->EmptyString;
 
         mBlendMode = true;
-        mSrcBlendFactor = GL_SRC_ALPHA;
-        mDstBlendFactor = GL_ONE_MINUS_SRC_ALPHA;
+        mSrcBlendFactor = DGLBlendSrcAlpha;
+        mDstBlendFactor = DGLBlendInvSrcAlpha;
         mBlendColor = ColorF(1.0f,1.0f,1.0f,1.0f);
         mAlphaTest = -1.0f;
 
@@ -125,8 +128,8 @@ public:
     StringTableEntry    mRenderGroup;
 
     bool                mBlendMode;
-    GLenum              mSrcBlendFactor;
-    GLenum              mDstBlendFactor;
+    S32                 mSrcBlendFactor;
+    S32                 mDstBlendFactor;
     ColorF              mBlendColor;
     F32                 mAlphaTest;
 

@@ -384,9 +384,9 @@ void GuiSceneObjectCtrl::onRender(Point2I offset, const RectI& updateRect)
       y2 *= -1;
 
       // Setup new logical coordinate system.
-      glMatrixMode(GL_PROJECTION);
-      glPushMatrix();
-      glLoadIdentity();
+      DGL->setMatrix(DGLProjection);
+      DGL->PushMatrix();
+      DGL->LoadIdentity();
       RectI viewport;
       DGL->GetViewport(&viewport);
 
@@ -404,23 +404,19 @@ void GuiSceneObjectCtrl::onRender(Point2I offset, const RectI& updateRect)
       }
 
       // Setup Orthographic Projection for Object Area.
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID)
-      glOrthof( x1, x2, y1, y2, 0.0f, MAX_LAYERS_SUPPORTED );
-#else
-      glOrtho( x1, x2, y1, y2, 0.0f, MAX_LAYERS_SUPPORTED );
-#endif
+      DGL->SetOrthoState(x1, x2, y1, y2, 0.0f, MAX_LAYERS_SUPPORTED);
+
       // Setup new viewport.
       DGL->SetViewport(objRect);
 
       // Set ModelView.
-      //glMatrixMode(GL_MODELVIEW);
       DGL->SetModelViewMatrix();
-      glPushMatrix();
-      glLoadIdentity();
+      DGL->PushMatrix();
+      DGL->LoadIdentity();
 
       // Enable Alpha Test.
-      glEnable        ( GL_ALPHA_TEST );
-      glAlphaFunc     ( GL_GREATER, 0.0f );
+      DGL->EnableState(DGLRSAlphaTest);
+      DGL->setAlphaFunc(DGLGreater, 0.0f);
 
       // Calculate maximal clip bounds.
       RectF clipBounds( -x1,-y1, x2-x1, y2-y1 );
@@ -447,15 +443,15 @@ void GuiSceneObjectCtrl::onRender(Point2I offset, const RectI& updateRect)
       mSelectedSceneObject->sceneRender( &guiSceneRenderState, &guiSceneRenderRequest, &mBatchRenderer );
 
       // Restore Standard Settings.
-      glDisable       ( GL_DEPTH_TEST );
-      glDisable       ( GL_ALPHA_TEST );
+      DGL->DisableState(DGLRSDepthTest);
+      DGL->DisableState(DGLRSAlphaTest);
 
       // Restore Matrices.
       //glMatrixMode(GL_MODELVIEW);
       DGL->SetModelViewMatrix();
-      glPopMatrix();
-      glMatrixMode(GL_PROJECTION);
-      glPopMatrix();
+      DGL->PopMatrix();
+      DGL->setMatrix(DGLProjection);
+      DGL->PopMatrix();
    }
    else
    {

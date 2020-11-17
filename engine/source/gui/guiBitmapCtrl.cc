@@ -132,7 +132,7 @@ void GuiBitmapCtrl::setBitmap(const char *name, bool resize)
    mBitmapName = StringTable->insert(name);
    if (*mBitmapName) {
 	   mTextureHandle = TextureHandle(mBitmapName, TextureHandle::BitmapTexture, true);
-	   mTextureHandle.setFilter(GL_LINEAR);
+	   mTextureHandle.setFilter(DGLTextureFilterLinear);
 
       // Resize the control to fit the bitmap
       if (resize) {

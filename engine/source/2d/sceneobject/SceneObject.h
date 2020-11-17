@@ -625,8 +625,8 @@ public:
     static const char* getCollisionShapeTypeDescription(const b2Shape::Type collisionShapeType);
     static S32 getSrcBlendFactorEnum(const char* label);
     static S32 getDstBlendFactorEnum(const char* label);
-    static const char* getSrcBlendFactorDescription(const DGLBlend factor);
-    static const char* getDstBlendFactorDescription(const DGLBlend factor);
+    static const char* getSrcBlendFactorDescription(const S32 factor);
+    static const char* getDstBlendFactorDescription(const S32 factor);
 
     /// Declare Console Object.
     DECLARE_CONOBJECT( SceneObject );

@@ -112,7 +112,7 @@ bool GuiScrollCtrl::onWake()
 	if(mProfile->mBitmapName != NULL && mProfile->constructBitmapArray() >= 39)
 	{
 	   mTextureHandle = mProfile->mTextureHandle;
-	   mTextureHandle.setFilter(GL_NEAREST);
+	   mTextureHandle.setFilter(DGLTextureFilterNearest);
 
 	   bool result;
 	   result = mProfile->constructBitmapArray() >= BmpStates * BmpCount;
@@ -1015,7 +1015,7 @@ void GuiScrollCtrl::renderChildControls(Point2I offset, RectI content, const Rec
 				if (childClip.intersect(clipRect))
 				{
                DGL->SetClipRect(clipRect);
-					glDisable(GL_CULL_FACE);
+               DGL->DisableState(DGLRSCullFace);
 					ctrl->onRender(childPosition, RectI(childPosition, ctrl->getExtent()));
 				}
 			}

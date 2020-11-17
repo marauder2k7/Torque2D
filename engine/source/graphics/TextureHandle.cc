@@ -135,23 +135,27 @@ U32 TextureHandle::getGLName( void ) const
 
 //-----------------------------------------------------------------------------
 
-void TextureHandle::setFilter( const DGLTextureFilter filter )
+void TextureHandle::setFilter( const S32 filter )
 {
     // Finish if no object.
     if (object == NULL  )
         return;
 
     // Set filter.
-    object->mFilter = filter;
+    object->mFilter = (DGLTextureFilter)filter;
 
     // Finish if no GL texture name.
     if ( object->mGLTextureName == 0 )
         return;
 
     // Set texture state.
-    glBindTexture( GL_TEXTURE_2D, object->mGLTextureName );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter );
+    //glBindTexture( GL_TEXTURE_2D, object->mGLTextureName );
+    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter );
+    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter );
+
+    DGL->BindTexture(object->mGLTextureName);
+    DGL->SetTextureParam(DGLTextureParamMagFilter, (DGLTextureFilter)filter);
+    DGL->SetTextureParam(DGLTextureParamMinFilter, (DGLTextureFilter)filter);
 }
 
 //-----------------------------------------------------------------------------
@@ -170,15 +174,15 @@ void TextureHandle::setClamp( const bool clamp )
         return;
 
     // Set texture state.
-    glBindTexture(GL_TEXTURE_2D, object->mGLTextureName);
-    GLenum glClamp;
+    DGL->BindTexture(object->mGLTextureName);
+    DGLTextureFilter glClamp;
     if ( clamp )
-        glClamp = dglDoesSupportEdgeClamp() ? GL_CLAMP_TO_EDGE : GL_CLAMP;
+        glClamp = DGL->smEdgeClamp ? DGLClampEdge : DGLClampDef;
     else
-        glClamp = GL_REPEAT;
+        glClamp = DGLClampRepeat;
 
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, glClamp );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, glClamp );
+    DGL->SetTextureParam(DGLTextureParamMagFilter, glClamp);
+    DGL->SetTextureParam(DGLTextureParamMinFilter, glClamp);
 }
 
 //-----------------------------------------------------------------------------

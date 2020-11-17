@@ -111,11 +111,11 @@ bool GBitmap::readJPEG(Stream &stream)
    // Read file header, set default decompression parameters
    jpeg_read_header(&cinfo, true);
 
-   BitmapFormat format;
+   DGLFormat format;
    switch (cinfo.out_color_space)
    {
-      case JCS_GRAYSCALE:  format = Alpha; break;
-      case JCS_RGB:        format = RGB;   break;
+      case JCS_GRAYSCALE:  format = DGLFormatA8; break;
+      case JCS_RGB:        format = DGLFormatR8G8B8;   break;
       default:
          jpeg_destroy_decompress(&cinfo);
          return false;
@@ -155,9 +155,9 @@ bool GBitmap::writeJPEG(Stream& stream) const
    // in Alpha format should be saved as a grayscale which coincides
    // with how the readJPEG function will read-in a JPEG. So the
    // only formats supported are RGB and Alpha, not RGBA.
-   AssertFatal(getFormat() == RGB || getFormat() == Alpha,
+   AssertFatal(getFormat() == DGLFormatR8G8B8 || getFormat() == DGLFormatA8,
                 "GBitmap::writeJPEG: ONLY RGB bitmap writing supported at this time.");
-   if (internalFormat != RGB && internalFormat != Alpha)
+   if (internalFormat != DGLFormatR8G8B8 && internalFormat != DGLFormatA8)
       return false;
 
    // maximum image size allowed
@@ -188,19 +188,12 @@ bool GBitmap::writeJPEG(Stream& stream) const
    cinfo.input_components = bytesPerPixel;   // samples per pixel(RGB:3, Alpha:1)
    switch (internalFormat)
    {
-      case Alpha:  // no alpha support in JPEG format, so turn it into a grayscale
+      case DGLFormatA8:  // no alpha support in JPEG format, so turn it into a grayscale
          cinfo.in_color_space = JCS_GRAYSCALE;
          break;
-      case RGB:    // otherwise we are writing in RGB format
+      case DGLFormatR8G8B8:    // otherwise we are writing in RGB format
          cinfo.in_color_space = JCS_RGB;
          break;
-      case Palettized:
-      case Intensity:
-      case RGBA:
-      case RGB565:
-      case RGB5551:
-      case Luminance:
-      case LuminanceAlpha:
 #ifdef TORQUE_OS_IOS
       case PVR2:
       case PVR2A:

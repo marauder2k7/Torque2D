@@ -97,22 +97,13 @@ bool GBitmap::readMSBmp(Stream& stream)
    stream.read(&bi.biClrUsed);
    stream.read(&bi.biClrImportant);
 
-   BitmapFormat fmt = RGB;
+   DGLFormat fmt = DGLFormatR8G8B8;
    if(bi.biBitCount == 8)
    {
-      fmt = Palettized;
       if(!bi.biClrUsed)
          bi.biClrUsed = 256;
       stream.read(sizeof(RGBQUAD) * bi.biClrUsed, rgb);
 
-      pPalette = new GPalette;
-      for (U32 i = 0; i < 256; i++)
-      {
-         (pPalette->getColors())[i].red   = rgb[i].rgbRed;
-         (pPalette->getColors())[i].green = rgb[i].rgbGreen;
-         (pPalette->getColors())[i].blue  = rgb[i].rgbBlue;
-         (pPalette->getColors())[i].alpha = 255;
-      }
    }
    U8 *rowBuffer = new U8[bi.biWidth * 4];
    allocateBitmap(bi.biWidth, bi.biHeight, false, fmt);
@@ -124,7 +115,7 @@ bool GBitmap::readMSBmp(Stream& stream)
       stream.read(bytesPerPixel * width, rowDest);
    }
 
-   if(bytesPerPixel == 3) // do BGR swap
+   if(bytesPerPixel == 3 && bi.biBitCount != 8) // do BGR swap
    {
       U8 *ptr = getAddress(0,0);
       for(int i = 0; i < width * height; i++)
@@ -142,6 +133,9 @@ bool GBitmap::readMSBmp(Stream& stream)
    if( bi.biBitCount == 8 && sgForcePalletedBMPsTo16Bit ) {
        mForce16Bit = true;
    }
+
+   
+
    return true;
 }
 
@@ -157,18 +151,18 @@ bool GBitmap::writeMSBmp(Stream& io_rStream) const
    bi.biHeight          = getHeight();         //our data is top-down
    bi.biPlanes = 1;
 
-   if(getFormat() == Palettized)
+   if(getFormat() == DGLFormatR8G8B8)
+   {
+      bi.biBitCount = 24;
+      bi.biCompression = BI_RGB;
+      bi.biClrUsed = 0;
+   }
+   else
    {
       bi.biBitCount = 8;
       bi.biCompression = BI_RGB;
       bi.biClrUsed = 256;
       AssertFatal(pPalette != NULL, "Error, must have a palette");
-   }
-   else if(getFormat() == RGB)
-   {
-      bi.biBitCount = 24;
-      bi.biCompression = BI_RGB;
-      bi.biClrUsed = 0;
    }
 
    U32 bytesPP = bi.biBitCount >> 3;
@@ -203,18 +197,6 @@ bool GBitmap::writeMSBmp(Stream& io_rStream) const
    io_rStream.write(bi.biYPelsPerMeter);
    io_rStream.write(bi.biClrUsed);
    io_rStream.write(bi.biClrImportant);
-
-   if(getFormat() == Palettized)
-   {
-      for (S32 ndx=0; ndx<256; ndx++)
-      {
-         rgb[ndx].rgbRed      = pPalette->getColor(ndx).red;
-         rgb[ndx].rgbGreen    = pPalette->getColor(ndx).green;
-         rgb[ndx].rgbBlue     = pPalette->getColor(ndx).blue;
-         rgb[ndx].rgbReserved = 0;
-      }
-      io_rStream.write(sizeof(RGBQUAD)*256, (U8*)&rgb);
-   }
 
    //write the bitmap bits
    U8* pMSUpsideDownBits = new U8[bi.biSizeImage];

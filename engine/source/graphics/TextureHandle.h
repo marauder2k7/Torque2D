@@ -162,7 +162,7 @@ public:
 
     void setClamp( const bool clamp );
 
-    void setFilter( const DGLTextureFilter filter );
+    void setFilter( const S32 filter );
 
     void clear( void ) { unlock(); }
 

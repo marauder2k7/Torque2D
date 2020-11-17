@@ -75,22 +75,33 @@ public:
    virtual void EnableClientState(DGLClientState cs);
    virtual void DisableClientState(DGLClientState cs);
    virtual void setBlendFunc(DGLBlend sFactor, DGLBlend dFactor);
+   virtual void setAlphaFunc(DGLCompare cmp, F32 testMode);
    virtual void SetOrthoState(F32 wMin, F32 wMax, F32 hMin, F32 hMax, F32 mNear, U32 mFar);
    virtual void SetVertexPoint(U32 size, U32 stride, const void *pointer);
+   virtual void SetColorPoint(U32 size, U32 stride, const void * pointer);
+   virtual void SetTexPoint(U32 size, U32 stride, const void * pointer);
    virtual void ClearBuffer(DGLBufferBit bit);
    virtual void ClearColor(F32 r, F32 g, F32 b, F32 a);
    virtual void ScissorTest(S32 x, S32 y, S32 width, S32 height);
    virtual void SetColorF(F32 r, F32 g, F32 b, F32 a);
    virtual void SetColorI(U32 r, U32 g, U32 b, U32 a);
    virtual void SetLineWidth(F32 width);
+   virtual void SetPolygonMode(DGLPolyMode face, DGLPolyMode mode);
+   virtual void SetTextureEnvironment(DGLTextureEnvironment target, DGLTextureEnvironment name, DGLTextureEnvironment param);
+   virtual void SetRotate(F32 ang, F32 x, F32 y, F32 z);
+   virtual void SetTranslate(F32 x, F32 y, F32 z);
 
    //-------------------------------------------------------------------------------
    // TEXTURE
    //-------------------------------------------------------------------------------
    virtual void AreTexturesLoaded(S32 size, const U32* addr, bool isLoad);
    virtual void LoadTexture(U32 n, U32 glName);
+   virtual void BindTexture(U32 glName);
    virtual void DeleteTextures(U32 n, const U32* glName);
-
+   virtual void SetTextureParam(DGLTextureParam param, const DGLTextureFilter filter);
+   virtual void UploadTexture16(U32 mip, DGLFormat inFmt, U32 width, U32 height, U32 b, U16 *bits);
+   virtual void UploadTexture(U32 mip, DGLFormat inFmt, U32 width, U32 height, U32 b, U8 *bits);
+   
    //-------------------------------------------------------------------------------
    // CAMERA
    //-------------------------------------------------------------------------------
@@ -102,7 +113,9 @@ public:
    //------------------------------------------------------------------------------
    // Draw
    //------------------------------------------------------------------------------
+   virtual void DrawElements(DGLPrimitiveType type, U32 count, const void * buff);
    virtual void DrawArrays(DGLPrimitiveType type, U32 first, U32 count);
+
 
 };
 

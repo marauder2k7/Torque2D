@@ -252,67 +252,44 @@ void GuiSliderCtrl::onRender(Point2I offset, const RectI &updateRect)
             Point2I mid(ext.x, ext.y / 2);
             Point2I oldpos = pos;
             pos += Point2I(1, 0);
-            glColor4f(0, 0, 0, 1);
+            DGL->SetColorF(0, 0, 0, 1);
 
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
             // tick marks
             for (U32 t = 0; t <= (mTicks + 1); t++)
             {
                 S32 x = (S32) (F32(mid.x + 1) / F32(mTicks + 1) * F32(t)) + pos.x;
                 S32 y = pos.y + mid.y;
 
-                GLfloat shiftVert[] = {
-                        (GLfloat) (x),
-                        (GLfloat) (y + mShiftPoint),
-                        (GLfloat) (x),
-                        (GLfloat) (y + mShiftPoint * 2.0f + 2.0f),
+                F32 shiftVert[] = {
+                        (F32) (x),
+                        (F32) (y + mShiftPoint),
+                        (F32) (x),
+                        (F32) (y + mShiftPoint * 2.0f + 2.0f),
                 };
 
-                glVertexPointer(2, GL_FLOAT, 0, shiftVert);
-                glDrawArrays(GL_LINES, 0, 2);
+                DGL->SetVertexPoint(2, 0, shiftVert);
+                DGL->DrawArrays(DGLLineList, 0, 2);
             }
 
-            glColor4f(0.9f, 0.9f, 0.9f, 1.0f);
+            DGL->SetColorF(0.9f, 0.9f, 0.9f, 1.0f);
             // tick marks
             for (U32 t = 0; t <= (mTicks + 1); t++)
             {
                 S32 x = (S32) (F32(mid.x + 1) / F32(mTicks + 1) * F32(t)) + pos.x + 1;
                 S32 y = pos.y + mid.y + 1;
 
-                GLfloat shiftVert[] = {
-                        (GLfloat) (x),
-                        (GLfloat) (y + mShiftPoint),
-                        (GLfloat) (x),
-                        (GLfloat) (y + mShiftPoint * 2 + 3),
+                F32 shiftVert[] = {
+                        (F32) (x),
+                        (F32) (y + mShiftPoint),
+                        (F32) (x),
+                        (F32) (y + mShiftPoint * 2 + 3),
                 };
 
-                glVertexPointer(2, GL_FLOAT, 0, shiftVert);
-                glDrawArrays(GL_LINES, 0, 2);
+                DGL->SetVertexPoint(2, 0, shiftVert);
+                DGL->DrawArrays(DGLLineList, 0, 2);
 
             }
-#else
-         glBegin(GL_LINES);
-         // tick marks
-         for (U32 t = 0; t <= (mTicks+1); t++)
-         {
-            S32 x = (S32)(F32(mid.x+1)/F32(mTicks+1)*F32(t)) + pos.x;
-            S32 y = pos.y + mid.y;
-            glVertex2i(x, y + mShiftPoint);
-            glVertex2i(x, y + mShiftPoint*2 + 2);
-         }
-         glEnd();
-         glColor4f(0.9f, 0.9f, 0.9f, 1.0f);
-         glBegin(GL_LINES);
-         // tick marks
-         for (U32 t = 0; t <= (mTicks+1); t++)
-         {
-            S32 x = (S32)(F32(mid.x+1)/F32(mTicks+1)*F32(t)) + pos.x + 1;
-            S32 y = pos.y + mid.y + 1;
-            glVertex2i(x, y + mShiftPoint );
-            glVertex2i(x, y + mShiftPoint*2 + 3);
-         }
-         glEnd();
-#endif
+
             pos = oldpos;
         }
 
@@ -353,88 +330,53 @@ void GuiSliderCtrl::onRender(Point2I offset, const RectI &updateRect)
             if (mDisplayValue)
                 mid.set(ext.x, mThumbSize.y / 2);
 
-            glColor4f(0, 0, 0, 1);
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
+            DGL->SetColorF(0, 0, 0, 1);
             // tick marks
             for (U32 t = 0; t <= (mTicks + 1); t++)
             {
                 S32 x = (S32) (F32(mid.x - 1) / F32(mTicks + 1) * F32(t));
-                GLfloat verts[] = {
-                        static_cast<GLfloat>(pos.x + x), static_cast<GLfloat>(pos.y + mid.y - mShiftPoint),
-                        static_cast<GLfloat>(pos.x + x), static_cast<GLfloat>(pos.y + mid.y + mShiftPoint)
+                F32 verts[] = {
+                        static_cast<F32>(pos.x + x), static_cast<F32>(pos.y + mid.y - mShiftPoint),
+                        static_cast<F32>(pos.x + x), static_cast<F32>(pos.y + mid.y + mShiftPoint)
                 };
 
-                glVertexPointer(2, GL_FLOAT, 0, verts);
-                glDrawArrays(GL_LINES, 0, 2);
+                DGL->SetVertexPoint(2, 0, verts);
+                DGL->DrawArrays(DGLLineList, 0, 2);
             }
 
-            GLfloat verts[] = {
-                    static_cast<GLfloat>(pos.x), static_cast<GLfloat>(pos.y + mid.y),
-                    static_cast<GLfloat>(pos.x + mid.x), static_cast<GLfloat>(pos.y + mid.y)
+            F32 verts[] = {
+                    static_cast<F32>(pos.x), static_cast<F32>(pos.y + mid.y),
+                    static_cast<F32>(pos.x + mid.x), static_cast<F32>(pos.y + mid.y)
             };
 
-            glVertexPointer(2, GL_FLOAT, 0, verts);
-            glDrawArrays(GL_LINES, 0, 2);
+            DGL->SetVertexPoint(2, 0, verts);
+            DGL->DrawArrays(DGLLineList, 0, 2);
 
         }
         else
         {
             Point2I mid(ext.x / 2, ext.y);
-            glColor4f(0, 0, 0, 1);
+            DGL->SetColorF(0, 0, 0, 1);
             // tick marks
             for (U32 t = 0; t <= (mTicks + 1); t++)
             {
                 S32 y = (S32) (F32(mid.y - 1) / F32(mTicks + 1) * F32(t));
-                GLfloat verts[] = {
-                        static_cast<GLfloat>(pos.x + mid.x - mShiftPoint), static_cast<GLfloat>(pos.y + y),
-                        static_cast<GLfloat>(pos.x + mid.x + mShiftPoint), static_cast<GLfloat>(pos.y + y)
+                F32 verts[] = {
+                        static_cast<F32>(pos.x + mid.x - mShiftPoint), static_cast<F32>(pos.y + y),
+                        static_cast<F32>(pos.x + mid.x + mShiftPoint), static_cast<F32>(pos.y + y)
                 };
 
-                glVertexPointer(2, GL_FLOAT, 0, verts);
-                glDrawArrays(GL_LINES, 0, 2);
+                DGL->SetVertexPoint(2, 0, verts);
+                DGL->DrawArrays(DGLLineList, 0, 2);
             }
 
-            GLfloat verts[] = {
-                    static_cast<GLfloat>(pos.x + mid.x), static_cast<GLfloat>(pos.y),
-                    static_cast<GLfloat>(pos.x + mid.x), static_cast<GLfloat>(pos.y + mid.y)
+            F32 verts[] = {
+                    static_cast<F32>(pos.x + mid.x), static_cast<F32>(pos.y),
+                    static_cast<F32>(pos.x + mid.x), static_cast<F32>(pos.y + mid.y)
             };
             //for the horizontal line
-            glVertexPointer(2, GL_FLOAT, 0, verts);
-            glDrawArrays(GL_LINES, 0, 2);
-#else
-         glBegin(GL_LINES);
-            // horz rule
-            glVertex2i(pos.x,       pos.y+mid.y);
-            glVertex2i(pos.x+mid.x, pos.y+mid.y);
-
-            // tick marks
-            for (U32 t = 0; t <= (mTicks+1); t++)
-            {
-               S32 x = (S32)(F32(mid.x-1)/F32(mTicks+1)*F32(t));
-               glVertex2i(pos.x+x, pos.y+mid.y-mShiftPoint);
-               glVertex2i(pos.x+x, pos.y+mid.y+mShiftPoint);
-            }
-         glEnd();
-      }
-      else
-      {
-         Point2I mid(ext.x/2, ext.y);
-
-         glColor4f(0, 0, 0, 1);
-         glBegin(GL_LINES);
-            // horz rule
-            glVertex2i(pos.x+mid.x, pos.y);
-            glVertex2i(pos.x+mid.x, pos.y+mid.y);
-
-            // tick marks
-            for (U32 t = 0; t <= (mTicks+1); t++)
-            {
-               S32 y = (S32)(F32(mid.y-1)/F32(mTicks+1)*F32(t));
-               glVertex2i(pos.x+mid.x-mShiftPoint, pos.y+y);
-               glVertex2i(pos.x+mid.x+mShiftPoint, pos.y+y);
-            }
-         glEnd();
-#endif
+            DGL->SetVertexPoint(2, 0, verts);
+            DGL->DrawArrays(DGLLineList, 0, 2);
             mDisplayValue = false;
         }
 

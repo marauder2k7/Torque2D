@@ -831,7 +831,7 @@ ConsoleMethodWithDocs(CompositeSprite, getSpriteBlendMode, ConsoleBool, 2, 2, ()
 ConsoleMethodWithDocs(CompositeSprite, setSpriteSrcBlendFactor, ConsoleVoid, 3, 3, (srcBlend))
 {
     // Fetch source blend factor.
-    GLenum blendFactor = SceneObject::getSrcBlendFactorEnum(argv[2]);
+    S32 blendFactor = SceneObject::getSrcBlendFactorEnum(argv[2]);
 
     object->setSpriteSrcBlendFactor( blendFactor );
 }
@@ -855,7 +855,7 @@ ConsoleMethodWithDocs(CompositeSprite, getSpriteSrcBlendFactor, ConsoleString, 2
 ConsoleMethodWithDocs(CompositeSprite, setSpriteDstBlendFactor, ConsoleVoid, 3, 3, (dstBlend))
 {
     // Fetch destination blend factor.
-    GLenum blendFactor = SceneObject::getDstBlendFactorEnum(argv[2]);
+    S32 blendFactor = SceneObject::getDstBlendFactorEnum(argv[2]);
 
     object->setSpriteDstBlendFactor( blendFactor );
 }

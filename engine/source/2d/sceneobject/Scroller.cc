@@ -320,10 +320,10 @@ void Scroller::sceneRender( const SceneRenderState* pSceneRenderState, const Sce
 #ifndef TORQUE_OS_EMSCRIPTEN
 
     // Set-up a set of clip-planes against the OOBB.
-    GLdouble left[4] = {1, 0, 0, -renderOOBB0.x};
-    GLdouble right[4] = {-1, 0, 0, renderOOBB1.x};
-    GLdouble top[4] = {0, -1, 0, renderOOBB3.y};
-    GLdouble bottom[4] = {0, 1, 0, -renderOOBB0.y};
+    F64 left[4] = {1, 0, 0, -renderOOBB0.x};
+    F64 right[4] = {-1, 0, 0, renderOOBB1.x};
+    F64 top[4] = {0, -1, 0, renderOOBB3.y};
+    F64 bottom[4] = {0, 1, 0, -renderOOBB0.y};
 
     //This is to prevent some android devices from throwing opengl errors. For instance the tegra 3 only supports 1
     int maxClip = 4;

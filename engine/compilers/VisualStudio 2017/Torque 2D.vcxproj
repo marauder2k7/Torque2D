@@ -385,7 +385,6 @@
     <ClCompile Include="..\..\source\graphics\bitmapPng.cc" />
     <ClCompile Include="..\..\source\graphics\gColor.cc" />
     <ClCompile Include="..\..\source\graphics\dgl.cc" />
-    <ClCompile Include="..\..\source\graphics\dglMatrix.cc" />
     <ClCompile Include="..\..\source\graphics\DynamicTexture.cc" />
     <ClCompile Include="..\..\source\graphics\gBitmap.cc" />
     <ClCompile Include="..\..\source\graphics\gFont.cc" />

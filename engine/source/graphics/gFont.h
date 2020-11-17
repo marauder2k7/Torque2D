@@ -167,7 +167,7 @@ public:
    /// are treated as having 0 for RGB).
    bool isAlphaOnly()
    {
-      return mTextureSheets[0].getBitmap()->getFormat() == GBitmap::Alpha;
+      return mTextureSheets[0].getBitmap()->getFormat() == DGLFormatA8;
    }
 
    /// Get the filename for a cached font.

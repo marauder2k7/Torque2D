@@ -264,13 +264,19 @@ void DebugDraw::DrawPolygon( const b2Vec2* vertices, int32 vertexCount, const Co
     // Debug Profiling.
     PROFILE_SCOPE(DebugDraw_DrawPolygon);
 
-    glColor3f(color.red, color.green, color.blue);
-    glBegin(GL_LINE_LOOP);
-    for (int32 i = 0; i < vertexCount; ++i)
+
+    DGL->SetColorF(color.red, color.green, color.blue, 1.0f);
+    Vector<F32> verts;
+    for (U32 i = 0; i < vertexCount; i++)
     {
-        glVertex2f(vertices[i].x, vertices[i].y);
+       verts.push_back(vertices[i].x);
+       verts.push_back(vertices[i].y);
     }
-    glEnd();
+    DGL->SetVertexPoint(2, 0, verts.address());
+    DGL->EnableClientState(DGLCSVertexArray);
+    DGL->DrawArrays(DGLLineLoop, 0, vertexCount);
+    DGL->DisableClientState(DGLCSVertexArray);
+
 }
 
 //-----------------------------------------------------------------------------
@@ -280,24 +286,24 @@ void DebugDraw::DrawSolidPolygon( const b2Vec2* vertices, int32 vertexCount, con
     // Debug Profiling.
     PROFILE_SCOPE(DebugDraw_DrawSolidPolygon);
 
-    glEnable(GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glColor4f(0.5f * color.red, 0.5f * color.green, 0.5f * color.blue, 0.15f);
-    glBegin(GL_TRIANGLE_FAN);
-    for (int32 i = 0; i < vertexCount; ++i)
+    DGL->EnableState(DGLRSBlend);
+    DGL->setBlendFunc(DGLBlendSrcAlpha, DGLBlendInvSrcAlpha);
+    DGL->SetColorF(0.5f * color.red, 0.5f * color.green, 0.5f * color.blue, 0.15f);
+    Vector<F32> verts;
+    for (U32 i = 0; i < vertexCount; i++)
     {
-        glVertex2f(vertices[i].x, vertices[i].y);
+       verts.push_back(vertices[i].x);
+       verts.push_back(vertices[i].y);
     }
-    glEnd();
-    glDisable(GL_BLEND);
+    DGL->SetVertexPoint(2, 0, verts.address());
+    DGL->EnableClientState(DGLCSVertexArray);
+    DGL->DrawArrays(DGLTriangleFan, 0, vertexCount);
+    DGL->DisableState(DGLRSBlend);
 
-    glColor4f(color.red, color.green, color.blue, 1.0f);
-    glBegin(GL_LINE_LOOP);
-    for (int32 i = 0; i < vertexCount; ++i)
-    {
-        glVertex2f(vertices[i].x, vertices[i].y);
-    }
-    glEnd();
+    DGL->SetColorF(color.red, color.green, color.blue, 1.0f);
+    DGL->SetVertexPoint(2, 0, verts.address());
+    DGL->DrawArrays(DGLLineLoop, 0, vertexCount);
+    DGL->DisableClientState(DGLCSVertexArray);
 }
 
 //-----------------------------------------------------------------------------
@@ -310,15 +316,21 @@ void DebugDraw::DrawCircle( const b2Vec2& center, float32 radius, const ColorF& 
     const float32 k_segments = 16.0f;
     const float32 k_increment = 2.0f * b2_pi / k_segments;
     float32 theta = 0.0f;
-    glColor3f(color.red, color.green, color.blue);
-    glBegin(GL_LINE_LOOP);
-    for (int32 i = 0; i < k_segments; ++i)
+    DGL->SetColorF(color.red, color.green, color.blue, 1.0);
+    Vector<F32> verts;
+    for (U32 n = 0; n < k_segments; n++)
     {
-        b2Vec2 v = center + radius * b2Vec2(cosf(theta), sinf(theta));
-        glVertex2f(v.x, v.y);
-        theta += k_increment;
+       b2Vec2 v = center + radius * b2Vec2(mCos(theta), mSin(theta));
+
+       verts.push_back(v.x);
+       verts.push_back(v.y);
+
+       theta += k_increment;
     }
-    glEnd();
+    DGL->EnableClientState(DGLCSVertexArray);
+    DGL->SetVertexPoint(2, 0, verts.address());
+    DGL->DrawArrays(DGLLineLoop, 0, k_segments);
+    DGL->DisableClientState(DGLCSVertexArray);
 }
     
 //-----------------------------------------------------------------------------
@@ -331,46 +343,49 @@ void DebugDraw::DrawSolidCircle( const b2Vec2& center, float32 radius, const b2V
     const float32 k_segments = 12.0f;
     const float32 k_increment = 2.0f * b2_pi / k_segments;
     float32 theta = 0.0f;
-    glEnable(GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glColor4f(0.5f * color.red, 0.5f * color.green, 0.5f * color.blue, 0.15f);
-    glBegin(GL_TRIANGLE_FAN);
-    for (int32 i = 0; i < k_segments; ++i)
+    DGL->EnableState(DGLRSBlend);
+    DGL->setBlendFunc(DGLBlendSrcAlpha, DGLBlendInvSrcAlpha);
+    DGL->SetColorF(0.5f * color.red, 0.5f * color.green, 0.5f * color.blue, 0.15f);
+    
+    Vector<F32> verts;
+    for (U32 n = 0; n < k_segments; n++)
     {
-        b2Vec2 v = center + radius * b2Vec2(cosf(theta), sinf(theta));
-        glVertex2f(v.x, v.y);
-        theta += k_increment;
-    }
-    glEnd();
-    glDisable(GL_BLEND);
+       b2Vec2 v = center + radius * b2Vec2(mCos(theta), mSin(theta));
 
-    theta = 0.0f;
-    glColor4f(color.red, color.green, color.blue, 1.0f);
-    glBegin(GL_LINE_LOOP);
-    for (int32 i = 0; i < k_segments; ++i)
-    {
-        b2Vec2 v = center + radius * b2Vec2(cosf(theta), sinf(theta));
-        glVertex2f(v.x, v.y);
-        theta += k_increment;
-    }
-    glEnd();
+       verts.push_back(v.x);
+       verts.push_back(v.y);
 
-    b2Vec2 p = center + radius * axis;
-    glBegin(GL_LINES);
-    glVertex2f(center.x, center.y);
-    glVertex2f(p.x, p.y);
-    glEnd();
+       theta += k_increment;
+    }
+
+    DGL->SetVertexPoint(2, 0, verts.address());
+    DGL->EnableClientState(DGLCSVertexArray);
+    DGL->DrawArrays(DGLTriangleFan, 0, k_segments);
+    DGL->DisableState(DGLRSBlend);
+
+    DGL->SetColorF(color.red, color.green, color.blue, 1.0f);
+    DGL->SetVertexPoint(2, 0, verts.address());
+    DGL->DrawArrays(DGLLineLoop, 0, k_segments);
+    DGL->DisableClientState(DGLCSVertexArray);
 }
     
 //-----------------------------------------------------------------------------
 
 void DebugDraw::DrawSegment( const b2Vec2& p1, const b2Vec2& p2, const ColorF& color )
 {
-    glColor3f(color.red, color.green, color.blue);
-    glBegin(GL_LINES);
-    glVertex2f(p1.x, p1.y);
-    glVertex2f(p2.x, p2.y);
-    glEnd();
+
+    DGL->SetColorF(color.red, color.green, color.blue, 1.0f);
+
+    F32 verts[]{
+       p1.x,p1.y,
+       p2.x,p2.y,
+    };
+
+    DGL->EnableClientState(DGLCSVertexArray);
+    DGL->SetVertexPoint(2, 0, verts);
+    DGL->DrawArrays(DGLLineList, 0, 4);
+    DGL->DisableClientState(DGLCSVertexArray);
+
 }
 
 //-----------------------------------------------------------------------------
@@ -379,30 +394,39 @@ void DebugDraw::DrawTransform( const b2Transform& xf )
 {
     b2Vec2 p1 = xf.p, p2;
     const float32 k_axisScale = 0.4f;
-    glBegin(GL_LINES);
-    
-    glColor3f(1.0f, 0.0f, 0.0f);
-    glVertex2f(p1.x, p1.y);
+
+    DGL->SetColorF(1.0f, 0.0f, 0.0f, 1.0f);
     p2 = p1 + k_axisScale * xf.q.GetXAxis();
-    glVertex2f(p2.x, p2.y);
+    F32 verts[]{
+       p1.x,p1.y,
+       p2.x,p2.y,
+    };
 
-    glColor3f(0.0f, 1.0f, 0.0f);
-    glVertex2f(p1.x, p1.y);
-    p2 = p1 + k_axisScale * xf.q.GetYAxis();
-    glVertex2f(p2.x, p2.y);
-
-    glEnd();
+    DGL->EnableClientState(DGLCSVertexArray);
+    DGL->SetVertexPoint(2, 0, verts);
+    DGL->DrawArrays(DGLLineList, 0, 4);
+    DGL->SetColorF(0.0f, 1.0f, 0.0f, 1.0f);
+    p2 = p1 + k_axisScale * xf.q.GetXAxis();
+    F32 verts2[]{
+       p1.x,p1.y,
+       p2.x,p2.y,
+    };
+    DGL->SetVertexPoint(2, 0, verts2);
+    DGL->DrawArrays(DGLLineList, 0, 4);
+    DGL->DisableClientState(DGLCSVertexArray);
 }
 
 //-----------------------------------------------------------------------------
 
 void DebugDraw::DrawPoint( const b2Vec2& p, float32 size, const ColorF& color )
 {
-    glPointSize(size);
-    glBegin(GL_POINTS);
-    glColor3f(color.red, color.green, color.blue);
-    glVertex2f(p.x, p.y);
-    glEnd();
-    glPointSize(1.0f);
+    DGL->SetColorF(color.red, color.green, color.blue, 1.0f);
+    F32 verts[]{
+       p.x,p.y,
+    };
+    DGL->EnableClientState(DGLCSVertexArray);
+    DGL->SetVertexPoint(2, 0, verts);
+    DGL->DrawArrays(DGLPointList, 0, 2);
+    DGL->DisableClientState(DGLCSVertexArray);
 }
 

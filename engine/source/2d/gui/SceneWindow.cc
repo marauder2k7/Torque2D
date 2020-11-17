@@ -1789,7 +1789,7 @@ void SceneWindow::renderMetricsOverlay( Point2I offset, const RectI& updateRect 
     const F32 colorScale = 1.0f / 255.0f;
     //glColor4f( fillColor.red * colorScale, fillColor.green * colorScale, fillColor.blue * colorScale, fillColor.alpha * colorScale );
 
-    DGL->SetColor(fillColor.red * colorScale, fillColor.green * colorScale, fillColor.blue * colorScale, fillColor.alpha * colorScale);
+    DGL->SetColorF(fillColor.red * colorScale, fillColor.green * colorScale, fillColor.blue * colorScale, fillColor.alpha * colorScale);
 
     // Fetch debug scene object.
     SceneObject* pDebugSceneObject = pScene->getDebugSceneObject();

@@ -205,7 +205,7 @@ bool GBitmap::readPNG(Stream& io_rStream)
    //  data as RGB or RGBA, _always_, with a maximal channel width of 8 bits.
    //
    bool transAlpha     = false;
-   BitmapFormat format = RGB;
+   DGLFormat format = DGLFormatR8G8B8;
 
    // Strip off any 16 bit info
    //
@@ -223,29 +223,31 @@ bool GBitmap::readPNG(Stream& io_rStream)
    if (color_type == PNG_COLOR_TYPE_PALETTE) 
    {
       png_set_expand(png_ptr);
-      format = transAlpha ? RGBA : RGB;
+      format = transAlpha ? DGLFormatR8G8B8A8 : DGLFormatR8G8B8;
    } 
    else if (color_type == PNG_COLOR_TYPE_GRAY) 
    {
       png_set_expand(png_ptr);
-      //png_set_gray_to_rgb(png_ptr);
-      format = Alpha; //transAlpha ? RGBA : RGB;
+      if (bit_depth == 16)
+         format = DGLFormatL16;
+      else
+         format = DGLFormatA8;
    }
    else if (color_type == PNG_COLOR_TYPE_GRAY_ALPHA) 
    {
       png_set_expand(png_ptr);
       png_set_gray_to_rgb(png_ptr);
-      format = RGBA;
+      format = DGLFormatR8G8B8A8;
    }
    else if (color_type == PNG_COLOR_TYPE_RGB) 
    {
-      format = transAlpha ? RGBA : RGB;
+      format = transAlpha ? DGLFormatR8G8B8A8 : DGLFormatR8G8B8;
       png_set_expand(png_ptr);
    }
    else if (color_type == PNG_COLOR_TYPE_RGB_ALPHA) 
    {
       png_set_expand(png_ptr);
-      format = RGBA;
+      format = DGLFormatR8G8B8A8;
    }
 
    // Update the info pointer with the result of the transformations
@@ -254,11 +256,11 @@ bool GBitmap::readPNG(Stream& io_rStream)
    png_read_update_info(png_ptr, info_ptr);
 
    png_uint_32 rowBytes = (png_uint_32)png_get_rowbytes(png_ptr, info_ptr);
-   if (format == RGB) {
+   if (format == DGLFormatR8G8B8) {
       AssertFatal(rowBytes == width * 3,
                   "Error, our rowbytes are incorrect for this transform... (3)");
    } 
-   else if (format == RGBA) 
+   else if (format == DGLFormatR8G8B8A8)
    {
       AssertFatal(rowBytes == width * 4,
                   "Error, our rowbytes are incorrect for this transform... (4)");
@@ -314,9 +316,20 @@ bool GBitmap::_writePNG(Stream&   stream,
                         const U32 filter) const
 {
    // ONLY RGB bitmap writing supported at this time!
-   AssertFatal(getFormat() == RGB || getFormat() == RGBA || getFormat() == Alpha, "GBitmap::writePNG: ONLY RGB bitmap writing supported at this time.");
-   if (internalFormat != RGB && internalFormat != RGBA && internalFormat != Alpha)
-      return (false);
+   AssertFatal(getFormat() == DGLFormatR8G8B8 ||
+      getFormat() == DGLFormatR8G8B8A8 ||
+      getFormat() == DGLFormatR8G8B8X8 ||
+      getFormat() == DGLFormatA8 ||
+      getFormat() == DGLFormatR5G6B5 ||
+      getFormat() == DGLFormatR8G8B8A8_LINEAR_FORCE, "_writePNG: ONLY RGB bitmap writing supported at this time.");
+
+   if (internalFormat   != DGLFormatR8G8B8 &&
+      internalFormat    != DGLFormatR8G8B8A8 &&
+      internalFormat    != DGLFormatR8G8B8X8 &&
+      internalFormat    != DGLFormatA8 &&
+      internalFormat    != DGLFormatR5G6B5 && 
+      internalFormat    != DGLFormatR8G8B8A8_LINEAR_FORCE)
+      return false;
 
    #define MAX_HEIGHT 4096
 
@@ -365,7 +378,8 @@ bool GBitmap::_writePNG(Stream&   stream,
    // PNG_INTERLACE_ADAM7, and the compression_type and filter_type MUST
    // currently be PNG_COMPRESSION_TYPE_BASE and PNG_FILTER_TYPE_BASE. REQUIRED
 
-   if (getFormat() == RGB) {
+   if (getFormat() == DGLFormatR8G8B8) 
+   {
       png_set_IHDR(png_ptr, info_ptr,
                    width, height,               // the width & height
                    8, PNG_COLOR_TYPE_RGB,       // bit_depth, color_type,
@@ -373,7 +387,8 @@ bool GBitmap::_writePNG(Stream&   stream,
                    PNG_COMPRESSION_TYPE_BASE,   // compression type
                    PNG_FILTER_TYPE_BASE);       // filter type
    }
-   else if (getFormat() == RGBA) {
+   else if (getFormat() == DGLFormatR8G8B8A8 || getFormat() == DGLFormatR8G8B8X8 || getFormat() == DGLFormatR8G8B8A8_LINEAR_FORCE) 
+   {
       png_set_IHDR(png_ptr, info_ptr,
                    width, height,               // the width & height
                    8, PNG_COLOR_TYPE_RGB_ALPHA, // bit_depth, color_type,
@@ -381,13 +396,29 @@ bool GBitmap::_writePNG(Stream&   stream,
                    PNG_COMPRESSION_TYPE_BASE,   // compression type
                    PNG_FILTER_TYPE_BASE);       // filter type
    }
-   else if (getFormat() == Alpha) {
+   else if (getFormat() == DGLFormatA8) 
+   {
       png_set_IHDR(png_ptr, info_ptr,
                    width, height,               // the width & height
                    8, PNG_COLOR_TYPE_GRAY,      // bit_depth, color_type,
                    PNG_INTERLACE_NONE,          // no interlace
                    PNG_COMPRESSION_TYPE_BASE,   // compression type
                    PNG_FILTER_TYPE_BASE);       // filter type
+   }
+   else if (getFormat() == DGLFormatR5G6B5)
+   {
+      png_set_IHDR(png_ptr, info_ptr,
+         width, height,               // the width & height
+         16, PNG_COLOR_TYPE_GRAY,     // bit_depth, color_type,
+         PNG_INTERLACE_NONE,          // no interlace
+         PNG_COMPRESSION_TYPE_DEFAULT,   // compression type
+         PNG_FILTER_TYPE_DEFAULT);       // filter type
+
+      png_color_8_struct sigBit = { 0 };
+      sigBit.gray = 16;
+      png_set_sBIT(png_ptr, info_ptr, &sigBit);
+
+      png_set_swap(png_ptr);
    }
 
    png_write_info(png_ptr, info_ptr);

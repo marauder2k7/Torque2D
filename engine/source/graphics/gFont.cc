@@ -305,7 +305,7 @@ void GFont::addBitmap(PlatformFont::CharInfo &charInfo)
    GBitmap *bmp = mTextureSheets[mCurSheet].getBitmap();
 
    AssertFatal(bmp, "GFont::addBitmap - null texture sheet bitmap!");
-   AssertFatal(bmp->getFormat() == GBitmap::Alpha, "GFont::addBitmap - cannot added characters to non-greyscale textures!");
+   AssertFatal(bmp->getFormat() == DGLFormatA8, "GFont::addBitmap - cannot added characters to non-greyscale textures!");
    
    // [neo, 5/7/2007 - #3050]
    // If we get large font sizes charInfo.height/width will be larger than TextureSheetSize
@@ -337,14 +337,14 @@ void GFont::addSheet()
     char buf[30];
     dSprintf(buf, sizeof(buf), "newfont_%d", smSheetIdCount++);
 
-    GBitmap *bitmap = new GBitmap(TextureSheetSize, TextureSheetSize, false, GBitmap::Alpha);
+    GBitmap *bitmap = new GBitmap(TextureSheetSize, TextureSheetSize, false, DGLFormatA8);
 
     // Set everything to transparent.
     U8 *bits = bitmap->getWritableBits();
     dMemset(bits, 0, sizeof(U8) *TextureSheetSize*TextureSheetSize);
 
     TextureHandle handle = TextureHandle(buf, bitmap, TextureHandle::BitmapKeepTexture);
-    handle.setFilter(GL_NEAREST);
+    handle.setFilter(DGLTextureFilterNearest);
 
     mTextureSheets.increment();
     constructInPlace(&mTextureSheets.last());
@@ -666,7 +666,7 @@ bool GFont::read(Stream& io_rStream)
        mTextureSheets.increment();
        constructInPlace(&mTextureSheets.last());
        mTextureSheets.last() = TextureHandle(buf, bmp, TextureHandle::BitmapKeepTexture);
-       mTextureSheets.last().setFilter(GL_NEAREST);
+       mTextureSheets.last().setFilter(DGLTextureFilterNearest);
    }
    
    // Read last position info
@@ -1229,7 +1229,7 @@ bool GFont::readBMFont(Stream& io_rStream)
         mTextureSheets.increment();
         constructInPlace(&mTextureSheets.last());
         mTextureSheets.last() = TextureHandle(buf, bmp, TextureHandle::BitmapKeepTexture);
-        mTextureSheets.last().setFilter(GL_NEAREST);
+        mTextureSheets.last().setFilter(DGLTextureFilterNearest);
     }
     return (io_rStream.getStatus() == Stream::EOS);
 }

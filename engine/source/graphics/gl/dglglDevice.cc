@@ -2,6 +2,8 @@
 #include "graphics/gl/dglGLDevice.h"
 #include "platform/platformGL.h"
 
+#include "graphics/gl/glEnumTranslate.h"
+
 //------------------------------------------------------------------------------
 
 namespace GLAD
@@ -269,13 +271,26 @@ void DGLGLDevice::SetViewport(const RectI &aViewPort)
    worldToScreenScale = F32((frustNear * viewPort.extent.x) / (frustRight - frustLeft));
 }
 
+//------------------------------------------------------------------------------
+// CAMERA END
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+// DRAW
+//------------------------------------------------------------------------------
+
+void DGLGLDevice::DrawElements(DGLPrimitiveType type, U32 count, const void* buff)
+{
+   glDrawElements(DGLGLPrimitiveType[type], count, GL_UNSIGNED_SHORT, buff);
+}
+
 void DGLGLDevice::DrawArrays(DGLPrimitiveType type, U32 first, U32 count)
 {
-   glDrawArrays(type, first, count);
+   glDrawArrays(DGLGLPrimitiveType[type], first, count);
 }
 
 //------------------------------------------------------------------------------
-// CAMERA END
+// DRAW END
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -284,7 +299,7 @@ void DGLGLDevice::DrawArrays(DGLPrimitiveType type, U32 first, U32 count)
 
 void DGLGLDevice::setMatrix(DGLMatrixType type)
 {
-   glMatrixMode(type);
+   glMatrixMode(DGLGLMatrixType[type]);
 }
 
 void DGLGLDevice::LoadMatrix(const MatrixF *m)
@@ -371,28 +386,33 @@ void DGLGLDevice::LoadIdentity()
 
 void DGLGLDevice::EnableState(DGLRenderState rs)
 {
-   glEnable(rs);
+   glEnable(DGLGLRenderState[rs]);
 }
 
 void DGLGLDevice::DisableState(DGLRenderState rs)
 {
-   glDisable(rs);
+   glDisable(DGLGLRenderState[rs]);
 }
 
 void DGLGLDevice::EnableClientState(DGLClientState cs)
 {
-   glEnableClientState(cs);
+   glEnableClientState(DGLGLClientState[cs]);
 }
 
 void DGLGLDevice::DisableClientState(DGLClientState cs)
 {
-   glDisableClientState(cs);
+   glDisableClientState(DGLGLClientState[cs]);
 
 }
 
 void DGLGLDevice::setBlendFunc(DGLBlend sFactor, DGLBlend dFactor)
 {
-   glBlendFunc(sFactor, dFactor);
+   glBlendFunc(DGLGLBlend[sFactor], DGLGLBlend[dFactor]);
+}
+
+void DGLGLDevice::setAlphaFunc(DGLCompare cmp, F32 testMode)
+{
+   glAlphaFunc(DGLGLCompare[cmp], testMode);
 }
 
 void DGLGLDevice::SetOrthoState(F32 wMin, F32 wMax, F32 hMin, F32 hMax, F32 mNear, U32 mFar)
@@ -407,9 +427,23 @@ void DGLGLDevice::SetVertexPoint(U32 size, U32 stride, const void * pointer)
    glVertexPointer(size, GL_FLOAT, stride, pointer);
 }
 
+void DGLGLDevice::SetColorPoint(U32 size, U32 stride, const void * pointer)
+{
+   // We only use float here as this is all that is used in the engine.
+   // this function should be removed asap when the shaders are implemented.
+   glColorPointer(size, GL_FLOAT, stride, pointer);
+}
+
+void DGLGLDevice::SetTexPoint(U32 size, U32 stride, const void * pointer)
+{
+   // We only use float here as this is all that is used in the engine.
+   // this function should be removed asap when the shaders are implemented.
+   glTexCoordPointer(size, GL_FLOAT, stride, pointer);
+}
+
 void DGLGLDevice::ClearBuffer(DGLBufferBit bit)
 {
-   glClear(bit);
+   glClear(DGLGLBufferBit[bit]);
 }
 
 void DGLGLDevice::ClearColor(F32 r, F32 g, F32 b, F32 a)
@@ -419,7 +453,7 @@ void DGLGLDevice::ClearColor(F32 r, F32 g, F32 b, F32 a)
 
 void DGLGLDevice::ScissorTest(S32 x, S32 y, S32 width, S32 height)
 {
-
+   glScissor(x, y, width, height);
 }
 
 void DGLGLDevice::SetColorF(F32 r, F32 g, F32 b, F32 a)
@@ -435,6 +469,26 @@ void DGLGLDevice::SetColorI(U32 r, U32 g, U32 b, U32 a)
 void DGLGLDevice::SetLineWidth(F32 width)
 {
    glLineWidth(width);
+}
+
+void DGLGLDevice::SetPolygonMode(DGLPolyMode face, DGLPolyMode mode)
+{
+   glPolygonMode(DGLGLPolyMode[face], DGLGLPolyMode[face]);
+}
+
+void DGLGLDevice::SetTextureEnvironment(DGLTextureEnvironment target, DGLTextureEnvironment name, DGLTextureEnvironment param)
+{
+   glTexEnvi(DGLGLTextureEnvironment[target], DGLGLTextureEnvironment[name], DGLGLTextureEnvironment[param]);
+}
+
+void DGLGLDevice::SetRotate(F32 ang, F32 x, F32 y, F32 z)
+{
+   glRotatef(ang, x, y, z);
+}
+
+void DGLGLDevice::SetTranslate(F32 x, F32 y, F32 z)
+{
+   glTranslatef(x, y, z);
 }
 
 //------------------------------------------------------------------------------
@@ -456,9 +510,30 @@ void DGLGLDevice::LoadTexture(U32 n, U32 glName)
    glGenTextures(n, &glName);
 }
 
+void DGLGLDevice::BindTexture(U32 glName)
+{
+   glBindTexture(GL_TEXTURE_2D, glName);
+}
+
 void DGLGLDevice::DeleteTextures(U32 n, const U32* glName)
 {
    glDeleteTextures(1, glName);
+}
+
+void DGLGLDevice::SetTextureParam(DGLTextureParam param, const DGLTextureFilter filter)
+{
+   // we will only use 2d textures...... i think
+   glTexParameteri(GL_TEXTURE_2D, DGLGLTextureParam[param], DGLGLTextureFilter[filter]);
+}
+
+void DGLGLDevice::UploadTexture16(U32 mip, DGLFormat inFmt, U32 width, U32 height, U32 b, U16 *bits)
+{
+   glTexImage2D(GL_TEXTURE_2D, mip, DGLGLInternalFormat[inFmt], width, height, b, DGLGLTextureFormat[inFmt], DGLGLTextureData[inFmt], bits);
+}
+
+void DGLGLDevice::UploadTexture(U32 mip, DGLFormat inFmt, U32 width, U32 height, U32 b, U8 *bits)
+{
+   glTexImage2D(GL_TEXTURE_2D, mip, DGLGLInternalFormat[inFmt], width, height, b, DGLGLTextureFormat[inFmt], DGLGLTextureData[inFmt], bits);
 }
 
 //------------------------------------------------------------------------------

@@ -296,19 +296,27 @@ class Point3F;*/
     virtual void EnableClientState(DGLClientState cs) = 0;
     virtual void DisableClientState(DGLClientState cs) = 0;
     virtual void setBlendFunc(DGLBlend sFactor, DGLBlend dFactor) = 0;
+    virtual void setAlphaFunc(DGLCompare cmp, F32 testMode) = 0;
     virtual void SetOrthoState(F32 wMin, F32 wMax, F32 hMin, F32 hMax, F32 mNear, U32 mFar) = 0;
     virtual void SetVertexPoint(U32 size, U32 stride, const void *pointer) = 0;
+    virtual void SetColorPoint(U32 size, U32 stride, const void * pointer) = 0;
+    virtual void SetTexPoint(U32 size, U32 stride, const void * pointer) = 0;
     virtual void ClearBuffer(DGLBufferBit bit) = 0;
     virtual void ClearColor(F32 r, F32 g, F32 b, F32 a) = 0;
     virtual void ScissorTest(S32 x, S32 y, S32 width, S32 height) = 0;
     virtual void SetColorF(F32 r, F32 g, F32 b, F32 a) = 0;
     virtual void SetColorI(U32 r, U32 g, U32 b, U32 a) = 0;
     virtual void SetLineWidth(F32 width) = 0;
+    virtual void SetPolygonMode(DGLPolyMode face, DGLPolyMode mode) = 0;
+    virtual void SetTextureEnvironment(DGLTextureEnvironment target, DGLTextureEnvironment name, DGLTextureEnvironment param) = 0;
+    virtual void SetRotate(F32 ang, F32 x, F32 y, F32 z) = 0;
+    virtual void SetTranslate(F32 x, F32 y, F32 z) = 0;
 
     //------------------------------------------------------------------------------------------
-    // DRAW ARRAY FUNCTIONS
+    // DRAW FUNCTIONS
     // Pass these off to the api's.
     //------------------------------------------------------------------------------------------
+    virtual void DrawElements(DGLPrimitiveType type, U32 count, const void * buff) = 0;
     virtual void DrawArrays(DGLPrimitiveType type, U32 first, U32 count) = 0;
 
     //------------------------------------------------------------------------------------------
@@ -318,6 +326,10 @@ class Point3F;*/
     virtual void AreTexturesLoaded(S32 size, const U32* addr, bool isLoad) = 0;
     virtual void LoadTexture(U32 n, U32 glName) = 0;
     virtual void DeleteTextures(U32 n, const U32* glName) = 0;
+    virtual void SetTextureParam(DGLTextureParam param, const DGLTextureFilter filter) = 0;
+    virtual void BindTexture(U32 glName) = 0;
+    virtual void UploadTexture16(U32 mip, DGLFormat inFmt, U32 width, U32 height, U32 b, U16 *bits) = 0;
+    virtual void UploadTexture(U32 mip, DGLFormat inFmt, U32 width, U32 height, U32 b, U8 *bits) = 0;
 
     //------------------------------------------------------------------------------------------
     // MATRIX FUNCTIONS
@@ -365,7 +377,7 @@ class Point3F;*/
     /// Sets the viewing frustrum.  This effectively creates the view volume and sets up the 6 clipping planes (near, far, left, right, top, bottom)
     virtual void SetFrustum(F64 left, F64 right, F64 bottom, F64 top, F64 nearDist, F64 farDist, bool ortho = false) = 0;
     /// Returns the parameters for the current viewing frustrum
-    virtual void GetFrustum(F64 *left, F64 *right, F64 *bottom, F64 *top, F64 *nearDist, F64 *farDist) = 0;
+    void GetFrustum(F64 *left, F64 *right, F64 *bottom, F64 *top, F64 *nearDist, F64 *farDist);
     /// returns whether or not the coordinate system is orthographic (if it is not projected)
     bool IsOrtho() { return isOrtho; }
     /// Sets up an orthographical viewport and clipping region.  This is best used for guis

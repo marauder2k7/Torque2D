@@ -32,13 +32,23 @@ namespace DGLGLEnumTranslate
 };
 
 extern GLenum DGLGLPrimitiveType[DGLPT_COUNT];
-extern GLenum DGLGLTextureFilter[DGLTextureFilter_COUNT];
 extern GLenum DGLGLBlend[DGLBlend_COUNT];
 extern GLenum DGLGLMatrixType[DGLMM_COUNT];
 extern GLenum DGLGLRenderState[DGLRS_COUNT];
 extern GLenum DGLGLClientState[DGLCS_COUNT];
 extern GLenum DGLGLBufferBit[DGLBB_COUNT];
-extern GLenum DGLGLClamp[DGLClamp_COUNT];
+extern GLenum DGLGLPolyMode[DGLPolyMode_COUNT];
+extern GLenum DGLGLCompare[DGLCompare_COUNT];
+
+
+extern GLenum DGLGLTextureFilter[DGLTextureFilter_COUNT];
+extern GLenum DGLGLTextureParam[DGLTextureParam_COUNT];
+
+extern GLenum DGLGLTextureFormat[DGLFormat_COUNT];
+extern GLenum DGLGLInternalFormat[DGLFormat_COUNT];
+extern GLenum DGLGLTextureData[DGLFormat_COUNT];
+
+extern GLenum DGLGLTextureEnvironment[DGLTextureEnvironment_COUNT];
 
 
 #endif //_GLENUMTRANSLATE_H_

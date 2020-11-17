@@ -399,7 +399,7 @@ void GuiColorPickerCtrl::onRender(Point2I offset, const RectI& updateRect)
          //mPickColor.blue = rBuffer[2];
          //mPickColor.alpha = rBuffer[3]; 
 
-         GLubyte rBuffer[4] = { 255, 255, 255, 255 };
+         U32 rBuffer[4] = { 255, 255, 255, 255 };
 
          glReadBuffer( GL_BACK );
 

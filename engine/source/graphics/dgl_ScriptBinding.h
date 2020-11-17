@@ -29,8 +29,8 @@
 */
 ConsoleFunctionWithDocs(CaptureScreenArea, bool, 7, 7, (posX, posY, width, height, fileName, fileType))
 {
-    GLint positionX = dAtoi(argv[1]);
-    GLint positionY = dAtoi(argv[2]);
+    U32 positionX = dAtoi(argv[1]);
+    U32 positionY = dAtoi(argv[2]);
     U32 width = dAtoi(argv[3]);
     U32 height = dAtoi(argv[4]);
     
@@ -123,8 +123,8 @@ ConsoleFunctionWithDocs(png2jpg, ConsoleInt, 2, 3, ( pngFilename, [quality ]? ))
    }
    fs.close();
 
-   if (bmp.getFormat() != GBitmap::RGB &&
-       bmp.getFormat() != GBitmap::RGBA) {
+   if (bmp.getFormat() != DGLFormatR8G8B8 &&
+       bmp.getFormat() != DGLFormatR8G8B8A8) {
       Con::printf("Error: %s is not a 24 or 32-bit .PNG\n", bmpname);
       return false;
    }
@@ -132,14 +132,14 @@ ConsoleFunctionWithDocs(png2jpg, ConsoleInt, 2, 3, ( pngFilename, [quality ]? ))
    GBitmap * outRGB = NULL;
    GBitmap * outAlpha = NULL;
    GBitmap workRGB, workAlpha;
-   if (bmp.getFormat() == GBitmap::RGB)
+   if (bmp.getFormat() == DGLFormatR8G8B8)
       outRGB = &bmp;
    else
    {
       S32 w = bmp.getWidth();
       S32 h = bmp.getHeight();
-      workRGB.allocateBitmap(w,h,false,GBitmap::RGB);
-      workAlpha.allocateBitmap(w,h,false,GBitmap::Alpha);
+      workRGB.allocateBitmap(w,h,false, DGLFormatR8G8B8);
+      workAlpha.allocateBitmap(w,h,false,DGLFormatA8);
 
       U8 * rgbBits = workRGB.getWritableBits();
       U8 * alphaBits = workAlpha.getWritableBits();

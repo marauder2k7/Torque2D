@@ -31,6 +31,10 @@
 #include "collection/vector.h"
 #endif
 
+#ifndef _DGL_H_
+#include "graphics/dgl.h"
+#endif
+
 #ifndef _VECTOR2_H_
 #include "2d/core/Vector2.h"
 #endif
@@ -248,7 +252,7 @@ public:
     
     inline const FrameArea& getImageFrameArea( U32 frame ) const            { clampFrame(frame); return mFrames[frame]; };
     inline const FrameArea& getImageFrameArea( const char* namedFrame)      { return getCellByName(namedFrame); };
-    inline const void       bindImageTexture( void)                         { glBindTexture( GL_TEXTURE_2D, getImageTexture().getGLName() ); };
+    inline const void       bindImageTexture( void)                         { DGL->BindTexture( getImageTexture().getGLName() ); };
     
     virtual bool            isAssetValid( void ) const                      { return !mImageTextureHandle.IsNull(); }
 

@@ -232,8 +232,8 @@ protected:
     StringTableEntry    mRenderGroup;
 
     bool                mBlendMode;
-    GLenum              mSrcBlendFactor;
-    GLenum              mDstBlendFactor;
+    S32                 mSrcBlendFactor;
+    S32                 mDstBlendFactor;
     ColorF              mBlendColor;
     F32                 mAlphaTest;
 
@@ -305,10 +305,10 @@ public:
 
     inline void setBlendMode( const bool blendMode ) { mBlendMode = blendMode; }
     inline bool getBlendMode( void ) const { return mBlendMode; }
-    inline void setSrcBlendFactor( GLenum srcBlendFactor ) { mSrcBlendFactor = srcBlendFactor; }
-    inline GLenum getSrcBlendFactor( void ) const { return mSrcBlendFactor; }
-    inline void setDstBlendFactor( GLenum dstBlendFactor ) { mDstBlendFactor = dstBlendFactor; }
-    inline GLenum getDstBlendFactor( void ) const { return mDstBlendFactor; }
+    inline void setSrcBlendFactor(S32 srcBlendFactor ) { mSrcBlendFactor = srcBlendFactor; }
+    inline S32 getSrcBlendFactor( void ) const { return mSrcBlendFactor; }
+    inline void setDstBlendFactor(S32 dstBlendFactor ) { mDstBlendFactor = dstBlendFactor; }
+    inline S32 getDstBlendFactor( void ) const { return mDstBlendFactor; }
     inline void setBlendColor( const ColorF& blendColor ) { mBlendColor = blendColor; }
     inline const ColorF& getBlendColor( void ) const { return mBlendColor; }
     inline void setBlendAlpha( const F32 alpha ) { mBlendColor.alpha = alpha; }

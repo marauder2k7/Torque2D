@@ -377,9 +377,9 @@ protected:
     static bool     setBlendMode(void* obj, const char* data)                           { static_cast<ParticleAssetEmitter*>(obj)->setBlendMode(dAtob(data)); return false; }
     static bool     writeBlendMode( void* obj, StringTableEntry pFieldName )            { return static_cast<ParticleAssetEmitter*>(obj)->getBlendMode() == false; }
     static bool     setSrcBlendFactor(void* obj, const char* data)                      { static_cast<ParticleAssetEmitter*>(obj)->setSrcBlendFactor(SceneObject::getSrcBlendFactorEnum(data)); return false; }
-    static bool     writeSrcBlendFactor( void* obj, StringTableEntry pFieldName )       { return static_cast<ParticleAssetEmitter*>(obj)->getSrcBlendFactor() != GL_SRC_ALPHA; }
+    static bool     writeSrcBlendFactor( void* obj, StringTableEntry pFieldName )       { return static_cast<ParticleAssetEmitter*>(obj)->getSrcBlendFactor() != DGLBlendSrcAlpha; }
     static bool     setDstBlendFactor(void* obj, const char* data)                      { static_cast<ParticleAssetEmitter*>(obj)->setDstBlendFactor(SceneObject::getDstBlendFactorEnum(data)); return false; }
-    static bool     writeDstBlendFactor( void* obj, StringTableEntry pFieldName )       { return static_cast<ParticleAssetEmitter*>(obj)->getDstBlendFactor() != GL_ONE_MINUS_SRC_ALPHA; }
+    static bool     writeDstBlendFactor( void* obj, StringTableEntry pFieldName )       { return static_cast<ParticleAssetEmitter*>(obj)->getDstBlendFactor() != DGLBlendInvSrcAlpha; }
     static bool     setAlphaTest(void* obj, const char* data)                           { static_cast<ParticleAssetEmitter*>(obj)->setAlphaTest(dAtof(data)); return false; }
     static bool     writeAlphaTest( void* obj, StringTableEntry pFieldName )            { return static_cast<ParticleAssetEmitter*>(obj)->getAlphaTest() >= 0.0f; }
 };

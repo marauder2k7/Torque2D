@@ -1149,19 +1149,7 @@ void GuiMenuTextListCtrl::onRenderCell(Point2I offset, Point2I cell, bool select
    idx = mList[cell.y].text[1];
    if(idx != 1)
    {
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
-// PUAP -Mat untested	
-//How are these used/made? cannot create in TGB GUI editor
-       if(selected || mouseOver)
-       {
-           glColor4f(mProfile->mFontColorHL.red,mProfile->mFontColorHL.green,mProfile->mFontColorHL.blue, 255 );//full alpha
-       }
-            else
-       {
-           glColor4f(mProfile->mFontColor.red,mProfile->mFontColor.green,mProfile->mFontColor.blue, 255);
-       }
-       glDrawArrays(GL_TRIANGLES, 0, 3 );
-#else
+
       // This is a submenu, so draw an arrow
       F32 left = (F32)(offset.x + mCellSize.x - 12);
       F32 right = (F32)(left + 8);
@@ -1169,20 +1157,26 @@ void GuiMenuTextListCtrl::onRenderCell(Point2I offset, Point2I cell, bool select
       F32 bottom = (F32)(top + 8);
       F32 middle = (F32)(top + 4);
 
-      glBegin(GL_TRIANGLES);
-         if(selected || mouseOver)
-         {
-            glColor3ub(mProfile->mFontColorHL.red,mProfile->mFontColorHL.green,mProfile->mFontColorHL.blue);
+      if(selected || mouseOver)
+      {
+         DGL->SetColorI(mProfile->mFontColorHL.red,mProfile->mFontColorHL.green,mProfile->mFontColorHL.blue, 255);
 
-         } else
-         {
-            glColor3ub(mProfile->mFontColor.red,mProfile->mFontColor.green,mProfile->mFontColor.blue);
-         }
-         glVertex2fv( Point3F(left, top, 0.0f) );
-         glVertex2fv( Point3F(right, middle, 0.0f) );
-         glVertex2fv( Point3F(left, bottom, 0.0f) );
-      glEnd();
-#endif
+      } 
+      else
+      {
+         DGL->SetColorI(mProfile->mFontColor.red,mProfile->mFontColor.green,mProfile->mFontColor.blue,255);
+      }
+
+      F32 verts[]{
+         left,top,
+         right,middle,
+         left,bottom,
+      };
+
+      DGL->EnableClientState(DGLCSVertexArray);
+      DGL->SetVertexPoint(2, 0, verts);
+      DGL->DrawArrays(DGLTriangleList, 0, 3);
+      DGL->DisableClientState(DGLCSVertexArray);
    }
 }
 

@@ -172,7 +172,7 @@ void BatchRender::SubmitTriangles(
 		mTextureBuffer[mTextureCoordCount++] = *(pTextureArray++);
         mTextureBuffer[mTextureCoordCount++] = *(pTextureArray++);
         mTextureBuffer[mTextureCoordCount++] = *(pTextureArray++);
-	}
+	 }
 
     // Stats.
     mpDebugStats->batchTrianglesSubmitted += triangleCount;
@@ -357,60 +357,60 @@ void BatchRender::flushInternal( void )
     if ( mWireframeMode )
     {
         // Disable texturing.    
-        glDisable( GL_TEXTURE_2D );
+        DGL->DisableState( DGLRSTexture2D );
 
         // Set the polygon mode to line.
-        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+        DGL->SetPolygonMode(DGLFrontAndBack, DGLLine);
     }
     else
     {
         // Enable texturing.    
-        glEnable( GL_TEXTURE_2D );
-        glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+        DGL->EnableState(DGLRSTexture2D);
+        DGL->SetTextureEnvironment(DGLTexEnvi, DGLTexEnvMode, DGLModulate);
 
         // Set the polygon mode to fill.
-        glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+        DGL->SetPolygonMode(DGLFrontAndBack, DGLFill);
     }
 
     // Set blend mode.
     if ( mBlendMode )
     {
-        glEnable( GL_BLEND );
-        glBlendFunc( mSrcBlendFactor, mDstBlendFactor );
-        glColor4f(mBlendColor.red, mBlendColor.green, mBlendColor.blue, mBlendColor.alpha );
+        DGL->EnableState(DGLRSBlend);
+        DGL->setBlendFunc((DGLBlend)mSrcBlendFactor, (DGLBlend)mDstBlendFactor);
+        DGL->SetColorF(mBlendColor.red, mBlendColor.green, mBlendColor.blue, mBlendColor.alpha);
     }
     else
     {
-        glDisable( GL_BLEND );
-        glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+        DGL->DisableState(DGLRSBlend);
+        DGL->SetColorF( 1.0f, 1.0f, 1.0f, 1.0f );
     }
 
     // Set alpha-blend mode.
     if ( mAlphaTestMode >= 0.0f )
     {
-        glEnable( GL_ALPHA_TEST );
-        glAlphaFunc( GL_GREATER, mAlphaTestMode );
+       DGL->EnableState(DGLRSAlphaTest);
+       DGL->setAlphaFunc(DGLGreater, mAlphaTestMode);
     }
     else
     {
-        glDisable( GL_ALPHA_TEST );
+       DGL->DisableState(DGLRSAlphaTest);
     }
 
     // Enable vertex and texture arrays.
-    glEnableClientState( GL_VERTEX_ARRAY );
-    glVertexPointer( 2, GL_FLOAT, 0, mVertexBuffer );
-    glTexCoordPointer( 2, GL_FLOAT, 0, mTextureBuffer );
+    DGL->EnableClientState(DGLCSVertexArray);
+    DGL->SetVertexPoint(2, 0, mVertexBuffer);
+    DGL->SetTexPoint(2, 0, mTextureBuffer);
 
     // Use the texture coordinates if not in wireframe mode.
-    if ( !mWireframeMode )
-        glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+    if (!mWireframeMode)
+       DGL->EnableClientState(DGLCSTextCoordArray);
 
     // Do we have any colors?
     if ( mColorCount > 0 )
     {
         // Yes, so enable color array.
-        glEnableClientState( GL_COLOR_ARRAY );
-        glColorPointer( 4, GL_FLOAT, 0, mColorBuffer );
+        DGL->EnableClientState(DGLCSColorArray);
+        DGL->SetColorPoint( 4,0, mColorBuffer );
     }
 
     // Strict order mode?
@@ -418,10 +418,10 @@ void BatchRender::flushInternal( void )
     {
         // Bind the texture if not in wireframe mode.
         if ( !mWireframeMode )
-            glBindTexture( GL_TEXTURE_2D, mStrictOrderTextureHandle.getGLName() );
+            DGL->BindTexture( mStrictOrderTextureHandle.getGLName() );
 
         // Draw the triangles
-        glDrawElements( GL_TRIANGLES, mIndexCount, GL_UNSIGNED_SHORT, mIndexBuffer );
+        DGL->DrawElements(DGLTriangleList, mIndexCount, mIndexBuffer);
 
         // Stats.
         mpDebugStats->batchDrawCallsStrict++;
@@ -499,10 +499,10 @@ void BatchRender::flushInternal( void )
 
             // Bind the texture if not in wireframe mode.
             if ( !mWireframeMode )
-                glBindTexture( GL_TEXTURE_2D, batchItr->key );
+               DGL->BindTexture( batchItr->key );
 
             // Draw the triangles.
-            glDrawElements( GL_TRIANGLES, mIndexCount, GL_UNSIGNED_SHORT, mIndexBuffer );
+            DGL->DrawElements( DGLTriangleList, mIndexCount, mIndexBuffer );
 
             // Stats.
             mpDebugStats->batchDrawCallsSorted++;
@@ -526,13 +526,15 @@ void BatchRender::flushInternal( void )
     }
 
     // Reset common render state.
-    glDisableClientState( GL_VERTEX_ARRAY );
-    glDisableClientState( GL_TEXTURE_COORD_ARRAY );
-    glDisableClientState( GL_COLOR_ARRAY );
-    glDisable( GL_ALPHA_TEST );
-    glDisable( GL_BLEND );
-    glDisable( GL_TEXTURE_2D );
-    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+
+    DGL->DisableClientState(DGLCSVertexArray);
+    DGL->DisableClientState(DGLCSColorArray);
+    DGL->DisableClientState(DGLCSTextCoordArray);
+    DGL->DisableState(DGLRSAlphaTest);
+    DGL->DisableState(DGLRSBlend);
+    DGL->DisableState(DGLRSTexture2D);
+    DGL->SetPolygonMode(DGLFrontAndBack, DGLFill);
+
 
     // Reset batch state.
     mTriangleCount = 0;

@@ -77,12 +77,12 @@ void GuiGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
 		dglDrawRect(rect, mProfile->mBorderColor);
 	}*/
 
-	glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);
-	glEnable(GL_BLEND);
+   DGL->setBlendFunc(DGLBlendSrcColor, DGLBlendInvSrcColor);
+   DGL->EnableState(DGLRSBlend);
 	ColorF color(1.0, 1.0, 1.0, 0.5);
    DGL->DrawRectFill(updateRect, color);
-	glDisable(GL_BLEND);
-	glBlendFunc(GL_ONE, GL_ZERO);
+   DGL->DisableState(DGLRSBlend);
+   DGL->setBlendFunc(DGLBlendOne, DGLBlendZero);
 
 	for (int k = 0; k < MaxPlots; k++)
 	{
@@ -102,12 +102,11 @@ void GuiGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
 		if (mPlots[k].mGraphData.size() == 0)
 			continue;
 
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
 		// Bar graph
 		if(mPlots[k].mGraphType == Bar)
 		{
 			//PUAP -Mat untested
-			glColor4f( mPlots[k].mGraphColor.red, mPlots[k].mGraphColor.green,mPlots[k].mGraphColor.blue, 255 );//was a color3fv, so use full alpha
+			DGL->SetColorF( mPlots[k].mGraphColor.red, mPlots[k].mGraphColor.green,mPlots[k].mGraphColor.blue, 255 );//was a color3fv, so use full alpha
 
 			S32 temp1,temp2;
 			temp1 = 0;
@@ -119,14 +118,14 @@ void GuiGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
 				else
 					temp2 = (S32)(((F32)getExtent().x / (F32)mPlots[k].mGraphData.size()) * (F32)sample);
 
-				GLfloat verts[] = {
-					static_cast<GLfloat>(getPosition().x + temp1), static_cast<GLfloat>((getPosition().y + getExtent().y) - (S32)(getDatum(k, sample) * Scale)),
-					static_cast<GLfloat>(getPosition().x + temp2), static_cast<GLfloat>((getPosition().y + getExtent().y) - (S32)(getDatum(k, sample) * Scale)),
-					static_cast<GLfloat>(getPosition().x + temp2), static_cast<GLfloat>(getPosition().y + getExtent().y),//may need to switch these last two
-					static_cast<GLfloat>(getPosition().x + temp1), static_cast<GLfloat>(getPosition().y + getExtent().y),
+				F32 verts[] = {
+					static_cast<F32>(getPosition().x + temp1), static_cast<F32>((getPosition().y + getExtent().y) - (S32)(getDatum(k, sample) * Scale)),
+					static_cast<F32>(getPosition().x + temp2), static_cast<F32>((getPosition().y + getExtent().y) - (S32)(getDatum(k, sample) * Scale)),
+					static_cast<F32>(getPosition().x + temp2), static_cast<F32>(getPosition().y + getExtent().y),//may need to switch these last two
+					static_cast<F32>(getPosition().x + temp1), static_cast<F32>(getPosition().y + getExtent().y),
 				};
-				glVertexPointer(2, GL_FLOAT, 0, verts);
-				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            DGL->SetVertexPoint(2, 0, verts);
+            DGL->DrawArrays(DGLTriangleStrip, 0, 4);
 				
 				temp1 = temp2;
 			}
@@ -136,7 +135,7 @@ void GuiGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
 		else if(mPlots[k].mGraphType == Filled)
 		{
 			//PUAP -Mat untested
-			glColor4f( mPlots[k].mGraphColor.red, mPlots[k].mGraphColor.green,mPlots[k].mGraphColor.blue, 255 );//was a color3fv, so use full alpha
+         DGL->SetColorF( mPlots[k].mGraphColor.red, mPlots[k].mGraphColor.green,mPlots[k].mGraphColor.blue, 255 );//was a color3fv, so use full alpha
 
 			S32 temp1,temp2;
 			temp1 = 0;
@@ -148,14 +147,14 @@ void GuiGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
 				else
 					temp2 = (S32)(((F32)getExtent().x / (F32)mPlots[k].mGraphData.size()) * (F32)sample);
 
-				GLfloat verts[] = {
-						static_cast<GLfloat>(getPosition().x + temp1), static_cast<GLfloat>((getPosition().y + getExtent().y) - (S32)(getDatum(k, sample) * Scale)),
-						static_cast<GLfloat>(getPosition().x + temp2), static_cast<GLfloat>((getPosition().y + getExtent().y) - (S32)(getDatum(k, sample+1) * Scale)),
-						static_cast<GLfloat>(getPosition().x + temp2), static_cast<GLfloat>(getPosition().y + getExtent().y),//may need to switch these last two
-						static_cast<GLfloat>(getPosition().x + temp1), static_cast<GLfloat>(getPosition().y + getExtent().y),
+				F32 verts[] = {
+						static_cast<F32>(getPosition().x + temp1), static_cast<F32>((getPosition().y + getExtent().y) - (S32)(getDatum(k, sample) * Scale)),
+						static_cast<F32>(getPosition().x + temp2), static_cast<F32>((getPosition().y + getExtent().y) - (S32)(getDatum(k, sample+1) * Scale)),
+						static_cast<F32>(getPosition().x + temp2), static_cast<F32>(getPosition().y + getExtent().y),//may need to switch these last two
+						static_cast<F32>(getPosition().x + temp1), static_cast<F32>(getPosition().y + getExtent().y),
 				};
-				glVertexPointer(2, GL_FLOAT, 0, verts);
-				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            DGL->SetVertexPoint(2, 0, verts);
+            DGL->DrawArrays(DGLTriangleStrip, 0, 4);
 				
 				temp1 = temp2;
 			}
@@ -169,14 +168,14 @@ void GuiGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
 			else
 				temp2 = (S32)(((F32)getExtent().x / (F32)mPlots[k].mGraphData.size()) * (F32)sample);
 
-			GLfloat last[] = {
-					static_cast<GLfloat>(getPosition().x + temp1), static_cast<GLfloat>((getPosition().y + getExtent().y) - (S32)(getDatum(k, sample) * Scale)),
-					static_cast<GLfloat>(getPosition().x + temp2), static_cast<GLfloat>((getPosition().y + getExtent().y) - (S32)(getDatum(k, sample) * Scale)),
-					static_cast<GLfloat>(getPosition().x + temp2), static_cast<GLfloat>(getPosition().y + getExtent().y),
-					static_cast<GLfloat>(getPosition().x + temp1), static_cast<GLfloat>(getPosition().y + getExtent().y),
+			F32 last[] = {
+					static_cast<F32>(getPosition().x + temp1), static_cast<F32>((getPosition().y + getExtent().y) - (S32)(getDatum(k, sample) * Scale)),
+					static_cast<F32>(getPosition().x + temp2), static_cast<F32>((getPosition().y + getExtent().y) - (S32)(getDatum(k, sample) * Scale)),
+					static_cast<F32>(getPosition().x + temp2), static_cast<F32>(getPosition().y + getExtent().y),
+					static_cast<F32>(getPosition().x + temp1), static_cast<F32>(getPosition().y + getExtent().y),
 			};
-			glVertexPointer(2, GL_FLOAT, 0, last);
-			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+         DGL->SetVertexPoint(2, 0, last);
+         DGL->DrawArrays(DGLTriangleStrip, 0, 4);
 			
 		}
 
@@ -185,7 +184,7 @@ void GuiGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
 		else if((mPlots[k].mGraphType == Point) || (mPlots[k].mGraphType == Polyline))
 		{
 			//PUAP -Mat untested
-			glColor4f( mPlots[k].mGraphColor.red, mPlots[k].mGraphColor.green,mPlots[k].mGraphColor.blue, 255 );//was a color3fv, so use full alpha
+         DGL->SetColorF( mPlots[k].mGraphColor.red, mPlots[k].mGraphColor.green,mPlots[k].mGraphColor.blue, 255 );//was a color3fv, so use full alpha
 
 			S32 temp;
 			if(mPlots[k].mGraphData.size() >= getExtent().x)
@@ -193,8 +192,8 @@ void GuiGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
 			else
 				temp = (S32)(((F32)getExtent().x / (F32)mPlots[k].mGraphData.size()) * (F32)0);
 			
-			GLfloat verts[] = {
-					static_cast<GLfloat>(getPosition().x + temp), static_cast<GLfloat>(getPosition().y + getExtent().y - (S32)(getDatum(k, 0) * Scale)),
+         F32 verts[] = {
+					static_cast<F32>(getPosition().x + temp), static_cast<F32>(getPosition().y + getExtent().y - (S32)(getDatum(k, 0) * Scale)),
 				0, 0
 			};
 			
@@ -209,135 +208,15 @@ void GuiGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
 				verts[3] = getPosition().y + getExtent().y - (S32)(getDatum(k, sample) * Scale);
 			}
 
-			glVertexPointer(2, GL_FLOAT, 0, verts);
+         DGL->SetVertexPoint(2, 0, verts);
 			
 			if(mPlots[k].mGraphType == Point)
-				glDrawArrays(GL_POINTS, 0, 4);
+				DGL->DrawArrays(DGLPointList, 0, 4);
 			else
-				glDrawArrays(GL_LINE_STRIP, 0, 4);
+            DGL->DrawArrays(DGLLineStrip, 0, 4);
 		}
 	}
-#else
-		// Bar graph
-		if(mPlots[k].mGraphType == Bar)
-		{
 
-			glBegin(GL_QUADS);
-
-			glColor3fv(mPlots[k].mGraphColor.address());
-
-			S32 temp1,temp2;
-			temp1 = 0;
-
-			for (S32 sample = 0; sample < getExtent().x; sample++)
-			{
-				if(mPlots[k].mGraphData.size() >= getExtent().x)
-					temp2 = sample;
-				else
-					temp2 = (S32)(((F32)getExtent().x / (F32)mPlots[k].mGraphData.size()) * (F32)sample);
-
-				glVertex2i(getPosition().x + temp1,
-					(getPosition().y + getExtent().y) - (S32)(getDatum(k, sample) * Scale));
-
-				glVertex2i(getPosition().x + temp2,
-					(getPosition().y + getExtent().y) - (S32)(getDatum(k, sample) * Scale));
-
-				glVertex2i(getPosition().x + temp2,
-					getPosition().y + getExtent().y);
-
-				glVertex2i(getPosition().x + temp1,
-					getPosition().y + getExtent().y);
-
-				temp1 = temp2;
-			}
-
-			glEnd();
-		}
-
-		// Filled graph
-		else if(mPlots[k].mGraphType == Filled)
-		{
-			glBegin(GL_QUADS);
-
-			glColor3fv(mPlots[k].mGraphColor.address());
-
-			S32 temp1,temp2;
-			temp1 = 0;
-
-			for (S32 sample = 0; sample < (getExtent().x-1); sample++)
-			{
-				if(mPlots[k].mGraphData.size() >= getExtent().x)
-					temp2 = sample;
-				else
-					temp2 = (S32)(((F32)getExtent().x / (F32)mPlots[k].mGraphData.size()) * (F32)sample);
-
-				glVertex2i(getPosition().x + temp1,
-					(getPosition().y + getExtent().y) - (S32)(getDatum(k, sample) * Scale));
-
-				glVertex2i(getPosition().x + temp2,
-					(getPosition().y + getExtent().y) - (S32)(getDatum(k, sample+1) * Scale));
-
-				glVertex2i(getPosition().x + temp2,
-					getPosition().y + getExtent().y);
-
-				glVertex2i(getPosition().x + temp1,
-					getPosition().y + getExtent().y);
-
-				temp1 = temp2;
-			}
-
-			
-			// last point
-			S32 sample = getExtent().x;
-
-			if(mPlots[k].mGraphData.size() >= getExtent().x)
-				temp2 = sample;
-			else
-				temp2 = (S32)(((F32)getExtent().x / (F32)mPlots[k].mGraphData.size()) * (F32)sample);
-
-			glVertex2i(getPosition().x + temp1,
-				(getPosition().y + getExtent().y) - (S32)(getDatum(k, sample) * Scale));
-
-			glVertex2i(getPosition().x + temp2,
-				(getPosition().y + getExtent().y) - (S32)(getDatum(k, sample) * Scale));
-
-			glVertex2i(getPosition().x + temp2,
-				getPosition().y + getExtent().y);
-
-			glVertex2i(getPosition().x + temp1,
-				getPosition().y + getExtent().y);
-
-			glEnd();
-		}
-
-		
-		// Point or Polyline graph
-		else if((mPlots[k].mGraphType == Point) || (mPlots[k].mGraphType == Polyline))
-		{
-			if(mPlots[k].mGraphType == Point)
-				glBegin(GL_POINTS);
-			else
-				glBegin(GL_LINE_STRIP);
-
-			glColor3fv(mPlots[k].mGraphColor.address());
-
-			for (S32 sample = 0; sample < getExtent().x; sample++)
-			{
-				S32 temp;
-				if(mPlots[k].mGraphData.size() >= getExtent().x)
-					temp = sample;
-				else
-					temp = (S32)(((F32)getExtent().x / (F32)mPlots[k].mGraphData.size()) * (F32)sample);
-
-				glVertex2i(getPosition().x + temp,
-					(getPosition().y + getExtent().y) - (S32)(getDatum(k, sample) * Scale));
-			}
-
-			glEnd();
-		}
-
-	}
-#endif
 }
 
 void GuiGraphCtrl::addDatum(S32 plotID, F32 v)

@@ -168,10 +168,10 @@ public:
 
     void setSpriteBlendMode( const bool blendMode );
     bool getSpriteBlendMode( void ) const;
-    void setSpriteSrcBlendFactor( GLenum srcBlendFactor );
-    GLenum getSpriteSrcBlendFactor( void ) const;
-    void setSpriteDstBlendFactor( GLenum dstBlendFactor );
-    GLenum getSpriteDstBlendFactor( void ) const;
+    void setSpriteSrcBlendFactor(S32 srcBlendFactor );
+    S32 getSpriteSrcBlendFactor( void ) const;
+    void setSpriteDstBlendFactor(S32 dstBlendFactor );
+    S32 getSpriteDstBlendFactor( void ) const;
     void setSpriteBlendColor( const ColorF& blendColor );
     const ColorF& getSpriteBlendColor( void ) const;
     void setSpriteBlendAlpha( const F32 alpha );

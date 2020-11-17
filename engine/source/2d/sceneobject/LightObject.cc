@@ -12,8 +12,8 @@ LightObject::LightObject():
    mLightRadius(10.0f),
    mLightSegments(15)
 {
-   mSrcBlendFactor = GL_SRC_ALPHA;
-   mDstBlendFactor = GL_ONE;
+   mSrcBlendFactor = DGLBlendSrcAlpha;
+   mDstBlendFactor = DGLBlendOne;
    // Use a static body by default.
    mBodyDefinition.type = b2_staticBody;
 }

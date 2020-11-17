@@ -308,7 +308,7 @@ void Input::activate()
          if ( dInputManager->isKeyboardEnabled() && smLastKeyboardActivated )
             dInputManager->activateKeyboard();
 
-         if ( Video::isFullScreen() )
+         if ( DGL->isFullScreen() )
          {
             // DirectInput Mouse Hook-Up:
             if ( dInputManager->isMouseEnabled() && smLastMouseActivated )

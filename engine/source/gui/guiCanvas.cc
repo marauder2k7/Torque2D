@@ -1185,14 +1185,14 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
 {
    PROFILE_START(CanvasPreRender);
 
-#if !defined TORQUE_OS_IOS && !defined TORQUE_OS_ANDROID && !defined TORQUE_OS_EMSCRIPTEN
+/*#if !defined TORQUE_OS_IOS && !defined TORQUE_OS_ANDROID && !defined TORQUE_OS_EMSCRIPTEN
     
    if(mRenderFront)
       glDrawBuffer(GL_FRONT);
    else
       glDrawBuffer(GL_BACK);
 #endif
-
+*/
    // Make sure the root control is the size of the canvas.
    Point2I size = Platform::getWindowSize();
 
@@ -1267,8 +1267,8 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
     // Clear the background color if requested.
     if ( mUseBackgroundColor )
     {
-        glClearColor( mBackgroundColor.red, mBackgroundColor.green, mBackgroundColor.blue, mBackgroundColor.alpha );
-        glClear(GL_COLOR_BUFFER_BIT);	
+        DGL->ClearColor( mBackgroundColor.red, mBackgroundColor.green, mBackgroundColor.blue, mBackgroundColor.alpha );
+        DGL->ClearBuffer(DGLBBColorBB);	
     }
 
       //render the dialogs
@@ -1277,7 +1277,7 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
       {
          GuiControl *contentCtrl = static_cast<GuiControl*>(*i);
          DGL->SetClipRect(updateUnion);
-         glDisable( GL_CULL_FACE );
+         DGL->DisableState(DGLRSCullFace);
          contentCtrl->onRender(contentCtrl->getPosition(), updateUnion);
       }
 
@@ -1319,21 +1319,17 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
       //temp draw the mouse
       if (cursorON && mShowCursor && !mouseCursor && Canvas->getUseNativeCursor())
       {
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
-         glColor4ub(255, 0, 0, 255);
-         GLfloat vertices[] = {
-              (GLfloat)(cursorPt.x),(GLfloat)(cursorPt.y),
-              (GLfloat)(cursorPt.x + 2),(GLfloat)(cursorPt.y),
-              (GLfloat)(cursorPt.x + 2),(GLfloat)(cursorPt.y + 2),
-              (GLfloat)(cursorPt.x),(GLfloat)(cursorPt.y + 2),
+         DGL->SetColorI(255, 0, 0, 255);
+         F32 vertices[] = {
+              cursorPt.x, cursorPt.y,
+              cursorPt.x + 2,cursorPt.y,
+              cursorPt.x + 2,cursorPt.y + 2,
+              cursorPt.x, cursorPt.y + 2,
           };
-          glEnableClientState(GL_VERTEX_ARRAY);
-          glVertexPointer(2, GL_FLOAT, 0, vertices);
-          glDrawArrays(GL_LINE_LOOP, 0, 4);
-#else
-         glColor4ub(255, 0, 0, 255);
-         glRecti((S32)cursorPt.x, (S32)cursorPt.y, (S32)(cursorPt.x + 2), (S32)(cursorPt.y + 2));
-#endif
+
+          DGL->EnableClientState(DGLCSVertexArray);
+          DGL->SetVertexPoint(2, 0, vertices);
+          DGL->DrawArrays(DGLLineLoop, 0, 4);
       }
        
       //DEBUG

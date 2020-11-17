@@ -105,8 +105,8 @@ private:
     U32                 mColorCount;
 
     bool                mBlendMode;
-    DGLBlend            mSrcBlendFactor;
-    DGLBlend            mDstBlendFactor;
+    S32                 mSrcBlendFactor;
+    S32                 mDstBlendFactor;
     ColorF              mBlendColor;
     F32                 mAlphaTestMode;
 
@@ -141,7 +141,7 @@ public:
     inline bool getStrictOrderMode( void ) const { return mStrictOrderMode; }
 
     /// Turns-on blend mode with the specified blend factors and color.
-    inline void setBlendMode(DGLBlend srcFactor, DGLBlend dstFactor, const ColorF& blendColor = ColorF(1.0f, 1.0f, 1.0f, 1.0f))
+    inline void setBlendMode(S32 srcFactor, S32 dstFactor, const ColorF& blendColor = ColorF(1.0f, 1.0f, 1.0f, 1.0f))
     {
         // Ignore no change.
         if (    mBlendMode &&
@@ -274,16 +274,30 @@ public:
             const Vector2& texturePos2,
             const Vector2& texturePos3 )
     {
-        glBegin( GL_TRIANGLE_STRIP );
-            glTexCoord2f( texturePos0.x, texturePos0.y );
-            glVertex2f( vertexPos0.x, vertexPos0.y );
-            glTexCoord2f( texturePos1.x, texturePos1.y );
-            glVertex2f( vertexPos1.x, vertexPos1.y );
-            glTexCoord2f( texturePos3.x, texturePos3.y );
-            glVertex2f( vertexPos3.x, vertexPos3.y );
-            glTexCoord2f( texturePos2.x, texturePos2.y );
-            glVertex2f( vertexPos2.x, vertexPos2.y );
-        glEnd();
+
+        F32 vertices[] = {
+           vertexPos0.x, vertexPos0.y,
+           vertexPos1.x, vertexPos1.y,
+           vertexPos3.x, vertexPos3.y,
+           vertexPos2.x, vertexPos2.y,
+
+        };
+
+        F32 texCoords[] = {
+           texturePos0.x, texturePos0.y,
+           texturePos1.x, texturePos1.y,
+           texturePos3.x, texturePos3.y,
+           texturePos2.x, texturePos2.y,
+        };
+
+        DGL->EnableClientState(DGLCSVertexArray);
+        DGL->EnableClientState(DGLCSTextCoordArray);
+        DGL->SetVertexPoint(2, 0, vertices);
+        DGL->SetTexPoint(2, 0, texCoords);
+        DGL->DrawArrays(DGLTriangleStrip, 0, 4);
+        DGL->DisableClientState(DGLCSVertexArray);
+        DGL->DisableClientState(DGLCSTextCoordArray);
+
     }
 
     /// Flush (render) any pending batches with a reason metric.

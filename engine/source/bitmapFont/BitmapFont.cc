@@ -248,7 +248,7 @@ namespace font
       }
 
       //Set the filter mode. For now we'll just support bilinear. In the future we should give the user an option.
-      mImageTextureHandle.setFilter(GL_LINEAR);
+      mImageTextureHandle.setFilter(DGLTextureFilterLinear);
 
       return mImageTextureHandle;
    }

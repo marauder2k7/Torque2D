@@ -1006,9 +1006,9 @@ void Scene::sceneRender( const SceneRenderState* pSceneRenderState )
 
     // Rotate the world matrix by the camera angle.
     const Vector2& cameraPosition = pSceneRenderState->mRenderPosition;
-    glTranslatef( cameraPosition.x, cameraPosition.y, 0.0f );
-    glRotatef( mRadToDeg(pSceneRenderState->mRenderAngle), 0.0f, 0.0f, 1.0f );
-    glTranslatef( -cameraPosition.x, -cameraPosition.y, 0.0f );
+    DGL->SetTranslate( cameraPosition.x, cameraPosition.y, 0.0f );
+    DGL->SetRotate( mRadToDeg(pSceneRenderState->mRenderAngle), 0.0f, 0.0f, 1.0f );
+    DGL->SetTranslate( -cameraPosition.x, -cameraPosition.y, 0.0f );
 
     // Clear world query.
     mpWorldQuery->clearQuery();

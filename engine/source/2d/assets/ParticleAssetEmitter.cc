@@ -208,8 +208,8 @@ ParticleAssetEmitter::ParticleAssetEmitter() :
                             mRandomImageFrame( false ),
                             mAnimationAsset( NULL ),
                             mBlendMode( true ),
-                            mSrcBlendFactor( GL_SRC_ALPHA ),
-                            mDstBlendFactor( GL_ONE_MINUS_SRC_ALPHA ),
+                            mSrcBlendFactor( DGLBlendSrcAlpha ),
+                            mDstBlendFactor( DGLBlendInvSrcAlpha ),
                             mAlphaTest( -1.0f )
 {
     // Set the pivot point.

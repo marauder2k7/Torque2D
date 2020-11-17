@@ -551,15 +551,17 @@ void GuiEditCtrl::onRender(Point2I offset, const RectI &updateRect)
       AssertFatal(ndot <= maxdot, "dot overflow");
       
       // draw the points.
-      glEnableClientState(GL_VERTEX_ARRAY);
-      glEnable( GL_BLEND );
-      glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-      glVertexPointer(2, GL_FLOAT, 0, dots);
-      glColor4ub(50, 50, 254, 200);
-      glDrawArrays( GL_POINTS, 0, ndot);
-      glDisableClientState(GL_VERTEX_ARRAY);
-      glDisable(GL_BLEND);
+      DGL->EnableClientState(DGLCSVertexArray);
+      DGL->EnableState(DGLRSBlend);
+      DGL->setBlendFunc(DGLBlendSrcAlpha, DGLBlendInvSrcAlpha);
+
+      DGL->SetVertexPoint(2, 0, dots);
+      DGL->SetColorI(50, 50, 254, 200);
+      DGL->DrawArrays(DGLPointList, 0, ndot);
+      DGL->DisableClientState(DGLCSVertexArray);
+      DGL->DisableState(DGLRSBlend);
+
       delete[] dots;
    }
 }

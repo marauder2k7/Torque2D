@@ -696,9 +696,6 @@
     <ClCompile Include="..\..\source\graphics\dgl.cc">
       <Filter>graphics</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\graphics\dglMatrix.cc">
-      <Filter>graphics</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\graphics\gBitmap.cc">
       <Filter>graphics</Filter>
     </ClCompile>

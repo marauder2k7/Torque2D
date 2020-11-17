@@ -46,23 +46,128 @@ enum DGLMatrixType
    DGLMM_COUNT
 };
 
+enum DGLPolyMode
+{
+   DGLPolyMode_FIRST = 0,
+   DGLFront,
+   DGLBack,
+   DGLFrontAndBack,
+   DGLFill,
+   DGLLine,
+   DGLPoint,
+   DGLPolyMode_COUNT
+};
+
 enum DGLTextureFilter
 {
    DGLTextureFilter_FIRST = 0,
    DGLTextureFilterNone = 0,
    DGLTextureFilterNearest,
    DGLTextureFilterLinear,
-   DGLTextureFilter_COUNT
-};
-
-enum DGLClamp
-{
-   DGLClamp_FIRST = 0,
    DGLClampDef,
    DGLClampRepeat,
    DGLClampEdge,
-   DGLClamp_COUNT
+   DGLTextureFilter_COUNT
 };
+
+// These represent Symbolic base formats
+enum DGLFormat
+{
+   DGLFormat_FIRST = 0,
+
+   // 8 bit texture formats...
+   DGLFormatA8 = 0,// first in group...
+   DGLFormatL8,
+   DGLFormatA4L4,
+
+   // 16 bit texture formats...
+   DGLFormatR5G6B5,// first in group...
+   DGLFormatR4G4B4A4,
+   DGLFormatR5G5B5A1,
+   DGLFormatR5G5B5X1,
+   DGLFormatA8L8,
+   DGLFormatL16,
+   DGLFormatR16F,
+   DGLFormatD16,
+
+   // 24 bit texture formats...
+   DGLFormatR8G8B8,// first in group...
+   DGLFormatR8G8B8_SRGB,
+   // 32 bit texture formats...
+   DGLFormatR8G8B8A8,// first in group...
+   DGLFormatR8G8B8X8,
+   DGLFormatB8G8R8A8,
+   DGLFormatR8G8B8A8_SRGB,
+   DGLFormatR32F,
+   DGLFormatR16G16,
+   DGLFormatR16G16F,
+   DGLFormatR10G10B10A2,
+   DGLFormatR11G11B10,
+   DGLFormatD32,
+   DGLFormatD24X8,
+   DGLFormatD24S8,
+   GFXFormatD24FS8,
+
+   // Guaranteed RGBA8 (for apis which really dont like bgr)
+   DGLFormatR8G8B8A8_LINEAR_FORCE,
+
+   // 64 bit texture formats...
+   DGLFormatR16G16B16A16,// first in group...
+   DGLFormatR16G16B16A16F,
+
+   // 128 bit texture formats...
+   DGLFormatR32G32B32A32F,// first in group...
+
+   DGLFormat_COUNT,
+
+   DGLFormat_8BIT    = DGLFormatA8,
+   DGLFormat_16BIT   = DGLFormatR5G6B5,
+   DGLFormat_24BIT   = DGLFormatR8G8B8,
+   DGLFormat_32BIT   = DGLFormatR8G8B8A8,
+   DGLFormat_64BIT   = DGLFormatR16G16B16A16,
+   DGLFormat_128BIT  = DGLFormatR32G32B32A32F
+
+};
+
+enum DGLCompare
+{
+   DGLCompare_FIRST = 0,
+   DGLNever,
+   DGLLess,
+   DGLEqual,
+   DGLLEqual,
+   DGLGreater,
+   DGLNotEqual,
+   DGLGEqual,
+   DGLAlways,
+   DGLCompare_COUNT
+};
+
+enum DGLTextureParam
+{
+   DGLTextureParam_FIRST = 0,
+   DGLTextureParamMagFilter,
+   DGLTextureParamMinFilter,
+   DGLTextureParamWrapS,
+   DGLTextureParamWrapT,
+   DGLTextureParam_COUNT
+};
+
+enum DGLTextureEnvironment
+{
+   DGLTextureEnvironment_FIRST = 0,
+   //Target
+   DGLTexEnvi,
+   DGLTexFilter,
+   DGLPointSprite,
+   //parameter name
+   DGLTexEnvMode,
+   //parameter
+   DGLModulate,
+   DGLReplace,
+   DGLTextureEnvironment_COUNT
+};
+
 
 /// The supported blend modes.
 enum DGLBlend

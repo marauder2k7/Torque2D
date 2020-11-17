@@ -58,16 +58,16 @@ S32 TextureManager::mTextureResidentCount = 0;
 #else
 struct Forced16BitMapping
 {
-    GLenum wanted;
-    GLenum forced;
-    bool   end;
+   DGLFormat wanted;
+   DGLFormat forced;
+   bool   end;
 };
 
 Forced16BitMapping sg16BitMappings[] =
 {
-    { GL_RGB,  GL_RGB5,  false },
-    { GL_RGBA, GL_RGBA4, false },
-    { 0, 0, true }
+    { DGLFormatR8G8B8,  DGLFormatR5G6B5,  false },
+    { DGLFormatR8G8B8A8, DGLFormatR4G4B4A4, false },
+    { DGLFormat_FIRST, DGLFormat_FIRST, true }
 };
 #define EXT_ARRAY_SIZE 3
 static const char* extArray[EXT_ARRAY_SIZE] = { "", ".jpg", ".png"};
@@ -306,8 +306,6 @@ StringTableEntry TextureManager::getUniqueTextureKey( void )
 
 GBitmap* TextureManager::createPowerOfTwoBitmap(GBitmap* pBitmap)
 {    
-    // Sanity!
-    AssertISV( pBitmap->getFormat() != GBitmap::Palettized, "Paletted bitmaps are not supported." );
 
     // Finish if already a power-of-two in dimension.
     if (isPow2(pBitmap->getWidth()) && isPow2(pBitmap->getHeight()))
@@ -377,46 +375,12 @@ void TextureManager::freeTexture( TextureObject* pTextureObject )
 
 //---------------------------------------------------------------------------------------------------------------------
 
-void TextureManager::getSourceDestByteFormat(GBitmap *pBitmap, U32 *sourceFormat, U32 *destFormat, U32 *byteFormat, U32* texelSize )
+void TextureManager::getSourceDestByteFormat(GBitmap *pBitmap, DGLFormat *sourceFormat )
 {
-    *byteFormat = GL_UNSIGNED_BYTE;
     U32 byteSize = 1;
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
-    switch(pBitmap->getFormat()) 
+    switch (pBitmap->getFormat())
     {
-    case GBitmap::Intensity:
-        AssertFatal( 0, "GBitmap::Intensity GL_INTENSITY format not supported" );
-        break;
-    case GBitmap::Palettized:
-        AssertFatal( 0, "GBitmap::Palettized GL_COLOR_INDEX format not supported" );
-        break;
-    case GBitmap::Luminance:
-        *sourceFormat = GL_LUMINANCE;
-          break;
-    case GBitmap::LuminanceAlpha:
-          *sourceFormat = GL_LUMINANCE_ALPHA;
-          byteSize = 2;
-          break;
-    case GBitmap::RGB:
-        *sourceFormat = GL_RGB;
-        break;
-    case GBitmap::RGBA:
-        *sourceFormat = GL_RGBA;
-        break;
-    case GBitmap::Alpha:
-        *sourceFormat = GL_ALPHA;
-        break;
-    case GBitmap::RGB565:
-        *sourceFormat = GL_RGB;
-        *byteFormat   = GL_UNSIGNED_SHORT_5_6_5;
-        byteSize = 2;
-        break;
-    case GBitmap::RGB5551:
-        *sourceFormat = GL_RGBA;
-        *byteFormat   = GL_UNSIGNED_SHORT_5_5_5_1;
-        byteSize = 1; // Incorrect but assume worst case.
-        break;
-#ifdef TORQUE_OS_IOS
+#if defined(TORQUE_OS_IOS)
     case GBitmap::PVR2:
         *sourceFormat = GL_RGB;
         *byteFormat = GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
@@ -437,93 +401,47 @@ void TextureManager::getSourceDestByteFormat(GBitmap *pBitmap, U32 *sourceFormat
         *byteFormat = GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
         byteSize = 1; // Incorrect but assume worst case.
         break;
-#endif
     }
     *destFormat = *sourceFormat;
     *texelSize = byteSize;
     return;
 #else   
-    switch(pBitmap->getFormat()) 
-    {
-    case GBitmap::Intensity:
-        *sourceFormat = GL_INTENSITY;
-        break; 
+    case DGLFormatA8:
+       *sourceFormat = DGLFormatA8;
+       break;
+    case DGLFormatL8:
+        *sourceFormat = DGLFormatL8;
+        break;
+    case DGLFormatA4L4:
+        *sourceFormat = DGLFormatA4L4;
+        break;
+    case DGLFormatR8G8B8:
+        *sourceFormat = DGLFormatR8G8B8;
+        break;
+    case DGLFormatR8G8B8A8:
+        *sourceFormat = DGLFormatR8G8B8A8;
+        break;
+    
 
-    case GBitmap::Palettized:
-        *sourceFormat = GL_COLOR_INDEX;
-        break;
-
-    case GBitmap::Luminance:
-        *sourceFormat = GL_LUMINANCE;
-        break;
-    case GBitmap::LuminanceAlpha:
-        *sourceFormat = GL_LUMINANCE_ALPHA;
-        break;
-    case GBitmap::RGB:
-        *sourceFormat = GL_RGB;
-        break;
-    case GBitmap::RGBA:
-        *sourceFormat = GL_RGBA;
-        break;
-    case GBitmap::Alpha:
-        *sourceFormat = GL_ALPHA;
-        break;
-
-    case GBitmap::RGB565:
-    case GBitmap::RGB5551:
+    case DGLFormatR5G5B5A1:
+    case DGLFormatR5G5B5X1:
 #if defined(TORQUE_BIG_ENDIAN)
         *sourceFormat = GL_BGRA_EXT;
-        *byteFormat   = GL_UNSIGNED_SHORT_1_5_5_5_REV;
 #else
-        *sourceFormat = GL_RGBA;
-        *byteFormat   = GL_UNSIGNED_SHORT_5_5_5_1;
+        *sourceFormat = DGLFormatR5G5B5A1;
 #endif
         break;
     };
-
-    if(*byteFormat == GL_UNSIGNED_BYTE)
-    {
-        if (*sourceFormat != GL_COLOR_INDEX)
-        {
-            *destFormat = *sourceFormat;
-        }
-        else
-        {
-            *destFormat = GL_COLOR_INDEX8_EXT;
-
-        }
-        byteSize = 1;
-        *texelSize = byteSize;
-    }
-    else
-    {
-        *destFormat = GL_RGB5_A1;
-        *texelSize = 2;
-    }
 
     if (TextureManager::mForce16BitTexture)
     {
         for (U32 i = 0; sg16BitMappings[i].end != true; i++)
         {
-            if (*destFormat == sg16BitMappings[i].wanted)
+            if (*sourceFormat == sg16BitMappings[i].wanted)
             {
-                *destFormat = sg16BitMappings[i].forced;
-                *texelSize = 2;
+                *sourceFormat = sg16BitMappings[i].forced;
                 return;
             }
-        }
-    }
-    else
-    {
-        if(*destFormat == GL_RGB)
-        {
-            *destFormat = GL_RGB8;
-            *texelSize = 3 * byteSize;
-        }
-        else if(*destFormat == GL_RGBA)
-        {
-            *destFormat = GL_RGBA8;
-            *texelSize = 4 * byteSize;
         }
     }
 #endif // defined(TORQUE_OS_IOS)
@@ -531,7 +449,7 @@ void TextureManager::getSourceDestByteFormat(GBitmap *pBitmap, U32 *sourceFormat
 
 //--------------------------------------------------------------------------------------------------------------------
 
-U16* TextureManager::create16BitBitmap( GBitmap *pDL, U8 *in_source8, GBitmap::BitmapFormat alpha_info, GLint *GLformat, GLint *GLdata_type, U32 width, U32 height )
+U16* TextureManager::create16BitBitmap( GBitmap *pDL, U8 *in_source8, DGLFormat alpha_info, DGLFormat *GLFormat, U32 width, U32 height )
 {
     //PUAP -Mat make 16 bit
     U16 *texture_data = new U16[width * height];
@@ -542,21 +460,19 @@ U16* TextureManager::create16BitBitmap( GBitmap *pDL, U8 *in_source8, GBitmap::B
     U32 *source_end = source + spanInBytes;
 
     switch (alpha_info) {
-        case GBitmap::Alpha: //ALPHA_TRANSPARENT:
+        case DGLFormatA8: //ALPHA_TRANSPARENT:
             while (source != source_end) {
                 U32 color = *source++;
                 *dest++ = ((color & 0xF8) << 8) | ((color & 0xF800) >> 5) | ((color & 0xF80000) >> 18) | (color >> 31);
             }
-            *GLformat = GL_RGBA;
-            *GLdata_type = GL_UNSIGNED_SHORT_5_5_5_1;
+            *GLFormat = DGLFormatR5G5B5A1;
             break;
-            case GBitmap::RGBA://ALPHA_BLEND
+            case DGLFormatB8G8R8A8://ALPHA_BLEND
             while (source != source_end) {
                 U32 color = *source++;
                 *dest++ = ((color & 0xF0) << 8) | ((color & 0xF000) >> 4) | ((color & 0xF00000) >> 16) | ((color & 0xF0000000) >> 28);
             }
-            *GLformat = GL_RGBA;
-            *GLdata_type = GL_UNSIGNED_SHORT_4_4_4_4;
+            *GLFormat = DGLFormatR4G4B4A4;
         break;
 
         default://ALPHA_NONE
@@ -574,8 +490,7 @@ U16* TextureManager::create16BitBitmap( GBitmap *pDL, U8 *in_source8, GBitmap::B
                 *dest = ((red & 0xF8) << 8) | ((green & 0xFC) << 3) | ((blue & 0xF8) >> 3);
                 dest++;
             }
-            *GLformat = GL_RGB;
-            *GLdata_type = GL_UNSIGNED_SHORT_5_6_5;
+            *GLFormat = DGLFormatR5G6B5;
         break;
     }
     return texture_data;
@@ -602,7 +517,7 @@ void TextureManager::refresh( TextureObject* pTextureObject )
     U8 *lumBits = NULL;
 
     // Fetch source/dest formats.
-    U32 sourceFormat, destFormat, byteFormat, texelSize;
+    DGLFormat sourceFormat;
    
 #if defined(TORQUE_OS_EMSCRIPTEN)
     if (pSourceBitmap->getFormat() == GBitmap::Alpha)
@@ -616,7 +531,7 @@ void TextureManager::refresh( TextureObject* pTextureObject )
     else
 #endif
     {
-        getSourceDestByteFormat(pSourceBitmap, &sourceFormat, &destFormat, &byteFormat, &texelSize);
+        getSourceDestByteFormat(pSourceBitmap, &sourceFormat);
     }
 
 #if defined(TORQUE_OS_IOS)
@@ -644,20 +559,21 @@ void TextureManager::refresh( TextureObject* pTextureObject )
 #endif
 
     // Bind texture.
-    glBindTexture( GL_TEXTURE_2D, pTextureObject->mGLTextureName );
+    //glBindTexture( GL_TEXTURE_2D, pTextureObject->mGLTextureName );
+
+    DGL->BindTexture(pTextureObject->mGLTextureName);
 
     // Are we forcing to 16-bit?
     if( pSourceBitmap->mForce16Bit )
     {
         // Yes, so generate a 16-bit texture.
-        GLint GLformat;
-        GLint GLdata_type;
+        DGLFormat GLformat;
 
         U16* pBitmap16 = create16BitBitmap( pNewBitmap, pNewBitmap->getWritableBits(), pNewBitmap->getFormat(), 
-                                                &GLformat, &GLdata_type,
+                                                &GLformat,
                                                 pNewBitmap->getWidth(), pNewBitmap->getHeight() );
 
-        glTexImage2D(GL_TEXTURE_2D, 
+        /*glTexImage2D(GL_TEXTURE_2D, 
                         0,
                         GLformat,
                         pNewBitmap->getWidth(), pNewBitmap->getHeight(), 
@@ -665,7 +581,13 @@ void TextureManager::refresh( TextureObject* pTextureObject )
                         GLformat, 
                         GLdata_type,
                         pBitmap16
-                    );
+                    );*/
+
+        DGL->UploadTexture16(0,
+           GLformat,
+           pNewBitmap->getWidth(), pNewBitmap->getHeight(),
+           0,
+           pBitmap16);
 
         //copy new texture_data into pBits
         delete [] pBitmap16;
@@ -673,28 +595,30 @@ void TextureManager::refresh( TextureObject* pTextureObject )
     else
     {
         // No, so upload as-is.
-        glTexImage2D(GL_TEXTURE_2D,
-            0,
-            destFormat,
+        DGL->UploadTexture(0,
+            sourceFormat,
             pNewBitmap->getWidth(), pNewBitmap->getHeight(),
             0,
-            sourceFormat,
-            byteFormat,
             bits);
     }
 
     const DGLTextureFilter filter = pTextureObject->getFilter();
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
 
-    DGLClamp glClamp;
+    DGL->SetTextureParam(DGLTextureParamMagFilter, filter);
+    DGL->SetTextureParam(DGLTextureParamMinFilter, filter);
+
+    DGLTextureFilter glClamp;
     if ( pTextureObject->getClamp() )
         glClamp = DGL->smEdgeClamp ? DGLClampEdge : DGLClampDef;
     else
         glClamp = DGLClampRepeat;
 
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, glClamp );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, glClamp );
+    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, glClamp );
+    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, glClamp );
+    DGL->SetTextureParam(DGLTextureParamWrapS, glClamp);
+    DGL->SetTextureParam(DGLTextureParamWrapT, glClamp);
 
     if(pNewBitmap != pSourceBitmap)
     {
@@ -755,14 +679,14 @@ void TextureManager::createGLName( TextureObject* pTextureObject )
     DGL->LoadTexture(1, pTextureObject->mGLTextureName);
 
     // Fetch source/dest formats.
-    U32 sourceFormat, destFormat, byteFormat, texelSize;
-    getSourceDestByteFormat(pTextureObject->mpBitmap, &sourceFormat, &destFormat, &byteFormat, &texelSize);
+    DGLFormat sourceFormat;
+    getSourceDestByteFormat(pTextureObject->mpBitmap, &sourceFormat);
 
     // Adjust metrics.
     mTextureResidentCount++;
-    pTextureObject->mTextureResidentSize = pTextureObject->mTextureWidth * pTextureObject->mTextureHeight * texelSize;
+    pTextureObject->mTextureResidentSize = pTextureObject->mTextureWidth * pTextureObject->mTextureHeight;
     mTextureResidentSize += pTextureObject->mTextureResidentSize;
-    pTextureObject->mTextureResidentWasteSize = ((pTextureObject->mTextureWidth * pTextureObject->mTextureHeight)-(pTextureObject->mBitmapWidth * pTextureObject->mBitmapHeight)) * texelSize;
+    pTextureObject->mTextureResidentWasteSize = ((pTextureObject->mTextureWidth * pTextureObject->mTextureHeight)-(pTextureObject->mBitmapWidth * pTextureObject->mBitmapHeight));
     mTextureResidentWasteSize += pTextureObject->mTextureResidentWasteSize;
 
     // Refresh the texture.

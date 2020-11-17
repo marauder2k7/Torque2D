@@ -163,18 +163,17 @@ void GuiFilterCtrl::onRender(Point2I offset, const RectI &updateRect)
    ext.x -= 4;
    ext.y -= 4;
 
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
 	//this was the same drawing as dglDrawLine		<Mat>
    DGL->DrawLine( (pos.x), (pos.y+ext.y), (pos.x+ext.x), (pos.y), ColorI(255 *0.9, 255 *0.9, 255 *0.9, 255 *1) );
 
    // draw the curv
-   glColor4f(0.4f, 0.4f, 0.4f, 1.0f);
+   DGL->SetColorF(0.4f, 0.4f, 0.4f, 1.0f);
 
-	GLfloat verts[] = {
+	F32 verts[] = {
 		0.0f, 0.0f,
 		0.0f, 0.0f		
 	};
-	glVertexPointer(2, GL_FLOAT, 0, verts );	
+	DGL->SetVertexPoint(2, 0, verts );	
 
 	F32 scale = 1.0f/F32(ext.x);
 
@@ -192,32 +191,13 @@ void GuiFilterCtrl::onRender(Point2I offset, const RectI &updateRect)
 		  verts[2] = pos.x+i;
 		  verts[3] = pos.y+y;
 
-		  // need to draw a line between each point, and the previous point, so save this point for next time (we get the very first point outside this loop)
-		  glDrawArrays(GL_LINES, 0, 2);
+		  // need to draw a line between each point, and the previous point, 
+        //so save this point for next time 
+        //(we get the very first point outside this loop)
+        DGL->DrawArrays(DGLLineList, 0, 2);
 		  verts[0] = verts[2];
 		  verts[1] = verts[3];
       }
-#else
-   // draw the identity line
-   glColor3f(0.9f, 0.9f, 0.9f);
-   glBegin(GL_LINES);
-      glVertex2i(pos.x, pos.y+ext.y);
-      glVertex2i(pos.x+ext.x, pos.y);
-   glEnd();
-
-   // draw the curve
-   glColor3f(0.4f, 0.4f, 0.4f);
-   glBegin(GL_LINE_STRIP);
-
-      F32 scale = 1.0f/F32(ext.x);
-      for (U32 i=0; S32(i) < ext.x; i++)
-      {
-         F32 index = F32(i)*scale;
-         S32 y = (S32)(ext.y*(1.0f-mFilter.getValue(index)));
-         glVertex2i(pos.x+i, pos.y+y );
-      }
-   glEnd();
-#endif
 
    // draw the knots
    for (U32 k=0; k < (U32)mFilter.size(); k++)

@@ -30,6 +30,11 @@
 #ifndef _RESMANAGER_H_
 #include "io/resource/resourceManager.h"
 #endif
+#ifndef _DGLENUMS_H_
+#include "graphics/dglEnums.h"
+#endif // !_DGLENUMS_H_
+
+
 #ifndef _COLOR_H_
 #include "graphics/gColor.h"
 #endif
@@ -54,27 +59,7 @@ class GBitmap: public ResourceInstance
 {
    //-------------------------------------- public enumerants and structures
   public:
-   /// BitmapFormat and UsageHint are
-   ///  written to the stream in write(...),
-   ///  be sure to maintain compatability
-   ///  if they are changed.
-   enum BitmapFormat {
-      Palettized = 0,
-      Intensity  = 1,
-      RGB        = 2,
-      RGBA       = 3,
-      Alpha      = 4,
-      RGB565     = 5,
-      RGB5551    = 6,
-      Luminance  = 7,
-      LuminanceAlpha = 8
-#ifdef TORQUE_OS_IOS
-       , PVR2 = 9,
-       PVR2A = 10,
-       PVR4 = 11,
-       PVR4A = 12
-#endif
-   };
+
 
    enum Constants {
       c_maxMipLevels = 12 //(2^(12 + 1) = 2048)
@@ -90,13 +75,13 @@ class GBitmap: public ResourceInstance
    GBitmap(const U32  in_width,
            const U32  in_height,
            const bool in_extrudeMipLevels = false,
-           const BitmapFormat in_format = RGB);
+           const DGLFormat in_format = DGLFormatR8G8B8);
    virtual ~GBitmap();
 
    void allocateBitmap(const U32  in_width,
                        const U32  in_height,
                        const bool in_extrudeMipLevels = false,
-                       const BitmapFormat in_format = RGB);
+                       const DGLFormat in_format = DGLFormatR8G8B8);
 
    void extrudeMipLevels(bool clearBorders = false);
    void extrudeMipLevelsDetail();
@@ -105,8 +90,9 @@ class GBitmap: public ResourceInstance
 
    void copyRect(const GBitmap *src, const RectI &srcRect, const Point2I &dstPoint);
 
-   BitmapFormat getFormat()       const;
-   bool         setFormat(BitmapFormat fmt);
+   DGLFormat getFormat()       const;
+   bool         setFormat(DGLFormat fmt);
+   bool         checkForTransparency();
    U32          getNumMipLevels() const;
    U32          getWidth(const U32 in_mipLevel  = 0) const;
    U32          getHeight(const U32 in_mipLevel = 0) const;
@@ -131,7 +117,7 @@ class GBitmap: public ResourceInstance
 
    void deleteImage();
 
-   BitmapFormat internalFormat;
+   DGLFormat internalFormat;
   public:
 
    U8* pBits;            // Master bytes
@@ -142,6 +128,8 @@ class GBitmap: public ResourceInstance
 
    U32 numMipLevels;
    U32 mipLevelOffsets[c_maxMipLevels];
+
+   bool hasTransparency;
 
    bool mForce16Bit;//-Mat some paletted images will always be 16bit
    GPalette* pPalette;      ///< Note that this palette pointer is ALWAYS
@@ -180,7 +168,7 @@ class GBitmap: public ResourceInstance
 //-------------------------------------- Inlines
 //
 
-inline GBitmap::BitmapFormat GBitmap::getFormat() const
+inline DGLFormat GBitmap::getFormat() const
 {
    return internalFormat;
 }
@@ -212,13 +200,6 @@ inline U32 GBitmap::getHeight(const U32 in_mipLevel) const
    return (retVal != 0) ? retVal : 1;
 }
 
-inline const GPalette* GBitmap::getPalette() const
-{
-   AssertFatal(getFormat() == Palettized,
-               "Error, incorrect internal format to return a palette");
-
-   return pPalette;
-}
 
 inline const U8* GBitmap::getBits(const U32 in_mipLevel) const
 {
@@ -251,8 +232,14 @@ inline const U8* GBitmap::getAddress(const S32 in_x, const S32 in_y, const U32 m
 
 extern void (*bitmapExtrude5551)(const void *srcMip, void *mip, U32 height, U32 width);
 extern void (*bitmapExtrudeRGB)(const void *srcMip, void *mip, U32 height, U32 width);
+extern void (*bitmapExtrudeRGBA)(const void *srcMip, void *mip, U32 height, U32 width);
+extern void (*bitmapExtrudeFPRGBA)(const void *srcMip, void *mip, U32 height, U32 width);
 extern void (*bitmapConvertRGB_to_5551)(U8 *src, U32 pixels);
+extern void (*bitmapConvertRGB_to_1555)(U8 *src, U32 pixels);
 extern void (*bitmapExtrudePaletted)(const void *srcMip, void *mip, U32 height, U32 width);
+extern void (*bitmapConvertRGBX_to_RGB)(U8 **src, U32 pixels);
+extern void (*bitmapConvertRGB_to_RGBX)(U8 **src, U32 pixels);
+extern void (*bitmapConvertA8_to_RGBA)(U8 **src, U32 pixels);
 
 void bitmapExtrudeRGB_c(const void *srcMip, void *mip, U32 height, U32 width);
 

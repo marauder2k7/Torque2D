@@ -41,7 +41,7 @@ U32       GBitmap::sBitmapIdSource = 0;
 
 
 GBitmap::GBitmap()
- : internalFormat(RGB),
+ : internalFormat(DGLFormatR8G8B8),
    pBits(NULL),
    byteSize(0),
    width(0),
@@ -49,7 +49,8 @@ GBitmap::GBitmap()
    numMipLevels(0),
    bytesPerPixel(0),
    pPalette(NULL),
-   mForce16Bit(false)
+   mForce16Bit(false),
+   hasTransparency(false)
 {
    for (U32 i = 0; i < c_maxMipLevels; i++)
       mipLevelOffsets[i] = 0xffffffff;
@@ -58,14 +59,7 @@ GBitmap::GBitmap()
 GBitmap::GBitmap(const GBitmap& rCopy)
 {
 
-   if (rCopy.pPalette)
-   {
-      pPalette = new GPalette;
-      pPalette->setPaletteType(rCopy.pPalette->getPaletteType());
-      dMemcpy(rCopy.pPalette->getColors(), pPalette->getColors(), sizeof(ColorI)*256);
-   }
-   else
-      pPalette = NULL;
+   pPalette = NULL;
 
    internalFormat = rCopy.internalFormat;
 
@@ -81,13 +75,15 @@ GBitmap::GBitmap(const GBitmap& rCopy)
    bytesPerPixel = rCopy.bytesPerPixel;
    numMipLevels = rCopy.numMipLevels;
    dMemcpy(mipLevelOffsets, rCopy.mipLevelOffsets, sizeof(mipLevelOffsets));
+
+   hasTransparency = rCopy.hasTransparency;
 }
 
 
 GBitmap::GBitmap(const U32  in_width,
                  const U32  in_height,
                  const bool in_extrudeMipLevels,
-                 const BitmapFormat in_format)
+                 const DGLFormat in_format)
  : pBits(NULL),
    byteSize(0),
    pPalette(NULL),
@@ -97,6 +93,8 @@ GBitmap::GBitmap(const U32  in_width,
       mipLevelOffsets[i] = 0xffffffff;
 
    allocateBitmap(in_width, in_height, in_extrudeMipLevels, in_format);
+
+   hasTransparency = false;
 }
 
 
@@ -147,7 +145,7 @@ void GBitmap::copyRect(const GBitmap *src, const RectI &srcRect, const Point2I &
 }
 
 //--------------------------------------------------------------------------
-void GBitmap::allocateBitmap(const U32 in_width, const U32 in_height, const bool in_extrudeMipLevels, const BitmapFormat in_format)
+void GBitmap::allocateBitmap(const U32 in_width, const U32 in_height, const bool in_extrudeMipLevels, const DGLFormat in_format)
 {
    //-------------------------------------- Some debug checks...
    U32 svByteSize = byteSize;
@@ -166,19 +164,21 @@ void GBitmap::allocateBitmap(const U32 in_width, const U32 in_height, const bool
 
    bytesPerPixel = 1;
    switch (internalFormat) {
-     case Alpha:
-     case Palettized:
-     case Luminance:
-     case Intensity:  bytesPerPixel = 1;
+     case DGLFormatA8:
+     case DGLFormatL8:           bytesPerPixel = 1;
       break;
-     case RGB:        bytesPerPixel = 3;
+     case DGLFormatR8G8B8:       bytesPerPixel = 3;
       break;
-     case RGBA:       bytesPerPixel = 4;
+     case DGLFormatR8G8B8A8_LINEAR_FORCE:
+     case DGLFormatR8G8B8X8:
+     case DGLFormatR8G8B8A8:     bytesPerPixel = 4;
       break;
-     case LuminanceAlpha:
-     case RGB565:
-     case RGB5551:    bytesPerPixel = 2;
+     case DGLFormatL16:
+     case DGLFormatR5G6B5:
+     case DGLFormatR5G5B5A1:     bytesPerPixel = 2;
       break;
+     case DGLFormatR16G16B16A16F:
+     case DGLFormatR16G16B16A16: bytesPerPixel = 8;
 #ifdef TORQUE_OS_IOS
         case PVR2:
         case PVR2A:
@@ -407,39 +407,35 @@ void GBitmap::extrudeMipLevels(bool clearBorders)
 
    switch (getFormat())
    {
-      case RGB5551:
+      case DGLFormatR5G5B5A1:
       {
          for(U32 i = 1; i < numMipLevels; i++)
             bitmapExtrude5551(getBits(i - 1), getWritableBits(i), getHeight(i), getWidth(i));
          break;
       }
 
-      case RGB:
+      case DGLFormatR8G8B8:
       {
          for(U32 i = 1; i < numMipLevels; i++)
             bitmapExtrudeRGB(getBits(i - 1), getWritableBits(i), getHeight(i-1), getWidth(i-1));
          break;
       }
 
-      case RGBA:
+      case DGLFormatR8G8B8A8:
+      case DGLFormatR8G8B8X8:
       {
          for(U32 i = 1; i < numMipLevels; i++)
             bitmapExtrudeRGBA(getBits(i - 1), getWritableBits(i), getHeight(i-1), getWidth(i-1));
          break;
       }
 
-      case Palettized:
+      case DGLFormatR16G16B16A16F:
       {
          for(U32 i = 1; i < numMipLevels; i++)
             bitmapExtrudePaletted(getBits(i - 1), getWritableBits(i), getHeight(i-1), getWidth(i-1));
          break;
       }
       
-      case Intensity:
-      case Luminance:
-      case LuminanceAlpha:
-      case Alpha:
-      case RGB565:
 #ifdef TORQUE_OS_IOS
       case PVR2:
       case PVR2A:
@@ -482,8 +478,8 @@ void GBitmap::extrudeMipLevels(bool clearBorders)
 //--------------------------------------------------------------------------
 void GBitmap::extrudeMipLevelsDetail()
 {
-   AssertFatal(getFormat() == GBitmap::RGB, "Error, only handles RGB for now...");
-   U32 i,j;
+   AssertFatal(getFormat() == DGLFormatR8G8B8, "Error, only handles RGB for now...");
+   U32 i, j;
 
    if(numMipLevels == 1)
       allocateBitmap(getWidth(), getHeight(), true, getFormat());
@@ -515,6 +511,8 @@ void GBitmap::extrudeMipLevelsDetail()
 }
 
 //--------------------------------------------------------------------------
+
+
 void bitmapConvertRGB_to_5551_c(U8 *src, U32 pixels)
 {
    U16 *dst = (U16 *)src;
@@ -533,13 +531,48 @@ void bitmapConvertRGB_to_5551_c(U8 *src, U32 pixels)
    }
 }
 
+void(*bitmapConvertRGB_to_5551)(U8 *src, U32 pixels) = bitmapConvertRGB_to_5551_c;
+
+void bitmapConvertRGBX_to_RGB_c(U8 **src, U32 pixels)
+{
+   const U8 *oldBits = *src;
+   U8 *newBits = new U8[pixels * 3];
+
+   // Copy the bits over to the new memory
+   for (U32 i = 0; i < pixels; i++)
+      dMemcpy(&newBits[i * 3], &oldBits[i * 4], sizeof(U8) * 3);
+
+   // Now hose the old bits
+   delete[] * src;
+   *src = newBits;
+}
+
+void(*bitmapConvertRGBX_to_RGB)(U8 **src, U32 pixels) = bitmapConvertRGBX_to_RGB_c;
 
 
-void (*bitmapConvertRGB_to_5551)(U8 *src, U32 pixels) = bitmapConvertRGB_to_5551_c;
+//------------------------------------------------------------------------------
 
+void bitmapConvertA8_to_RGBA_c(U8 **src, U32 pixels)
+{
+   const U8 *oldBits = *src;
+   U8 *newBits = new U8[pixels * 4];
+
+   // Zero new bits
+   dMemset(newBits, 0, pixels * 4);
+
+   // Copy Alpha values
+   for (U32 i = 0; i < pixels; i++)
+      newBits[i * 4 + 3] = oldBits[i];
+
+   // Now hose the old bits
+   delete[] * src;
+   *src = newBits;
+}
+
+void(*bitmapConvertA8_to_RGBA)(U8 **src, U32 pixels) = bitmapConvertA8_to_RGBA_c;
 
 //--------------------------------------------------------------------------
-bool GBitmap::setFormat(BitmapFormat fmt)
+bool GBitmap::setFormat(DGLFormat fmt)
 {
    if (getFormat() == fmt)
       return true;
@@ -552,18 +585,94 @@ bool GBitmap::setFormat(BitmapFormat fmt)
 
    switch (getFormat())
    {
-      case RGB:
-         if ( fmt == RGB5551 )
-         {
-            bitmapConvertRGB_to_5551(pBits, pixels);
-            internalFormat = RGB5551;
-            bytesPerPixel  = 2;
-         }
+   case DGLFormatR8G8B8:
+      switch (fmt)
+      {
+      case DGLFormatR5G5B5A1:
+
+         bitmapConvertRGB_to_5551(pBits, pixels);
+         internalFormat = DGLFormatR5G5B5A1;
+         bytesPerPixel = 2;
+         break;
+
+      case DGLFormatR8G8B8A8:
+      case DGLFormatR8G8B8X8:
+         // Took this out, it may crash -patw
+         //AssertFatal( mNumMipLevels == 1, "Do the mip-mapping in hardware." );
+
+         bitmapConvertRGB_to_RGBX(&pBits, pixels);
+         internalFormat = fmt;
+         bytesPerPixel = 4;
+         byteSize = pixels * 4;
          break;
 
       default:
          AssertWarn(0, "GBitmap::setFormat: unable to convert bitmap to requested format.");
          return false;
+      }
+      break;
+
+   case DGLFormatR8G8B8X8:
+      switch (fmt)
+      {
+         // No change needed for this
+      case DGLFormatR8G8B8A8:
+         internalFormat = DGLFormatR8G8B8A8;
+         break;
+
+      case DGLFormatR8G8B8:
+         bitmapConvertRGBX_to_RGB(&pBits, pixels);
+         internalFormat = DGLFormatR8G8B8;
+         bytesPerPixel = 3;
+         byteSize = pixels * 3;
+         break;
+
+      default:
+         AssertWarn(0, "GBitmap::setFormat: unable to convert bitmap to requested format.");
+         return false;
+      }
+      break;
+
+   case DGLFormatR8G8B8A8:
+      switch (fmt)
+      {
+         // No change needed for this
+      case DGLFormatR8G8B8X8:
+         internalFormat = DGLFormatR8G8B8X8;
+         break;
+
+      case DGLFormatR8G8B8:
+         bitmapConvertRGBX_to_RGB(&pBits, pixels);
+         internalFormat = DGLFormatR8G8B8;
+         bytesPerPixel = 3;
+         byteSize = pixels * 3;
+         break;
+
+      default:
+         AssertWarn(0, "GBitmap::setFormat: unable to convert bitmap to requested format.");
+         return false;
+      }
+      break;
+
+   case DGLFormatA8:
+      switch (fmt)
+      {
+      case DGLFormatR8G8B8A8:
+         internalFormat = DGLFormatR8G8B8A8;
+         bitmapConvertA8_to_RGBA(&pBits, pixels);
+         bytesPerPixel = 4;
+         byteSize = pixels * 4;
+         break;
+
+      default:
+         AssertWarn(0, "GBitmap::setFormat: unable to convert bitmap to requested format.");
+         return false;
+      }
+      break;
+
+   default:
+      AssertWarn(0, "GBitmap::setFormat: unable to convert bitmap to requested format.");
+      return false;
    }
 
    U32 offset = 0;
@@ -574,6 +683,51 @@ bool GBitmap::setFormat(BitmapFormat fmt)
    }
 
    return true;
+}
+
+//------------------------------------------------------------------------------
+
+bool GBitmap::checkForTransparency()
+{
+   hasTransparency = false;
+
+   ColorI pixel(255, 255, 255, 255);
+
+   switch (internalFormat)
+   {
+      // Non-transparent formats
+   case DGLFormatL8:
+   case DGLFormatL16:
+   case DGLFormatR8G8B8:
+   case DGLFormatR5G6B5:
+      break;
+      // Transparent formats
+   case DGLFormatA8:
+   case DGLFormatR8G8B8A8:
+   case DGLFormatR5G5B5A1:
+      // Let getColor() do the heavy lifting
+      for (U32 x = 0; x < width; x++)
+      {
+         for (U32 y = 0; y < height; y++)
+         {
+            if (getColor(x, y, pixel))
+            {
+               if (pixel.alpha < 255)
+               {
+                  hasTransparency = true;
+                  break;
+               }
+            }
+         }
+      }
+
+      break;
+   default:
+      AssertFatal(false, "GBitmap::checkForTransparency: misunderstood format specifier");
+      break;
+   }
+
+   return hasTransparency;
 }
 
 
@@ -605,36 +759,26 @@ bool GBitmap::getColor(const U32 x, const U32 y, ColorI& rColor) const
 {
    if (x >= width || y >= height)
       return false;
-   if (internalFormat == Palettized && pPalette == NULL)
-      return false;
 
    const U8* pLoc = getAddress(x, y);
 
    switch (internalFormat) {
-     case Palettized:
-      rColor = pPalette->getColor(*pLoc);
+   case DGLFormatA8:
+   case DGLFormatL8:
+      rColor.set(*pLoc, *pLoc, *pLoc, *pLoc);
+      break;
+   case DGLFormatL16:
+      rColor.set(U8(U16((pLoc[0] << 8) + pLoc[1])), 0, 0, 0);
+   case DGLFormatR8G8B8:
+   case DGLFormatR8G8B8X8:
+      rColor.set(pLoc[0], pLoc[1], pLoc[2], 255);
       break;
 
-     case Alpha:
-     case Intensity:
-     case Luminance:
-      rColor.set( *pLoc, *pLoc, *pLoc, *pLoc );
+   case DGLFormatR8G8B8A8:
+      rColor.set(pLoc[0], pLoc[1], pLoc[2], pLoc[3]);
       break;
 
-     case RGB:
-      rColor.set( pLoc[0], pLoc[1], pLoc[2], 255 );
-      break;
-
-     case RGBA:
-      rColor.set( pLoc[0], pLoc[1], pLoc[2], pLoc[3] );
-      break;
-         
-     case LuminanceAlpha:
-      rColor.set( pLoc[0], pLoc[0], pLoc[0], pLoc[1] );
-      break;
-         
-
-     case RGB5551:
+   case DGLFormatR5G5B5A1:
 #if defined(TORQUE_BIG_ENDIAN)
       rColor.red   = (*((U16*)pLoc) >> 0) & 0x1F;
       rColor.green = (*((U16*)pLoc) >> 5) & 0x1F;
@@ -662,37 +806,37 @@ bool GBitmap::setColor(const U32 x, const U32 y, ColorI& rColor)
 {
    if (x >= width || y >= height)
       return false;
-   if (internalFormat == Palettized && pPalette == NULL)
-      return false;
 
    U8* pLoc = getAddress(x, y);
 
    switch (internalFormat) {
-     case Palettized:
-      rColor = pPalette->getColor(*pLoc);
-      break;
-
-     case Alpha:
-     case Intensity:
-     case Luminance:
+   case DGLFormatA8:
+   case DGLFormatL8:
       *pLoc = rColor.alpha;
       break;
-         
-     case LuminanceAlpha:
-      *pLoc = rColor.red;
-      *(pLoc+1) = rColor.alpha;
-      break;
-         
 
-     case RGB:
-      dMemcpy( pLoc, &rColor, 3 * sizeof( U8 ) );
+   case DGLFormatL16:
+      dMemcpy(pLoc, &rColor, 2 * sizeof(U8));
       break;
 
-     case RGBA:
-      dMemcpy( pLoc, &rColor, 4 * sizeof( U8 ) );
+   case DGLFormatR8G8B8:
+      dMemcpy(pLoc, &rColor, 3 * sizeof(U8));
       break;
 
-     case RGB5551:
+   case DGLFormatR8G8B8A8:
+   case DGLFormatR8G8B8X8:
+      dMemcpy(pLoc, &rColor, 4 * sizeof(U8));
+      break;
+
+   case DGLFormatR5G6B5:
+#ifdef TORQUE_BIG_ENDIAN
+      *((U16*)pLoc) = (rColor.red << 11) | (rColor.green << 5) | (rColor.blue << 0);
+#else
+      *((U16*)pLoc) = (rColor.blue << 0) | (rColor.green << 5) | (rColor.red << 11);
+#endif
+      break;
+
+   case DGLFormatR5G5B5A1:
 #if defined(TORQUE_BIG_ENDIAN)
       *((U16*)pLoc) = (((rColor.alpha>0) ? 1 : 0)<<15) | (rColor.blue << 10) | (rColor.green << 5) | (rColor.red << 0);
 #else
@@ -822,23 +966,22 @@ bool GBitmap::read(Stream& io_rStream)
    //-------------------------------------- Read the object
    U32 fmt;
    io_rStream.read(&fmt);
-   internalFormat = BitmapFormat(fmt);
+   internalFormat = DGLFormat(fmt);
    bytesPerPixel = 1;
    switch (internalFormat) {
-     case Alpha:
-     case Palettized:
-     case Luminance:
-     case Intensity:  bytesPerPixel = 1;
+   case DGLFormatA8:
+   case DGLFormatL8:  bytesPerPixel = 1;
       break;
-     case RGB:        bytesPerPixel = 3;
+   case DGLFormatR8G8B8:        bytesPerPixel = 3;
       break;
-     case RGBA:       bytesPerPixel = 4;
+   case DGLFormatR8G8B8A8:       bytesPerPixel = 4;
       break;
-     case RGB565:
-     case RGB5551:    bytesPerPixel = 2;
+   case DGLFormatL16:
+   case DGLFormatR5G6B5:
+   case DGLFormatR5G5B5A1:    bytesPerPixel = 2;
       break;
-     default:
-      AssertFatal(false, "GBitmap::GBitmap: misunderstood format specifier");
+   default:
+      AssertFatal(false, "GBitmap::read: misunderstood format specifier");
       break;
    }
 
@@ -854,10 +997,7 @@ bool GBitmap::read(Stream& io_rStream)
    for (U32 i = 0; i < c_maxMipLevels; i++)
       io_rStream.read(&mipLevelOffsets[i]);
 
-   if (internalFormat == Palettized) {
-      pPalette = new GPalette;
-      pPalette->read(io_rStream);
-   }
+   checkForTransparency();
 
    return (io_rStream.getStatus() == Stream::Ok);
 }
@@ -879,12 +1019,6 @@ bool GBitmap::write(Stream& io_rStream) const
    io_rStream.write(numMipLevels);
    for (U32 i = 0; i < c_maxMipLevels; i++)
       io_rStream.write(mipLevelOffsets[i]);
-
-   if (internalFormat == Palettized) {
-      AssertFatal(pPalette != NULL,
-                  "GBitmap::write: cannot write a palettized bitmap wo/ a palette");
-      pPalette->write(io_rStream);
-   }
 
     return true;
 }

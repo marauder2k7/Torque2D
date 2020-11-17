@@ -846,8 +846,8 @@ void SceneObject::sceneRenderOverlay( const SceneRenderState* sceneRenderState )
         return;
 
     // Clear blending.
-    glDisable( GL_BLEND );
-    glDisable( GL_TEXTURE_2D );
+    DGL->DisableState(DGLRSBlend);
+    DGL->DisableState(DGLRSTexture2D);
 
     // AABB debug draw.
     if ( debugMask & Scene::SCENE_DEBUG_AABB )
@@ -2749,32 +2749,32 @@ void SceneObject::setBlendOptions( void )
     if ( mBlendMode )
     {
         // Enable Blending.
-        glEnable( GL_BLEND );
+        DGL->EnableState(DGLRSBlend);
         // Set Blend Function.
-        glBlendFunc( mSrcBlendFactor, mDstBlendFactor );
+        DGL->setBlendFunc( (DGLBlend)mSrcBlendFactor, (DGLBlend)mDstBlendFactor );
 
         // Set color.
-        glColor4f(mBlendColor.red,mBlendColor.green,mBlendColor.blue,mBlendColor.alpha );
+        DGL->SetColorF(mBlendColor.red,mBlendColor.green,mBlendColor.blue,mBlendColor.alpha );
     }
     else
     {
         // Disable Blending.
-        glDisable( GL_BLEND );
+        DGL->DisableState(DGLRSBlend);
         // Reset color.
-        glColor4f(1,1,1,1);
+        DGL->SetColorF(1,1,1,1);
     }
 
     // Set Alpha Test.
     if ( mAlphaTest >= 0.0f )
     {
         // Enable Test.
-        glEnable( GL_ALPHA_TEST );
-        glAlphaFunc( GL_GREATER, mAlphaTest );
+        DGL->EnableState(DGLRSAlphaTest);
+        DGL->setAlphaFunc(DGLGreater, mAlphaTest);
     }
     else
     {
         // Disable Test.
-        glDisable( GL_ALPHA_TEST );
+       DGL->DisableState(DGLRSAlphaTest);
     }
 }
 
@@ -2783,12 +2783,12 @@ void SceneObject::setBlendOptions( void )
 void SceneObject::resetBlendOptions( void )
 {
     // Disable Blending.
-    glDisable( GL_BLEND );
+    DGL->DisableState(DGLRSBlend);
 
-    glDisable( GL_ALPHA_TEST);
+    DGL->DisableState(DGLRSAlphaTest);
 
     // Reset color.
-    glColor4f(1,1,1,1);
+    DGL->SetColorF(1, 1, 1, 1);
 }
 
 //---------------------------------------------------------------------------------------------
@@ -4287,12 +4287,12 @@ S32 SceneObject::getSrcBlendFactorEnum(const char* label)
     // Warn.
     Con::warnf("SceneObject::getSrcBlendFactorEnum() - Invalid source blend factor of '%s'", label );
 
-    return GL_INVALID_BLEND_FACTOR;
+    return DGLBlend_FIRST;
 }
 
 //-----------------------------------------------------------------------------
 
-const char* SceneObject::getSrcBlendFactorDescription(const DGLBlend factor)
+const char* SceneObject::getSrcBlendFactorDescription(const S32 factor)
 {
     // Search for Mnemonic.
     for (U32 i = 0; i < (sizeof(srcBlendFactorLookup) / sizeof(EnumTable::Enums)); i++)
@@ -4326,7 +4326,7 @@ S32 SceneObject::getDstBlendFactorEnum(const char* label)
 
 //-----------------------------------------------------------------------------
 
-const char* SceneObject::getDstBlendFactorDescription(const DGLBlend factor)
+const char* SceneObject::getDstBlendFactorDescription(const S32 factor)
 {
     // Search for Mnemonic.
     for(U32 i = 0; i < (sizeof(dstBlendFactorLookup) / sizeof(EnumTable::Enums)); i++)
