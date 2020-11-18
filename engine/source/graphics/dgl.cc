@@ -38,8 +38,17 @@
 
 #include "dglMac_ScriptBinding.h"
 #include "dgl_ScriptBinding.h"
-
 #include <vector>
+
+Vector<DGLDevice*> DGLDevice::smDeviceList;
+DGLDevice * DGLDevice::smCurrentDevice = NULL;
+bool DGLDevice::smCritical = false;
+bool DGLDevice::smNeedResurrect = false;
+bool DGLDevice::smDisableVSync = true;
+bool DGLDevice::smEdgeClamp = false;
+
+DGLVideoMode DGLDevice::smCurrentRes;
+bool DGLDevice::smIsFullScreen;
 
 namespace {
 
@@ -50,13 +59,9 @@ ColorF colorAlphaW(1.0f, 1.0f, 1.0f, 0.0f);
 
 } // namespace {}
 
-DGLDevice * DGLDevice::smCurrentDevice = NULL;
-
-bool DGLDevice::smDisableVsync = true;
-
 DGLDevice::DGLDevice()
 {
-   VECTOR_SET_ASSOCIATION(mVideoModes);
+   VECTOR_SET_ASSOCIATION(mVideoModeList);
    mDeviceName = NULL;
    AssertFatal(smCurrentDevice == NULL, "Already a GFXDevice created! Bad!");
    smCurrentDevice = this;
@@ -206,7 +211,6 @@ bool DGLDevice::setDevice(const char * renderName, U32 width, U32 height, U32 bp
    bool result = smCurrentDevice->activate(width, height, bpp, fullScreen);
    smCritical = false;
 
-   smDGL = smCurrentDevice;
 
    if (result)
    {
@@ -1599,9 +1603,8 @@ bool DGLDevice::PointToScreen( Point3F &point3D, Point3F &screenPoint )
    screenPoint.y = y;
    screenPoint.z = z;
 
-
-   return (result == GL_TRUE);
-    */
+   */
+   return (true);
 }
 
 
@@ -1843,6 +1846,7 @@ bool DGLDevice::CheckState(const S32 mvDepth, const S32 pDepth,
             (v.extent.x == vp[2]) &&
             (v.extent.y == vp[3])));
     */
+   return true;
 }
 
 #if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
@@ -1854,16 +1858,16 @@ GLfloat gTextureVerts[8];
 bool DGLDevice::prevRes()
 {
    U32 resIndex;
-   for (resIndex = mVideoModes.size() - 1; resIndex > 0; resIndex--)
+   for (resIndex = mVideoModeList.size() - 1; resIndex > 0; resIndex--)
    {
-      if (mVideoModes[resIndex].bpp == smCurrentRes.bpp
-         && mVideoModes[resIndex].w <= smCurrentRes.w
-         && mVideoModes[resIndex].h != smCurrentRes.h)
+      if (mVideoModeList[resIndex].bpp == smCurrentRes.bpp
+         && mVideoModeList[resIndex].w <= smCurrentRes.w
+         && mVideoModeList[resIndex].h != smCurrentRes.h)
          break;
    }
 
-   if (mVideoModes[resIndex].bpp == smCurrentRes.bpp)
-      return(setResolution(mVideoModes[resIndex].w, mVideoModes[resIndex].h, mVideoModes[resIndex].bpp));
+   if (mVideoModeList[resIndex].bpp == smCurrentRes.bpp)
+      return(setResolution(mVideoModeList[resIndex].w, mVideoModeList[resIndex].h, mVideoModeList[resIndex].bpp));
 
    return(false);
 }
@@ -1873,16 +1877,16 @@ bool DGLDevice::prevRes()
 bool DGLDevice::nextRes()
 {
    U32 resIndex;
-   for (resIndex = 0; resIndex < (U32)mVideoModes.size() - 1; resIndex++)
+   for (resIndex = 0; resIndex < (U32)mVideoModeList.size() - 1; resIndex++)
    {
-      if (mVideoModes[resIndex].bpp == smCurrentRes.bpp
-         && mVideoModes[resIndex].w >= smCurrentRes.w
-         && mVideoModes[resIndex].h != smCurrentRes.h)
+      if (mVideoModeList[resIndex].bpp == smCurrentRes.bpp
+         && mVideoModeList[resIndex].w >= smCurrentRes.w
+         && mVideoModeList[resIndex].h != smCurrentRes.h)
          break;
    }
 
-   if (mVideoModes[resIndex].bpp == smCurrentRes.bpp)
-      return(setResolution(mVideoModes[resIndex].w, mVideoModes[resIndex].h, mVideoModes[resIndex].bpp));
+   if (mVideoModeList[resIndex].bpp == smCurrentRes.bpp)
+      return(setResolution(mVideoModeList[resIndex].w, mVideoModeList[resIndex].h, mVideoModeList[resIndex].bpp));
 
    return(false);
 }
@@ -1895,16 +1899,16 @@ bool DGLDevice::nextRes()
 const char* DGLDevice::getResolutionList()
 {
    if (Con::getBoolVariable("$pref::Video::clipHigh", false))
-      for (S32 i = mVideoModes.size() - 1; i >= 0; --i)
-         if (mVideoModes[i].w > 1152 || mVideoModes[i].h > 864)
-            mVideoModes.erase(i);
+      for (S32 i = mVideoModeList.size() - 1; i >= 0; --i)
+         if (mVideoModeList[i].w > 1152 || mVideoModeList[i].h > 864)
+            mVideoModeList.erase(i);
 
    if (Con::getBoolVariable("$pref::Video::only16", false))
-      for (S32 i = mVideoModes.size() - 1; i >= 0; --i)
-         if (mVideoModes[i].bpp == 32)
-            mVideoModes.erase(i);
+      for (S32 i = mVideoModeList.size() - 1; i >= 0; --i)
+         if (mVideoModeList[i].bpp == 32)
+            mVideoModeList.erase(i);
 
-   U32 resCount = mVideoModes.size();
+   U32 resCount = mVideoModeList.size();
    if (resCount > 0)
    {
       char* tempBuffer = new char[resCount * 15];
@@ -1912,7 +1916,7 @@ const char* DGLDevice::getResolutionList()
       for (U32 i = 0; i < resCount; i++)
       {
          char newString[15];
-         dSprintf(newString, sizeof(newString), "%d %d %d\t", mVideoModes[i].w, mVideoModes[i].h, mVideoModes[i].bpp);
+         dSprintf(newString, sizeof(newString), "%d %d %d\t", mVideoModeList[i].w, mVideoModeList[i].h, mVideoModeList[i].bpp);
          dStrcat(tempBuffer, newString);
       }
       tempBuffer[dStrlen(tempBuffer) - 1] = 0;

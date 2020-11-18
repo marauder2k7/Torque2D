@@ -33,7 +33,7 @@ namespace DGLGLEnumTranslate
 
 extern GLenum DGLGLPrimitiveType[DGLPT_COUNT];
 extern GLenum DGLGLBlend[DGLBlend_COUNT];
-extern GLenum DGLGLMatrixType[DGLMM_COUNT];
+extern GLenum DGLGLMatrixMode[DGLMM_COUNT];
 extern GLenum DGLGLRenderState[DGLRS_COUNT];
 extern GLenum DGLGLClientState[DGLCS_COUNT];
 extern GLenum DGLGLBufferBit[DGLBB_COUNT];
@@ -49,6 +49,8 @@ extern GLenum DGLGLInternalFormat[DGLFormat_COUNT];
 extern GLenum DGLGLTextureData[DGLFormat_COUNT];
 
 extern GLenum DGLGLTextureEnvironment[DGLTextureEnvironment_COUNT];
+
+extern GLenum DGLGLAPIValues[DGLAPIValues_COUNT];
 
 
 #endif //_GLENUMTRANSLATE_H_

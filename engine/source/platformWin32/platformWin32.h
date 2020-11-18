@@ -101,24 +101,10 @@ struct Win32PlatState
 
 extern Win32PlatState winState;
 
-extern bool GL_Init( const char *dllname_gl, const char *dllname_glu );
-extern bool GL_EXT_Init();
-extern void GL_Shutdown();
-
 extern HWND CreateOpenGLWindow( U32 width, U32 height, bool fullScreen, bool allowSizing = true );
 extern HWND CreateCurtain( U32 width, U32 height );
 extern void CreatePixelFormat( PIXELFORMATDESCRIPTOR *pPFD, S32 colorBits, S32 depthBits, S32 stencilBits, bool stereo );
 extern S32  ChooseBestPixelFormat( HDC hDC, PIXELFORMATDESCRIPTOR *pPFD );
 extern void setModifierKeys( S32 modKeys );
-
-#define WGLD3D_FUNCTION(fn_type, fn_name, fn_args, fn_value) extern fn_type (__stdcall *dwgl##fn_name)fn_args;
-#define WGL_FUNCTION(fn_type, fn_name, fn_args, fn_value) extern fn_type (__stdcall *d##fn_name)fn_args;
-#include "platformWin32/GLWinFunc.h"
-#undef WGL_FUNCTION
-#undef WGLD3D_FUNCTION
-
-#define WGLEXT_FUNCTION(fn_type, fn_name, fn_args, fn_value) extern fn_type (__stdcall *d##fn_name)fn_args;
-#include "platformWin32/GLWinExtFunc.h"
-#undef WGLEXT_FUNCTION
 
 #endif //_PLATFORMWIN32_H_

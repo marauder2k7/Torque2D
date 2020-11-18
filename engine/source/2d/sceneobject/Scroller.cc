@@ -327,24 +327,24 @@ void Scroller::sceneRender( const SceneRenderState* pSceneRenderState, const Sce
 
     //This is to prevent some android devices from throwing opengl errors. For instance the tegra 3 only supports 1
     int maxClip = 4;
-    glGetIntegerv(GL_MAX_CLIP_PLANES, &maxClip);
+    DGL->GetApiValue(DGLMaxClip, (S32*)maxClip);
 
-    glClipPlane(GL_CLIP_PLANE0, left);
+    DGL->SetClipPlane(DGLRSClipPlane0, left);
 
     if (maxClip > 1)
-    	glClipPlane(GL_CLIP_PLANE1, right);
+       DGL->SetClipPlane(DGLRSClipPlane1, left);
     if (maxClip > 2)
-    	glClipPlane(GL_CLIP_PLANE2, top);
+       DGL->SetClipPlane(DGLRSClipPlane2, left);
     if (maxClip > 3)
-    glClipPlane(GL_CLIP_PLANE3, bottom);
+       DGL->SetClipPlane(DGLRSClipPlane3, left);
 
-    glEnable(GL_CLIP_PLANE0);
+    DGL->EnableState(DGLRSClipPlane0);
     if (maxClip > 1)
-    	glEnable(GL_CLIP_PLANE1);
+       DGL->EnableState(DGLRSClipPlane1);
     if (maxClip > 2)
-    	glEnable(GL_CLIP_PLANE2);
+       DGL->EnableState(DGLRSClipPlane2);
     if (maxClip > 3)
-    	glEnable(GL_CLIP_PLANE3);
+       DGL->EnableState(DGLRSClipPlane3);
 
 #endif
 
@@ -392,13 +392,13 @@ void Scroller::sceneRender( const SceneRenderState* pSceneRenderState, const Sce
 
 #ifndef TORQUE_OS_EMSCRIPTEN
     // Disable the OOBB clip-planes.
-    glDisable(GL_CLIP_PLANE0);
+    DGL->DisableState(DGLRSClipPlane0);
     if (maxClip > 1)
-    	glDisable(GL_CLIP_PLANE1);
+       DGL->DisableState(DGLRSClipPlane1);
     if (maxClip > 2)
-    	glDisable(GL_CLIP_PLANE2);
+       DGL->DisableState(DGLRSClipPlane2);
     if (maxClip > 3)
-    	glDisable(GL_CLIP_PLANE3);
+       DGL->DisableState(DGLRSClipPlane3);
 
 #endif
 }

@@ -42,14 +42,14 @@ ConsoleFunctionWithDocs(CaptureScreenArea, bool, 7, 7, (posX, posY, width, heigh
     }
 
     // Read gl pixels here
-    glReadBuffer(GL_FRONT);
+    DGL->SetReadBuffer(DGLFront);
    
     Point2I extent;
     extent.x = width;
     extent.y = height;
 
     U8 * pixels = new U8[extent.x * extent.y * 4];
-    glReadPixels(positionX, positionY, extent.x, extent.y, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+    DGL->SetReadPixels(positionX, positionY, extent.x, extent.y, pixels);
 
     GBitmap * bitmap = new GBitmap;
     bitmap->allocateBitmap(U32(extent.x), U32(extent.y));

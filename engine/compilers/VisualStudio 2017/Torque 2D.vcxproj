@@ -389,7 +389,6 @@
     <ClCompile Include="..\..\source\graphics\gBitmap.cc" />
     <ClCompile Include="..\..\source\graphics\gFont.cc" />
     <ClCompile Include="..\..\source\graphics\gl\dglglDevice.cc" />
-    <ClCompile Include="..\..\source\graphics\gl\dglglInit.cc" />
     <ClCompile Include="..\..\source\graphics\gl\glad\gladGL.cc" />
     <ClCompile Include="..\..\source\graphics\gl\glEnumTranslate.cc" />
     <ClCompile Include="..\..\source\graphics\gl\win\dglGlDevice.win.cc" />
@@ -919,7 +918,6 @@
     <ClInclude Include="..\..\source\graphics\gFont.h" />
     <ClInclude Include="..\..\source\graphics\gFont_ScriptBinding.h" />
     <ClInclude Include="..\..\source\graphics\gl\dglglDevice.h" />
-    <ClInclude Include="..\..\source\graphics\gl\dglglInit.h" />
     <ClInclude Include="..\..\source\graphics\gl\glad\gladGL.h" />
     <ClInclude Include="..\..\source\graphics\gl\glad\gladWGL.h" />
     <ClInclude Include="..\..\source\graphics\gl\glEnumTranslate.h" />

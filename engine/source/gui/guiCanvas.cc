@@ -1367,8 +1367,6 @@ void GuiCanvas::swapBuffers()
 {
    PROFILE_START(SwapBuffers);
    //flip the surface
-   if(!mRenderFront)
-      DGL->swapBuffers();
    PROFILE_END();
 }
 

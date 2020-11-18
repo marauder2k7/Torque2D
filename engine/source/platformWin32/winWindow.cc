@@ -705,7 +705,7 @@ static LRESULT PASCAL WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
    case WM_ACTIVATEAPP:
       if ((bool) wParam)
       {         
-         DGLDevice::reactivate();
+         //DGLDevice::reactivate();
 
          if (DGLDevice::isFullScreen() )
             hideTheTaskbar();
@@ -726,7 +726,7 @@ static LRESULT PASCAL WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
          if ( lParam == 0 )
             sgKeyboardStateDirty = true;
          
-         DGLDevice::deactivate();
+         //DGLDevice::deactivate();
          restoreTheTaskbar();
 
       }
@@ -1211,139 +1211,11 @@ void CreatePixelFormat( PIXELFORMATDESCRIPTOR *pPFD, S32 colorBits, S32 depthBit
 }
 
 //--------------------------------------
-enum WinConstants { MAX_PFDS = 256 };
 
 #ifndef PFD_GENERIC_ACCELERATED
 #define PFD_GENERIC_ACCELERATED     0x00001000
 #endif
 
-S32 ChooseBestPixelFormat(HDC hDC, PIXELFORMATDESCRIPTOR *pPFD)
-{
-   PIXELFORMATDESCRIPTOR pfds[MAX_PFDS+1];
-   S32 i;
-   S32 bestMatch = 0;
-
-   S32 maxPFD = dwglDescribePixelFormat(hDC, 1, sizeof(PIXELFORMATDESCRIPTOR), &pfds[0]);
-   if(maxPFD > MAX_PFDS)
-      maxPFD = MAX_PFDS;
-
-   bool accelerated = false;
-
-   for(i = 1; i <= maxPFD; i++)
-   {
-      dwglDescribePixelFormat(hDC, i, sizeof(PIXELFORMATDESCRIPTOR), &pfds[i]);
-
-      // make sure this has hardware acceleration:
-      if ( ( pfds[i].dwFlags & PFD_GENERIC_FORMAT ) != 0 )
-         continue;
-
-      // verify pixel type
-      if ( pfds[i].iPixelType != PFD_TYPE_RGBA )
-         continue;
-
-      // verify proper flags
-      if ( ( ( pfds[i].dwFlags & pPFD->dwFlags ) & pPFD->dwFlags ) != pPFD->dwFlags )
-         continue;
-
-      accelerated = !(pfds[i].dwFlags & PFD_GENERIC_FORMAT);
-
-      //
-      // selection criteria (in order of priority):
-      //
-      //  PFD_STEREO
-      //  colorBits
-      //  depthBits
-      //  stencilBits
-      //
-      if ( bestMatch )
-      {
-         // check stereo
-         if ( ( pfds[i].dwFlags & PFD_STEREO ) && ( !( pfds[bestMatch].dwFlags & PFD_STEREO ) ) && ( pPFD->dwFlags & PFD_STEREO ) )
-         {
-            bestMatch = i;
-            continue;
-         }
-
-         if ( !( pfds[i].dwFlags & PFD_STEREO ) && ( pfds[bestMatch].dwFlags & PFD_STEREO ) && ( pPFD->dwFlags & PFD_STEREO ) )
-         {
-            bestMatch = i;
-            continue;
-         }
-
-         // check color
-         if ( pfds[bestMatch].cColorBits != pPFD->cColorBits )
-         {
-            // prefer perfect match
-            if ( pfds[i].cColorBits == pPFD->cColorBits )
-            {
-               bestMatch = i;
-               continue;
-            }
-            // otherwise if this PFD has more bits than our best, use it
-            else if ( pfds[i].cColorBits > pfds[bestMatch].cColorBits )
-            {
-               bestMatch = i;
-               continue;
-            }
-         }
-
-         // check depth
-         if ( pfds[bestMatch].cDepthBits != pPFD->cDepthBits )
-         {
-            // prefer perfect match
-            if ( pfds[i].cDepthBits == pPFD->cDepthBits )
-            {
-               bestMatch = i;
-               continue;
-            }
-            // otherwise if this PFD has more bits than our best, use it
-            else if ( pfds[i].cDepthBits > pfds[bestMatch].cDepthBits )
-            {
-               bestMatch = i;
-               continue;
-            }
-         }
-
-         // check stencil
-         if ( pfds[bestMatch].cStencilBits != pPFD->cStencilBits )
-         {
-            // prefer perfect match
-            if ( pfds[i].cStencilBits == pPFD->cStencilBits )
-            {
-               bestMatch = i;
-               continue;
-            }
-            // otherwise if this PFD has more bits than our best, use it
-            else if ( ( pfds[i].cStencilBits > pfds[bestMatch].cStencilBits ) &&
-               ( pPFD->cStencilBits > 0 ) )
-            {
-               bestMatch = i;
-               continue;
-            }
-         }
-      }
-      else
-      {
-         bestMatch = i;
-      }
-   }
-
-   if ( !bestMatch )
-      return 0;
-
-   else if ( pfds[bestMatch].dwFlags & PFD_GENERIC_ACCELERATED )
-   {
-      // MCD
-   }
-   else
-   {
-      // ICD
-   }
-
-   *pPFD = pfds[bestMatch];
-
-   return bestMatch;
-}
 
 //--------------------------------------
 //

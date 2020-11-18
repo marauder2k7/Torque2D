@@ -42,7 +42,7 @@ void drawSplineBeam( const Point3F& camPos, U32 numSegments,
    F32 texRepFactor = approxBeamLength * numTexRep;
 
 
-   glBegin(GL_TRIANGLE_STRIP);
+   //glBegin(GL_TRIANGLE_STRIP);
 
 
    for( U32 i=0; i<numSegments; i++ )
@@ -82,15 +82,15 @@ void drawSplineBeam( const Point3F& camPos, U32 numSegments,
 
       F32 u = uvOffset + texRepFactor * t;
 
-      glTexCoord2f( u, 0.0f );
-      glVertex3fv( curPoint + crossVec );
+      //glTexCoord2f( u, 0.0f );
+      //glVertex3fv( curPoint + crossVec );
 
-      glTexCoord2f( u, 1.0f );
-      glVertex3fv( curPoint - crossVec );
+      //glTexCoord2f( u, 1.0f );
+      //glVertex3fv( curPoint - crossVec );
 
    }
 
-   glEnd();
+   //glEnd();
 
 
 }
@@ -111,7 +111,7 @@ void drawSplineBeam( SplineBeamInfo &sbi )
    F32 texRepFactor = approxBeamLength * sbi.numTexRep;
 
 
-   glBegin(GL_TRIANGLE_STRIP);
+   //glBegin(GL_TRIANGLE_STRIP);
 
 
    for( U32 i=0; i<sbi.numSegments; i++ )
@@ -151,24 +151,24 @@ void drawSplineBeam( SplineBeamInfo &sbi )
 
       F32 u = sbi.uvOffset + texRepFactor * t;
 
-      if( i== 0 && sbi.zeroAlphaStart )
+      /*if( i== 0 && sbi.zeroAlphaStart )
       {
-         glColor4f( sbi.color.red, sbi.color.green, sbi.color.blue, 0.0f );
+         DGL->SetColorF( sbi.color.red, sbi.color.green, sbi.color.blue, 0.0f );
       }
       else
       {
          glColor4fv( sbi.color.address());
-      }
+      }*/
 
-      glTexCoord2f( u, 0.0 );
-      glVertex3fv( curPoint + crossVec );
+      //glTexCoord2f( u, 0.0 );
+      //glVertex3fv( curPoint + crossVec );
 
-      glTexCoord2f( u, 1.0 );
-      glVertex3fv( curPoint - crossVec );
+     // glTexCoord2f( u, 1.0 );
+     // glVertex3fv( curPoint - crossVec );
 
    }
 
-   glEnd();
+   //glEnd();
 
 }
 

@@ -401,12 +401,12 @@ void GuiColorPickerCtrl::onRender(Point2I offset, const RectI& updateRect)
 
          U32 rBuffer[4] = { 255, 255, 255, 255 };
 
-         glReadBuffer( GL_BACK );
+         DGL->SetReadBuffer( DGLBack );
 
          U32 buf_x = offset.x + mSelectorPos.x + 1;
          U32 buf_y = extent.y - ( offset.y + mSelectorPos.y + 1 );
                   
-         glReadPixels( buf_x, buf_y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, rBuffer );
+         DGL->SetReadPixels( buf_x, buf_y, 1, 1, rBuffer );
       
          mPickColor = ColorI( rBuffer[ 0 ], rBuffer[ 1 ], rBuffer[ 2 ], 255 );
 

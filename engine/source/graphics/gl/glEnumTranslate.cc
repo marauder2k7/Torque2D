@@ -41,6 +41,8 @@ GLenum DGLGLTextureData[DGLFormat_COUNT];
 
 GLenum DGLGLTextureEnvironment[DGLTextureEnvironment_COUNT];
 
+GLenum DGLGLAPIValues[DGLAPIValues_COUNT];
+
 void DGLGLEnumTranslate::init()
 {
 
@@ -67,10 +69,10 @@ void DGLGLEnumTranslate::init()
    DGLGLBlend[DGLBlendSrcAlphaSat]        = GL_SRC_ALPHA_SATURATE;
 
    // Matrix Mode
-   DGLGLMatrixType[DGLMatrixMode]         = GL_MATRIX_MODE;
-   DGLGLMatrixType[DGLModelView]          = GL_MODELVIEW;
-   DGLGLMatrixType[DGLProjection]         = GL_PROJECTION;
-   DGLGLMatrixType[DGLTexture]            = GL_TEXTURE;
+   DGLGLMatrixMode[DGLMatrixMode]         = GL_MATRIX_MODE;
+   DGLGLMatrixMode[DGLModelView]          = GL_MODELVIEW;
+   DGLGLMatrixMode[DGLProjection]         = GL_PROJECTION;
+   DGLGLMatrixMode[DGLTexture]            = GL_TEXTURE;
 
    // Render States
    DGLGLRenderState[DGLRSBlend]           = GL_BLEND;
@@ -214,5 +216,11 @@ void DGLGLEnumTranslate::init()
 
    DGLGLTextureEnvironment[DGLModulate]      = GL_MODULATE;
    DGLGLTextureEnvironment[DGLReplace]       = GL_REPLACE;
+
+   // Misc
+   DGLGLAPIValues[DGLMaxClip]       = GL_MAX_CLIP_PLANES;
+   DGLGLAPIValues[DGLMVStackDepth]  = GL_MODELVIEW_STACK_DEPTH;
+   DGLGLAPIValues[DGLPROJDepth]     = GL_PROJECTION_STACK_DEPTH;
+   DGLGLAPIValues[DGLTexStackDepth] = GL_TEXTURE_STACK_DEPTH;
 
 }

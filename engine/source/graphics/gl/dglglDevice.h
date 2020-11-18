@@ -36,21 +36,12 @@ public:
    //------------------------------------------------------------------------------
    // INIT
    //------------------------------------------------------------------------------
-
    DGLGLDevice();
-   virtual void initDevice();
-   bool activate(U32 width, U32 height, U32 bpp, bool fullScreen);
+   virtual bool activate(U32 width, U32 height, U32 bpp, bool fullScreen);
    void shutdown();
-   void destroy();
-   bool setScreenMode(U32 width, U32 height, U32 bpp, bool fullScreen, bool forceIt = false, bool repaint = true);
-   void swapBuffers();
-   const char* getDriverInfo();
-   bool getGammaCorrection(F32 &g);
-   bool setGammaCorrection(F32 g);
-   bool getVerticalSync();
-   bool setVerticalSync(bool on);
    void initGLstate();
-   virtual void create();
+   virtual DGLDevice* create();
+   virtual bool setScreenMode(U32 width, U32 height, U32 bpp, bool fullScreen, bool forceIt, bool repaint);
    virtual void enumerateVideoModes();
 
    //------------------------------------------------------------------------------
@@ -90,6 +81,9 @@ public:
    virtual void SetTextureEnvironment(DGLTextureEnvironment target, DGLTextureEnvironment name, DGLTextureEnvironment param);
    virtual void SetRotate(F32 ang, F32 x, F32 y, F32 z);
    virtual void SetTranslate(F32 x, F32 y, F32 z);
+   virtual void SetClipPlane(DGLRenderState clipPlane, const F64 *side);
+   virtual void SetReadBuffer(DGLPolyMode poly);
+   virtual void SetReadPixels(U32 posx, U32 posy, S32 width, S32 height, void * pixels);
 
    //-------------------------------------------------------------------------------
    // TEXTURE
@@ -116,6 +110,10 @@ public:
    virtual void DrawElements(DGLPrimitiveType type, U32 count, const void * buff);
    virtual void DrawArrays(DGLPrimitiveType type, U32 first, U32 count);
 
+   //------------------------------------------------------------------------------
+   // MISC
+   //------------------------------------------------------------------------------
+   virtual void GetApiValue(DGLAPIValues inval, S32 *outVal);
 
 };
 

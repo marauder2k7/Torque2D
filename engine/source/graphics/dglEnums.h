@@ -143,6 +143,16 @@ enum DGLCompare
    DGLCompare_COUNT
 };
 
+enum DGLAPIValues
+{
+   DGLAPIValues_FIRST = 0,
+   DGLMaxClip,
+   DGLMVStackDepth,
+   DGLPROJDepth,
+   DGLTexStackDepth,
+   DGLAPIValues_COUNT
+};
+
 enum DGLTextureParam
 {
    DGLTextureParam_FIRST = 0,

@@ -19,6 +19,9 @@ namespace GLAD
 
    void gglPerformExtensionBinds(void *context)
    {
-
+      if (!gladLoadWGL(wglGetCurrentDC()))
+      {
+         AssertFatal(false, "Unable to load GLAD WGL extensions. Make sure your OpenGL drivers are up to date!");
+      }
    }
 }

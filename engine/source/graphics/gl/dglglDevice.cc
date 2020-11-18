@@ -75,7 +75,7 @@ DGLGLDevice::DGLGLDevice() :
    mMaxShaderTextures(2),
    mContext(NULL)
 {
-
+   mDeviceName = "OpenGL";
 }
 
 //------------------------------------------------------------------------------
@@ -182,7 +182,7 @@ void DGLGLDevice::initGLstate()
    }
 #endif
 
-   PlatformGL::setVSync(smDisableVsync ? 0 : 1);
+   //PlatformGL::setVSync(smDisableVsync ? 0 : 1);
 
    GLuint vao;
    glGenVertexArrays(1, &vao);
@@ -299,7 +299,7 @@ void DGLGLDevice::DrawArrays(DGLPrimitiveType type, U32 first, U32 count)
 
 void DGLGLDevice::setMatrix(DGLMatrixType type)
 {
-   glMatrixMode(DGLGLMatrixType[type]);
+   glMatrixMode(DGLGLMatrixMode[type]);
 }
 
 void DGLGLDevice::LoadMatrix(const MatrixF *m)
@@ -491,6 +491,22 @@ void DGLGLDevice::SetTranslate(F32 x, F32 y, F32 z)
    glTranslatef(x, y, z);
 }
 
+void DGLGLDevice::SetClipPlane(DGLRenderState clipPlane, const F64 * side)
+{
+   glClipPlane(DGLGLRenderState[clipPlane], side);
+}
+
+void DGLGLDevice::SetReadBuffer(DGLPolyMode poly)
+{
+   glReadBuffer(DGLGLPolyMode[poly]);
+}
+
+void DGLGLDevice::SetReadPixels(U32 posx, U32 posy, S32 width, S32 height, void * pixels)
+{
+   glReadPixels(posx, posy, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+}
+
+
 //------------------------------------------------------------------------------
 // RENDER END
 //------------------------------------------------------------------------------
@@ -540,6 +556,9 @@ void DGLGLDevice::UploadTexture(U32 mip, DGLFormat inFmt, U32 width, U32 height,
 // TEXTURE END
 //------------------------------------------------------------------------------
 
-
+void DGLGLDevice::GetApiValue(DGLAPIValues inval, S32 *outVal)
+{
+   glGetIntegerv(DGLGLAPIValues[inval], outVal);
+}
 
 
