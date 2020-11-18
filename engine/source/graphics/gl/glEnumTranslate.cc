@@ -213,9 +213,11 @@ void DGLGLEnumTranslate::init()
    DGLGLTextureEnvironment[DGLPointSprite]   = GL_POINT_SPRITE;
 
    DGLGLTextureEnvironment[DGLTexEnvMode]    = GL_TEXTURE_ENV_MODE;
+   DGLGLTextureEnvironment[DGLTexEnvColor]   = GL_TEXTURE_ENV_COLOR;
 
    DGLGLTextureEnvironment[DGLModulate]      = GL_MODULATE;
    DGLGLTextureEnvironment[DGLReplace]       = GL_REPLACE;
+   DGLGLTextureEnvironment[DGLTexBlend]      = GL_BLEND;
 
    // Misc
    DGLGLAPIValues[DGLMaxClip]       = GL_MAX_CLIP_PLANES;

@@ -126,28 +126,28 @@ class Point3F;*/
     void DrawBlendBox(RectI & bounds, ColorF & c1, ColorF & c2, ColorF & c3, ColorF & c4);
     void DrawBlendRangeBox(RectI & bounds, bool vertical, U8 numColors, ColorI * colors);
 
-    virtual void DrawBitmap(TextureObject* texObject,
+    void DrawBitmap(TextureObject* texObject,
        const Point2I& in_rAt,
        const U32      in_flip = GFlip_None);
 
-    virtual void DrawBitmapTile(TextureObject* texObject,
+    void DrawBitmapTile(TextureObject* texObject,
        const RectI&   in_rTile,
        const U32      in_flip = GFlip_None,
        F32			    fSpin = 0.0f,
        bool           bSilhouette = false);
 
-    virtual void DrawBitmapStretch(TextureObject* texObject,
+    void DrawBitmapStretch(TextureObject* texObject,
        const RectI&   in_rStretch,
        const U32      in_flip = GFlip_None,
        F32			    fSpin = 0.0f,
        bool           bSilhouette = false);
 
-    virtual void DrawBitmapSR(TextureObject* texObject,
+    void DrawBitmapSR(TextureObject* texObject,
        const Point2I& in_rAt,
        const RectI&   in_rSubRegion,
        const U32      in_flip = GFlip_None);
 
-    virtual void DrawBitmapStretchSR(TextureObject* texObject,
+    void DrawBitmapStretchSR(TextureObject* texObject,
        const RectI&   in_rStretch,
        const RectI&   in_rSubRegion,
        const U32      in_flip = GFlip_None,
@@ -164,20 +164,20 @@ class Point3F;*/
     //-------------------------------------------------------------------------------
     // Drawing primitives
     //-------------------------------------------------------------------------------
-    virtual void DrawLine(S32 x1, S32 y1, S32 x2, S32 y2, const ColorI &color);
-    virtual void DrawLine(const Point2I &startPt, const Point2I &endPt, const ColorI &color);
-    virtual void DrawTriangleFill(const Point2I& pt1, const Point2I& pt2, const Point2I& pt3, const ColorI& color);
-    virtual void DrawRect(const Point2I &upperL, const Point2I &lowerR, const ColorI &color, const float &lineWidth = 1.0f);
-    virtual void DrawRect(const RectI &rect, const ColorI &color, const float &lineWidth = 1.0f);
-    virtual void DrawRectFill(const Point2I &upperL, const Point2I &lowerR, const ColorI &color);
-    virtual void DrawRectFill(const RectI &rect, const ColorI &color);
-    virtual void DrawQuadFill(const Point2I &point1, const Point2I &point2, const Point2I &point3, const Point2I &point4, const ColorI &color);
-    virtual void Draw2DSquare(const Point2F &screenPoint, F32 width, F32 spinAngle);
-    virtual void DrawBillboard(const Point3F &position, F32 width, F32 spinAngle);
-    virtual void WireCube(const Point3F &extent, const Point3F &center);
-    virtual void SolidCube(const Point3F &extent, const Point3F & enter);
-    virtual void DrawCircle(const Point2I &center, const F32 radius, const ColorI &color, const F32 &lineWidth = 1.0f);
-    virtual void DrawCircleFill(const Point2I &center, const F32 radius, const ColorI &color);
+    void DrawLine(S32 x1, S32 y1, S32 x2, S32 y2, const ColorI &color);
+    void DrawLine(const Point2I &startPt, const Point2I &endPt, const ColorI &color);
+    void DrawTriangleFill(const Point2I& pt1, const Point2I& pt2, const Point2I& pt3, const ColorI& color);
+    void DrawRect(const Point2I &upperL, const Point2I &lowerR, const ColorI &color, const float &lineWidth = 1.0f);
+    void DrawRect(const RectI &rect, const ColorI &color, const float &lineWidth = 1.0f);
+    void DrawRectFill(const Point2I &upperL, const Point2I &lowerR, const ColorI &color);
+    void DrawRectFill(const RectI &rect, const ColorI &color);
+    void DrawQuadFill(const Point2I &point1, const Point2I &point2, const Point2I &point3, const Point2I &point4, const ColorI &color);
+    void Draw2DSquare(const Point2F &screenPoint, F32 width, F32 spinAngle);
+    void DrawBillboard(const Point3F &position, F32 width, F32 spinAngle);
+    void WireCube(const Point3F &extent, const Point3F &center);
+    void SolidCube(const Point3F &extent, const Point3F & enter);
+    void DrawCircle(const Point2I &center, const F32 radius, const ColorI &color, const F32 &lineWidth = 1.0f);
+    void DrawCircleFill(const Point2I &center, const F32 radius, const ColorI &color);
     /// @}
 
     virtual void GetApiValue(DGLAPIValues inval, S32 *outVal) = 0;
@@ -203,6 +203,7 @@ class Point3F;*/
     virtual void SetLineWidth(F32 width) = 0;
     virtual void SetPolygonMode(DGLPolyMode face, DGLPolyMode mode) = 0;
     virtual void SetTextureEnvironment(DGLTextureEnvironment target, DGLTextureEnvironment name, DGLTextureEnvironment param) = 0;
+    virtual void SetTextureEnvironmentF(DGLTextureEnvironment target, DGLTextureEnvironment name, const F32 *val) = 0;
     virtual void SetRotate(F32 ang, F32 x, F32 y, F32 z) = 0;
     virtual void SetTranslate(F32 x, F32 y, F32 z) = 0;
     virtual void SetClipPlane(DGLRenderState clipPlane, const F64 *side) = 0;

@@ -79,6 +79,7 @@ public:
    virtual void SetLineWidth(F32 width);
    virtual void SetPolygonMode(DGLPolyMode face, DGLPolyMode mode);
    virtual void SetTextureEnvironment(DGLTextureEnvironment target, DGLTextureEnvironment name, DGLTextureEnvironment param);
+   virtual void SetTextureEnvironmentF(DGLTextureEnvironment target, DGLTextureEnvironment name, const F32 *val);
    virtual void SetRotate(F32 ang, F32 x, F32 y, F32 z);
    virtual void SetTranslate(F32 x, F32 y, F32 z);
    virtual void SetClipPlane(DGLRenderState clipPlane, const F64 *side);

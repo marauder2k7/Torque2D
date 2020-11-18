@@ -77,6 +77,7 @@ void DGLDevice::init()
    smIsFullScreen = false;
 
    destroy();
+
 }
 
 //------------------------------------------------------------------------------
@@ -479,27 +480,28 @@ void DGLDevice::DrawBitmapStretchSR(TextureObject* texture,
       return;
    AssertFatal(srcRect.isValidRect() == true,
                "GSurface::drawBitmapStretchSR: routines assume normal rects");
-   /*
-   glDisable(GL_LIGHTING);
 
-   glEnable(GL_TEXTURE_2D);
-   glBindTexture(GL_TEXTURE_2D, texture->getGLTextureName());
-   //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+   DisableState(DGLRSLighting);
+   EnableState(DGLRSTexture2D);
+   BindTexture(texture->getGLTextureName());
+
 
    if (bSilhouette)
    {
-      glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
+      SetTextureEnvironment(DGLTexEnvi, DGLTexEnvMode, DGLTexBlend);
    
       ColorF kModulationColor;
       GetBitmapModulation(&kModulationColor);
-      glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, kModulationColor.address());
+      SetTextureEnvironmentF(DGLTexEnvi, DGLTexEnvColor, kModulationColor.address());
    }
    else
    {
-      glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+      SetTextureEnvironment(DGLTexEnvi, DGLTexEnvMode, DGLModulate);
    }
-   glEnable(GL_BLEND);
-   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+   EnableState(DGLRSBlend);
+   setBlendFunc(DGLBlendSrcAlpha, DGLBlendInvSrcAlpha);
 
    F32 texLeft   = F32(srcRect.point.x)                    / F32(texture->getTextureWidth());
    F32 texRight  = F32(srcRect.point.x + srcRect.extent.x) / F32(texture->getTextureWidth());
@@ -558,43 +560,42 @@ void DGLDevice::DrawBitmapStretchSR(TextureObject* texture,
       texBottom = temp;
    }
 
-   glColor4ub(sg_bitmapModulation.red,
+   SetColorI(sg_bitmapModulation.red,
              sg_bitmapModulation.green,
              sg_bitmapModulation.blue,
              sg_bitmapModulation.alpha);
 
 
-    GLfloat verts[] = {
-        (GLfloat)scrPoints[0].x, (GLfloat)scrPoints[0].y,
-        (GLfloat)scrPoints[1].x, (GLfloat)scrPoints[1].y,
-        (GLfloat)scrPoints[2].x, (GLfloat)scrPoints[2].y,
-        (GLfloat)scrPoints[3].x, (GLfloat)scrPoints[3].y,
+    F32 verts[] = {
+        scrPoints[0].x, scrPoints[0].y,
+        scrPoints[1].x, scrPoints[1].y,
+        scrPoints[2].x, scrPoints[2].y,
+        scrPoints[3].x, scrPoints[3].y,
     };
-    GLfloat texVerts[] = {
-        (GLfloat)texLeft, (GLfloat)texTop,
-        (GLfloat)texRight, (GLfloat)texTop,		
-        (GLfloat)texLeft, (GLfloat)texBottom,
-        (GLfloat)texRight, (GLfloat)texBottom,
+    F32 texVerts[] = {
+        texLeft,  texTop,
+        texRight, texTop,		
+        texLeft,  texBottom,
+        texRight, texBottom,
     };
     
     
-    glDisableClientState(GL_COLOR_ARRAY);
+    DisableClientState(DGLCSColorArray);
     //glDisableClientState(GL_POINT_SIZE_ARRAY_OES);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    
-    glVertexPointer(2, GL_FLOAT, 0, verts);
-    glTexCoordPointer(2, GL_FLOAT, 0, texVerts);
-    
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    EnableClientState(DGLCSVertexArray);
+    EnableClientState(DGLCSTextCoordArray);
+
+    SetVertexPoint(2, 0, verts);
+    SetTexPoint(2, 0, texVerts);
+    DrawArrays(DGLTriangleStrip, 0, 4);
 
    if (bSilhouette)
    {
-      glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, ColorF(0.0f, 0.0f, 0.0f, 0.0f).address());
+      SetTextureEnvironmentF(DGLTexEnvi, DGLTexEnvColor, ColorF(0.0f, 0.0f, 0.0f, 0.0f).address());
    }
 
-   glDisable(GL_BLEND);
-   glDisable(GL_TEXTURE_2D);*/
+   DisableState(DGLRSBlend);
+   DisableState(DGLRSTexture2D);
 }
 
 void DGLDevice::DrawBitmap(TextureObject* texture, const Point2I& in_rAt, const U32 in_flip)
@@ -720,222 +721,6 @@ U32 DGLDevice::DrawTextN(GFont*          font,
 
 //-----------------------------------------------------------------------------
 
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
-U32 DGLDevice::DrawTextN(GFont*          font,
-                 const Point2I&  ptDraw,
-                 const UTF16*    in_string,
-                 U32             n,
-                 const ColorI*   colorTable,
-                 const U32       maxColorIndex,
-                 F32             rot)
-
-{
-   // return on zero length strings
-   if( n < 1 )
-      return ptDraw.x;
-
-
-   MatrixF rotMatrix( EulerF( 0.0, 0.0, mDegToRad( rot ) ) );
-   Point3F offset( ptDraw.x, ptDraw.y, 0.0 );
-   Point3F points[4];
-
-   U32 nCharCount = 0;
-
-   Point2I     pt;
-   UTF16       c;
-   pt.x                 = 0;
-
-   ColorI                  currentColor;
-   S32                     currentPt = 0;
-
-   TextureObject *lastTexture = NULL;
-
-   currentColor      = sg_bitmapModulation;
-
-   FrameTemp<TextVertex> vert(4*n);
-   /*
-   glDisable(GL_LIGHTING);
-
-   glEnable(GL_TEXTURE_2D);
-   glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-   glEnable(GL_BLEND);
-
-   //Luma: Optimise by setting states once before inner loop
-   glEnableClientState ( GL_VERTEX_ARRAY );
-   glEnableClientState ( GL_COLOR_ARRAY );
-   glEnableClientState ( GL_TEXTURE_COORD_ARRAY );
-   glVertexPointer     ( 2, GL_FLOAT, sizeof(TextVertex), &(vert[0].p) );
-   glColorPointer      ( 4, GL_UNSIGNED_BYTE, sizeof(TextVertex), &(vert[0].c) );
-   glTexCoordPointer   ( 2, GL_FLOAT, sizeof(TextVertex), &(vert[0].t) );
-
-   // first build the point, color, and coord arrays
-   U32 i;
-
-   for(i = 0,c = in_string[i];in_string[i] && i < n;i++,c = in_string[i])
-   {
-      nCharCount++;
-      if(nCharCount > n)
-          break;
-
-      // We have to do a little dance here since \t = 0x9, \n = 0xa, and \r = 0xd
-      if ((c >=  1 && c <=  7) ||
-         (c >= 11 && c <= 12) ||
-         (c == 14))
-      {
-         // Color code
-         if (colorTable)
-         {
-            static U8 remap[15] =
-            {
-               0x0, // 0 special null terminator
-               0x0, // 1 ascii start-of-heading??
-               0x1, 
-               0x2, 
-               0x3, 
-               0x4, 
-               0x5, 
-               0x6, 
-               0x0, // 8 special backspace
-               0x0, // 9 special tab
-               0x0, // a special \n
-               0x7, 
-               0x8,
-               0x0, // a special \r
-               0x9 
-            };
-
-            U8 remapped = remap[c];
-            // Ignore if the color is greater than the specified max index:
-            if ( remapped <= maxColorIndex )
-            {
-               const ColorI &clr = colorTable[remapped];
-               sg_bitmapModulation = clr;
-               currentColor = clr;
-            }
-         }
-         continue;
-      }
-
-      // reset color?
-      if ( c == 15 )
-      {
-         currentColor = sg_textAnchorColor;
-         sg_bitmapModulation = sg_textAnchorColor;
-         continue;
-      }
-
-      // push color:
-      if ( c == 16 )
-      {
-         sg_stackColor = sg_bitmapModulation;
-         continue;
-      }
-
-      // pop color:
-      if ( c == 17 )
-      {
-         currentColor = sg_stackColor;
-         sg_bitmapModulation = sg_stackColor;
-         continue;
-      }
-
-      // Tab character
-      if ( c == dT('\t') ) 
-      {
-          const PlatformFont::CharInfo &ci = font->getCharInfo( dT(' ') );
-          pt.x += ci.xIncrement * GFont::TabWidthInSpaces;
-          continue;
-      }
-
-      if( !font->isValidChar( c ) )  
-         continue;
-
-      const PlatformFont::CharInfo &ci = font->getCharInfo(c);
-
-      if(ci.bitmapIndex == -1)
-      {
-         pt.x += ci.xOrigin + ci.xIncrement;
-         continue;
-      }
-
-      TextureObject *newObj = font->getTextureHandle(ci.bitmapIndex);
-      if(newObj != lastTexture)
-      {
-         if(currentPt)
-         {
-            glBindTexture(GL_TEXTURE_2D, lastTexture->getGLTextureName());
-
-            //Luma:	More optimal rendering
-            for (S32 i=0; i<currentPt; i+=4) 
-            {
-                glDrawArrays(GL_TRIANGLE_STRIP, i, 4);
-            }
-            currentPt = 0;
-         }
-         lastTexture = newObj;
-      }
-      if(ci.width != 0 && ci.height != 0)
-      {
-         pt.y = font->getBaseline() - ci.yOrigin;
-         pt.x += ci.xOrigin;
-
-         F32 texLeft   = F32(ci.xOffset)             / F32(lastTexture->getTextureWidth());
-         F32 texRight  = F32(ci.xOffset + ci.width)  / F32(lastTexture->getTextureWidth());
-         F32 texTop    = F32(ci.yOffset)             / F32(lastTexture->getTextureHeight());
-         F32 texBottom = F32(ci.yOffset + ci.height) / F32(lastTexture->getTextureHeight());
-
-         F32 screenLeft   = pt.x;
-         F32 screenRight  = pt.x + ci.width;
-         F32 screenTop    = pt.y;
-         F32 screenBottom = pt.y + ci.height;
-
-         points[0] = Point3F(screenLeft, screenTop, 0.0);
-         points[1] = Point3F(screenRight,  screenTop, 0.0);
-         points[2] = Point3F( screenLeft,  screenBottom, 0.0);
-         points[3] = Point3F( screenRight, screenBottom, 0.0);
-
-         for( int i=0; i<4; i++ )
-         {
-            rotMatrix.mulP( points[i] );
-            points[i] += offset;
-         }
-         vert[currentPt++].set(points[0].x, points[0].y, texLeft, texTop, currentColor);
-         vert[currentPt++].set(points[1].x, points[1].y, texRight, texTop, currentColor);
-         vert[currentPt++].set(points[2].x, points[2].y, texLeft, texBottom, currentColor);
-         vert[currentPt++].set(points[3].x, points[3].y, texRight, texBottom, currentColor);
-         pt.x += ci.xIncrement - ci.xOrigin;
-      }
-      else
-         pt.x += ci.xIncrement;
-   }
-   if(currentPt)
-   {
-       //Luma:	More optimal rendering
-       glBindTexture(GL_TEXTURE_2D, lastTexture->getGLTextureName());
-       for (S32 i=0; i<currentPt; i+=4) 
-       {
-            glDrawArrays(GL_TRIANGLE_STRIP, i, 4);
-       }
-   }
-
-   glDisableClientState ( GL_VERTEX_ARRAY );
-   glDisableClientState ( GL_COLOR_ARRAY );
-   glDisableClientState ( GL_TEXTURE_COORD_ARRAY );
-
-   glDisable(GL_BLEND);
-   glDisable(GL_TEXTURE_2D);
-   */
-   pt.x += ptDraw.x; // DAW: Account for the fact that we removed the drawing point from the text start at the beginning.
-
-   AssertFatal(pt.x >= ptDraw.x, "How did this happen?");
-   PROFILE_END();
-
-   return pt.x - ptDraw.x;
-}
-
-#else
-
 U32 DGLDevice::DrawTextN(GFont*          font,
                  const Point2I&  ptDraw,
                  const UTF16*    in_string,
@@ -967,22 +752,23 @@ U32 DGLDevice::DrawTextN(GFont*          font,
    currentColor      = sg_bitmapModulation;
 
    FrameTemp<TextVertex> vert(4*n);
-   /*
-   glDisable(GL_LIGHTING);
 
-   glEnable(GL_TEXTURE_2D);
-   glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-   glEnable(GL_BLEND);
+   DisableState(DGLRSLighting);
+   EnableState(DGLRSTexture2D);
+   SetTextureEnvironment(DGLTexEnvi, DGLTexEnvMode, DGLModulate);
+   setBlendFunc(DGLBlendSrcAlpha, DGLBlendInvSrcAlpha);
+   EnableState(DGLRSBlend);
 
-   glEnableClientState ( GL_VERTEX_ARRAY );
-   glVertexPointer     ( 2, GL_FLOAT, sizeof(TextVertex), &(vert[0].p) );
+   // Enable states and link our arrays.
+   EnableClientState(DGLCSVertexArray);
+   SetVertexPoint(2, sizeof(TextVertex), &(vert[0].p));
 
-   glEnableClientState ( GL_COLOR_ARRAY );
-   glColorPointer      ( 4, GL_UNSIGNED_BYTE, sizeof(TextVertex), &(vert[0].c) );
+   EnableClientState(DGLCSColorArray);
+   SetColorPoint(4, sizeof(TextVertex), &(vert[0].c));
 
-   glEnableClientState ( GL_TEXTURE_COORD_ARRAY );
-   glTexCoordPointer   ( 2, GL_FLOAT, sizeof(TextVertex), &(vert[0].t) );
+
+   EnableClientState(DGLCSTextCoordArray);
+   SetTexPoint(2, sizeof(TextVertex), &(vert[0].t));
 
    // first build the point, color, and coord arrays
    U32 i;
@@ -1079,8 +865,8 @@ U32 DGLDevice::DrawTextN(GFont*          font,
       {
          if(currentPt)
          {
-            glBindTexture(GL_TEXTURE_2D, lastTexture->getGLTextureName());
-            glDrawArrays( GL_QUADS, 0, currentPt );
+            BindTexture(lastTexture->getGLTextureName());
+            DrawArrays(DGLQuads, 0, currentPt);
             currentPt = 0;
          }
          lastTexture = newObj;
@@ -1122,17 +908,17 @@ U32 DGLDevice::DrawTextN(GFont*          font,
    }
    if(currentPt)
    {
-      glBindTexture(GL_TEXTURE_2D, lastTexture->getGLTextureName());
-      glDrawArrays( GL_QUADS, 0, currentPt );
+      BindTexture(lastTexture->getGLTextureName());
+      DrawArrays(DGLQuads, 0, currentPt);
    }
 
-   glDisableClientState ( GL_VERTEX_ARRAY );
-   glDisableClientState ( GL_COLOR_ARRAY );
-   glDisableClientState ( GL_TEXTURE_COORD_ARRAY );
+   DisableClientState ( DGLCSVertexArray );
+   DisableClientState ( DGLCSColorArray );
+   DisableClientState ( DGLCSTextCoordArray );
 
-   glDisable(GL_BLEND);
-   glDisable(GL_TEXTURE_2D);
-   */
+   DisableState(DGLRSBlend);
+   DisableState(DGLRSTexture2D);
+
    pt.x += ptDraw.x; // DAW: Account for the fact that we removed the drawing point from the text start at the beginning.
 
    AssertFatal(pt.x >= ptDraw.x, "How did this happen?");
@@ -1140,29 +926,27 @@ U32 DGLDevice::DrawTextN(GFont*          font,
 
    return pt.x - ptDraw.x;
 }
-#endif
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- //
 // Drawing primitives
 
 void DGLDevice::DrawLine(S32 x1, S32 y1, S32 x2, S32 y2, const ColorI &color)
 {
-   /*
-   glEnable(GL_BLEND);
-   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-   glDisable(GL_TEXTURE_2D);
 
-   glColor4ub(color.red, color.green, color.blue, color.alpha);
-    GLfloat verts[] = {
-        (GLfloat)(x1 + 0.5f), (GLfloat)(y1 + 0.5f),
-        (GLfloat)(x2 + 0.5f), (GLfloat)(y2 + 0.5f),
-    };
-    
-    glVertexPointer(2, GL_FLOAT, 0, verts );
-    
-    glDrawArrays(GL_LINES, 0, 2);//draw last two
+   EnableState(DGLRSBlend);
+   setBlendFunc(DGLBlendSrcAlpha, DGLBlendInvSrcAlpha);
+   DisableState(DGLRSTexture2D);
 
-*/
+   SetColorI(color.red, color.green, color.blue, color.alpha);
+   F32 verts[] = {
+         (x1 + 0.5f), (y1 + 0.5f),
+         (x2 + 0.5f), (y2 + 0.5f),
+   };
+    
+   SetVertexPoint(2, 0, verts );
+
+   DrawArrays(DGLLineList, 0, 2);
+
 }
 
 void DGLDevice::DrawLine(const Point2I &startPt, const Point2I &endPt, const ColorI &color)
@@ -1172,45 +956,42 @@ void DGLDevice::DrawLine(const Point2I &startPt, const Point2I &endPt, const Col
 
 void DGLDevice::DrawTriangleFill(const Point2I &pt1, const Point2I &pt2, const Point2I &pt3, const ColorI &color)
 {
-   /*
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable(GL_TEXTURE_2D);
+   EnableState(DGLRSBlend);
+   setBlendFunc(DGLBlendSrcAlpha, DGLBlendInvSrcAlpha);
+   DisableState(DGLRSTexture2D);
 
-	glColor4ub(color.red, color.green, color.blue, color.alpha);
-	GLfloat vertices[] = {
-		(GLfloat)pt1.x, (GLfloat)pt1.y,
-		(GLfloat)pt2.x, (GLfloat)pt2.y,
-		(GLfloat)pt3.x, (GLfloat)pt3.y,
+	SetColorI(color.red, color.green, color.blue, color.alpha);
+	F32 vertices[] = {
+		pt1.x, pt1.y,
+		pt2.x, pt2.y,
+		pt3.x, pt3.y,
 	};
 
-	glVertexPointer(2, GL_FLOAT, 0, vertices);
-	glEnableClientState(GL_VERTEX_ARRAY);
-
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
-*/
+   SetVertexPoint(2, 0, vertices);
+	EnableClientState(DGLCSVertexArray);
+   DrawArrays(DGLTriangleStrip, 0, 2);
 }
 
 void DGLDevice::DrawRect(const Point2I &upperL, const Point2I &lowerR, const ColorI &color, const float &lineWidth)
 {
-   /*
-   glEnable(GL_BLEND);
-   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-   glDisable(GL_TEXTURE_2D);
+   EnableState(DGLRSBlend);
+   setBlendFunc(DGLBlendSrcAlpha, DGLBlendInvSrcAlpha);
+   DisableState(DGLRSTexture2D);
 
-   glLineWidth(lineWidth);
+   SetLineWidth(lineWidth);
 
-   glColor4ub(color.red, color.green, color.blue, color.alpha);
-    GLfloat verts[] = {
-        (GLfloat)(upperL.x), (GLfloat)(upperL.y),
-        (GLfloat)(lowerR.x), (GLfloat)(upperL.y),
-        (GLfloat)(lowerR.x), (GLfloat)(lowerR.y),
-        (GLfloat)(upperL.x), (GLfloat)(lowerR.y),
-    };
-    
-    glVertexPointer(2, GL_FLOAT, 0, verts );
-    glDrawArrays(GL_LINE_LOOP, 0, 4 );//draw last two
-*/
+   SetColorI(color.red, color.green, color.blue, color.alpha);
+   F32 vertices[] = {
+       upperL.x, upperL.y,
+       upperL.x, lowerR.y,
+       lowerR.x, upperL.y,
+       lowerR.x, lowerR.y,
+   };
+
+   SetVertexPoint(2, 0, vertices);
+   EnableClientState(DGLCSVertexArray);
+   DrawArrays(DGLLineLoop, 0, 4);
+
 }
 
 // the fill convention for lined rects is that they outline the rectangle border of the
@@ -1227,23 +1008,21 @@ void DGLDevice::DrawRect(const RectI &rect, const ColorI &color, const float &li
 
 void DGLDevice::DrawRectFill(const Point2I &upperL, const Point2I &lowerR, const ColorI &color)
 {
-   /*
-   glEnable(GL_BLEND);
-   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-   glDisable(GL_TEXTURE_2D);
+   EnableState(DGLRSBlend);
+   setBlendFunc(DGLBlendSrcAlpha, DGLBlendInvSrcAlpha);
+   DisableState(DGLRSTexture2D);
 
-   glColor4ub(color.red, color.green, color.blue, color.alpha);
-    GLfloat vertices[] = {
-        (GLfloat)upperL.x, (GLfloat)upperL.y,
-        (GLfloat)upperL.x, (GLfloat)lowerR.y,
-        (GLfloat)lowerR.x, (GLfloat)upperL.y,
-        (GLfloat)lowerR.x, (GLfloat)lowerR.y,
+   SetColorI(color.red, color.green, color.blue, color.alpha);
+    F32 vertices[] = {
+        upperL.x, upperL.y,
+        upperL.x, lowerR.y,
+        lowerR.x, upperL.y,
+        lowerR.x, lowerR.y,
     };
-    
-    glVertexPointer(2, GL_FLOAT, 0, vertices);
-    glEnableClientState(GL_VERTEX_ARRAY);
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    SetVertexPoint(2, 0, vertices);
+    EnableClientState(DGLCSVertexArray);
+    DrawArrays(DGLTriangleStrip, 0, 4);
 }
 void DGLDevice::DrawRectFill(const RectI &rect, const ColorI &color)
 {
@@ -1253,25 +1032,24 @@ void DGLDevice::DrawRectFill(const RectI &rect, const ColorI &color)
 
 void DGLDevice::DrawQuadFill(const Point2I &point1, const Point2I &point2, const Point2I &point3, const Point2I &point4, const ColorI &color)
 {
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable(GL_TEXTURE_2D);
+   EnableState(DGLRSBlend);
+   setBlendFunc(DGLBlendSrcAlpha, DGLBlendInvSrcAlpha);
+   DisableState(DGLRSTexture2D);
 
-	glColor4ub(color.red, color.green, color.blue, color.alpha);
+   SetColorI(color.red, color.green, color.blue, color.alpha);
 
 	//Points 3 and 4 are switched by design.
-	GLfloat vertices[] = {
-		(GLfloat)point1.x, (GLfloat)point1.y,
-		(GLfloat)point2.x, (GLfloat)point2.y,
-		(GLfloat)point4.x, (GLfloat)point4.y,
-		(GLfloat)point3.x, (GLfloat)point3.y,
+	F32 vertices[] = {
+		point1.x, point1.y,
+		point2.x, point2.y,
+		point4.x, point4.y,
+		point3.x, point3.y,
 	};
 
-	glVertexPointer(2, GL_FLOAT, 0, vertices);
-	glEnableClientState(GL_VERTEX_ARRAY);
+   SetVertexPoint(2, 0, vertices);
+   EnableClientState(DGLCSVertexArray);
+   DrawArrays(DGLTriangleStrip, 0, 4);
 
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-   */
 }
 
 void DGLDevice::Draw2DSquare( const Point2F &screenPoint, F32 width, F32 spinAngle )
@@ -1293,30 +1071,30 @@ void DGLDevice::Draw2DSquare( const Point2F &screenPoint, F32 width, F32 spinAng
       rotMatrix.mulP( points[i] );
       points[i] += offset;
    }
-   /*
-    GLfloat verts[] = {
+   
+    F32 verts[] = {
         0.0, 0.0,
         1.0, 0.0,
         0.0, 1.0,//may need to switch last two
         1.0, 1.0,
     };
 
-    GLfloat texVerts[] = {
-        (GLfloat)points[0].x, (GLfloat)points[0].y,
-        (GLfloat)points[1].x, (GLfloat)points[1].y,
-        (GLfloat)points[3].x, (GLfloat)points[3].y,
-        (GLfloat)points[2].x, (GLfloat)points[2].y,
+    F32 texVerts[] = {
+        points[0].x, points[0].y,
+        points[1].x, points[1].y,
+        points[3].x, points[3].y,
+        points[2].x, points[2].y,
     };
     
-    glDisableClientState(GL_COLOR_ARRAY);
+    DisableClientState(DGLCSColorArray);
     //glDisableClientState(GL_POINT_SIZE_ARRAY_OES);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    EnableClientState(DGLCSVertexArray);
+    EnableClientState(DGLCSTextCoordArray);
     
-    glVertexPointer(2, GL_FLOAT, 0, verts);
-    glTexCoordPointer(2, GL_FLOAT, 0, texVerts);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-*/
+    SetVertexPoint(2, 0, verts);
+    SetTexPoint(2, 0, texVerts);
+    DrawArrays(DGLTriangleFan, 0, 4);
+
 }
 
 void DGLDevice::DrawBillboard( const Point3F &position, F32 width, F32 spinAngle )
@@ -1343,30 +1121,30 @@ void DGLDevice::DrawBillboard( const Point3F &position, F32 width, F32 spinAngle
       points[i] += position;
    }
 
-/*
-    GLfloat verts[] = {
+
+    F32 verts[] = {
         0.0, 1.0,
         0.0, 0.0,
         1.0, 1.0,//may need to switch last two
         1.0, 0.0,
     };
-    
-    GLfloat texVerts[] = {
-        (GLfloat)points[0].x, (GLfloat)points[0].y,
-        (GLfloat)points[1].x, (GLfloat)points[1].y,
-        (GLfloat)points[3].x, (GLfloat)points[3].y,
-        (GLfloat)points[2].x, (GLfloat)points[2].y,
+
+    F32 texVerts[] = {
+        points[0].x, points[0].y,
+        points[1].x, points[1].y,
+        points[3].x, points[3].y,
+        points[2].x, points[2].y,
     };
     
-    glDisableClientState(GL_COLOR_ARRAY);
+    DisableClientState(DGLCSColorArray);
     //glDisableClientState(GL_POINT_SIZE_ARRAY_OES);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    EnableClientState(DGLCSVertexArray);
+    EnableClientState(DGLCSTextCoordArray);
     
-    glVertexPointer(2, GL_FLOAT, 0, verts);
-    glTexCoordPointer(2, GL_FLOAT, 0, texVerts);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-*/
+    SetVertexPoint(2, 0, verts);
+    SetTexPoint(2, 0, texVerts);
+    DrawArrays(DGLTriangleFan, 0, 4);
+
 }
 
 void DGLDevice::WireCube(const Point3F & extent, const Point3F & center)
@@ -1513,35 +1291,6 @@ void DGLDevice::DrawCircleFill(const Point2I &center, const F32 radius, const Co
 
 	F32 x = radius;//we start at angle = 0 
 	F32 y = 0;
-   /*
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable(GL_TEXTURE_2D);
-
-	glColor4ub(color.red, color.green, color.blue, color.alpha);
-
-	vector<GLfloat> verts;
-	verts.push_back(GLfloat(center.x));
-	verts.push_back(GLfloat(center.y));
-	for (int ii = 0; ii < num_segments; ii++)
-	{
-		verts.push_back(GLfloat(x + center.x));
-		verts.push_back(GLfloat(y + center.y));
-
-		//apply the rotation matrix
-		t = x;
-		x = c * x - s * y;
-		y = s * t + c * y;
-	}
-	verts.push_back(GLfloat(verts[2]));
-	verts.push_back(GLfloat(verts[3]));
-
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(2, GL_FLOAT, 0, verts.data());
-	glDrawArrays(GL_TRIANGLE_FAN, 0, num_segments+2);
-	glDisableClientState(GL_VERTEX_ARRAY);
-
-   */
 
    EnableState(DGLRSBlend);
    setBlendFunc(DGLBlendSrcAlpha, DGLBlendInvSrcAlpha);

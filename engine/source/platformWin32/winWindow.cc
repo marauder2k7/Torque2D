@@ -1409,8 +1409,6 @@ void Platform::initWindow(const Point2I &initialSize, const char *name)
 {
    MSG msg;
 
-   Con::printSeparator();
-   Con::printf("Video Initialization:");
    DGLDevice::init();
    //Video::init();
 

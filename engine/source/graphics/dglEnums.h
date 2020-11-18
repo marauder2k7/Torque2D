@@ -172,9 +172,11 @@ enum DGLTextureEnvironment
    DGLPointSprite,
    //parameter name
    DGLTexEnvMode,
+   DGLTexEnvColor,
    //parameter
    DGLModulate,
    DGLReplace,
+   DGLTexBlend,
    DGLTextureEnvironment_COUNT
 };
 

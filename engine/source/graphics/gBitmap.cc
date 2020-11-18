@@ -572,6 +572,26 @@ void bitmapConvertA8_to_RGBA_c(U8 **src, U32 pixels)
 void(*bitmapConvertA8_to_RGBA)(U8 **src, U32 pixels) = bitmapConvertA8_to_RGBA_c;
 
 //--------------------------------------------------------------------------
+
+void bitmapConvertRGB_to_RGBX_c(U8 **src, U32 pixels)
+{
+   const U8 *oldBits = *src;
+   U8 *newBits = new U8[pixels * 4];
+   dMemset(newBits, 0xFF, pixels * 4); // This is done to set alpha values -patw
+
+   // Copy the bits over to the new memory
+   for (U32 i = 0; i < pixels; i++)
+      dMemcpy(&newBits[i * 4], &oldBits[i * 3], sizeof(U8) * 3);
+
+   // Now hose the old bits
+   delete[] * src;
+   *src = newBits;
+}
+
+void(*bitmapConvertRGB_to_RGBX)(U8 **src, U32 pixels) = bitmapConvertRGB_to_RGBX_c;
+
+//--------------------------------------------------------------------------
+
 bool GBitmap::setFormat(DGLFormat fmt)
 {
    if (getFormat() == fmt)

@@ -76,6 +76,8 @@ DGLGLDevice::DGLGLDevice() :
    mContext(NULL)
 {
    mDeviceName = "OpenGL";
+   loadGlCore();
+   DGLGLEnumTranslate::init();
 }
 
 //------------------------------------------------------------------------------
@@ -479,6 +481,11 @@ void DGLGLDevice::SetPolygonMode(DGLPolyMode face, DGLPolyMode mode)
 void DGLGLDevice::SetTextureEnvironment(DGLTextureEnvironment target, DGLTextureEnvironment name, DGLTextureEnvironment param)
 {
    glTexEnvi(DGLGLTextureEnvironment[target], DGLGLTextureEnvironment[name], DGLGLTextureEnvironment[param]);
+}
+
+void DGLGLDevice::SetTextureEnvironmentF(DGLTextureEnvironment target, DGLTextureEnvironment name, const F32 * val)
+{
+   glTexEnvfv(DGLGLTextureEnvironment[target], DGLGLTextureEnvironment[name], val);
 }
 
 void DGLGLDevice::SetRotate(F32 ang, F32 x, F32 y, F32 z)

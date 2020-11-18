@@ -1,11 +1,8 @@
 #include "platformWin32/platformWin32.h"
 #include "platformWin32/platformGL.h"
 #include "graphics/gl/glad/gladWGL.h"
-
 #include "graphics/gl/dglglDevice.h"
 #include "game/gameInterface.h"
-
-#pragma comment(lib,“opengl32.lib”)
 
 void CreatePixelFormat(PIXELFORMATDESCRIPTOR *mPFD, S32 colorBits, S32 depthBits, S32 stencilBits)
 {
@@ -325,6 +322,7 @@ bool DGLGLDevice::activate(U32 width, U32 height, U32 bpp, bool fullScreen)
       AssertFatal(false, "DGLGLDevice::activate - unable to make context current!");
 
    loadGlCore();
+   loadGlExtensions(hdcGL);
 
    // Set the resolution:
    if (!setScreenMode(width, height, bpp, (fullScreen || mFullScreenOnly), true, false))
@@ -341,8 +339,6 @@ bool DGLGLDevice::activate(U32 width, U32 height, U32 bpp, bool fullScreen)
       Con::printf("  Renderer: %s", rendererString);
    if (versionString)
       Con::printf("  Version: %s", versionString);
-
-   loadGlExtensions(hdcGL);
 
    initGLstate();
 
