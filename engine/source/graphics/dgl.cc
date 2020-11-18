@@ -464,6 +464,7 @@ void DGLDevice::DrawBlendRangeBox(RectI &bounds, bool vertical, U8 numColors, Co
    }
    glEnd();
    */
+
 }
 
 
@@ -962,9 +963,9 @@ void DGLDevice::DrawTriangleFill(const Point2I &pt1, const Point2I &pt2, const P
 
 	SetColorI(color.red, color.green, color.blue, color.alpha);
 	F32 vertices[] = {
-		pt1.x, pt1.y,
-		pt2.x, pt2.y,
-		pt3.x, pt3.y,
+		(F32)pt1.x, (F32)pt1.y,
+      (F32)pt2.x, (F32)pt2.y,
+      (F32)pt3.x, (F32)pt3.y,
 	};
 
    SetVertexPoint(2, 0, vertices);
@@ -982,10 +983,10 @@ void DGLDevice::DrawRect(const Point2I &upperL, const Point2I &lowerR, const Col
 
    SetColorI(color.red, color.green, color.blue, color.alpha);
    F32 vertices[] = {
-       upperL.x, upperL.y,
-       upperL.x, lowerR.y,
-       lowerR.x, upperL.y,
-       lowerR.x, lowerR.y,
+       (F32)upperL.x, (F32)upperL.y,
+       (F32)upperL.x, (F32)lowerR.y,
+       (F32)lowerR.x, (F32)upperL.y,
+       (F32)lowerR.x, (F32)lowerR.y,
    };
 
    SetVertexPoint(2, 0, vertices);
@@ -1014,10 +1015,10 @@ void DGLDevice::DrawRectFill(const Point2I &upperL, const Point2I &lowerR, const
 
    SetColorI(color.red, color.green, color.blue, color.alpha);
     F32 vertices[] = {
-        upperL.x, upperL.y,
-        upperL.x, lowerR.y,
-        lowerR.x, upperL.y,
-        lowerR.x, lowerR.y,
+        (F32)upperL.x, (F32)upperL.y,
+        (F32)upperL.x, (F32)lowerR.y,
+        (F32)lowerR.x, (F32)upperL.y,
+        (F32)lowerR.x, (F32)lowerR.y,
     };
 
     SetVertexPoint(2, 0, vertices);
@@ -1040,10 +1041,10 @@ void DGLDevice::DrawQuadFill(const Point2I &point1, const Point2I &point2, const
 
 	//Points 3 and 4 are switched by design.
 	F32 vertices[] = {
-		point1.x, point1.y,
-		point2.x, point2.y,
-		point4.x, point4.y,
-		point3.x, point3.y,
+      (F32)point1.x, (F32)point1.y,
+      (F32)point2.x, (F32)point2.y,
+      (F32)point4.x, (F32)point4.y,
+      (F32)point3.x, (F32)point3.y,
 	};
 
    SetVertexPoint(2, 0, vertices);
@@ -1354,248 +1355,6 @@ bool DGLDevice::PointToScreen( Point3F &point3D, Point3F &screenPoint )
 
    */
    return (true);
-}
-
-
-
-bool DGLDevice::IsInCanonicalState()
-{
-   bool ret = true;
-   /*
-   // Canonical state:
-   //  BLEND disabled
-   //  TEXTURE_2D disabled on both texture units.
-   //  ActiveTexture set to 0
-   //  LIGHTING off
-   //  winding : clockwise ?
-   //  cullface : disabled
-
-   ret &= glIsEnabled(GL_BLEND) == GL_FALSE;
-   ret &= glIsEnabled(GL_CULL_FACE) == GL_FALSE;
-   GLint temp;
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
-// PUAP -Mat removed unsupported textureARB and Fog stuff
-   if (dglDoesSupportARBMultitexture() == true) {
-      //glActiveTextureARB(GL_TEXTURE1_ARB);
-      ret &= glIsEnabled(GL_TEXTURE_2D) == GL_FALSE;
-      glGetTexEnviv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, &temp);
-      ret &= temp == GL_REPLACE;
-
-      //glActiveTextureARB(GL_TEXTURE0_ARB);
-      ret &= glIsEnabled(GL_TEXTURE_2D) == GL_FALSE;
-      glGetTexEnviv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, &temp);
-      ret &= temp == GL_REPLACE;
-
-      //glClientActiveTextureARB(GL_TEXTURE1_ARB);
-      ret &= glIsEnabled(GL_TEXTURE_COORD_ARRAY) == GL_FALSE;
-      //glClientActiveTextureARB(GL_TEXTURE0_ARB);
-      ret &= glIsEnabled(GL_TEXTURE_COORD_ARRAY) == GL_FALSE;
-   } else {
-      ret &= glIsEnabled(GL_TEXTURE_2D) == GL_FALSE;
-      glGetTexEnviv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, &temp);
-      ret &= temp == GL_REPLACE;
-
-      ret &= glIsEnabled(GL_TEXTURE_COORD_ARRAY) == GL_FALSE;
-   }
-
-   ret &= glIsEnabled(GL_LIGHTING) == GL_FALSE;
-
-   ret &= glIsEnabled(GL_COLOR_ARRAY)         == GL_FALSE;
-   ret &= glIsEnabled(GL_VERTEX_ARRAY)        == GL_FALSE;
-   ret &= glIsEnabled(GL_NORMAL_ARRAY)        == GL_FALSE;
-   //if (dglDoesSupportFogCoord())
-      //ret &= glIsEnabled(GL_FOG_COORDINATE_ARRAY_EXT) == GL_FALSE;
-
-#else
-
-   if (dglDoesSupportARBMultitexture() == true) {
-      glActiveTextureARB(GL_TEXTURE1_ARB);
-      ret &= glIsEnabled(GL_TEXTURE_2D) == GL_FALSE;
-      glGetTexEnviv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, &temp);
-      ret &= temp == GL_REPLACE;
-
-      glActiveTextureARB(GL_TEXTURE0_ARB);
-      ret &= glIsEnabled(GL_TEXTURE_2D) == GL_FALSE;
-      glGetTexEnviv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, &temp);
-      ret &= temp == GL_REPLACE;
-
-      glClientActiveTextureARB(GL_TEXTURE1_ARB);
-      ret &= glIsEnabled(GL_TEXTURE_COORD_ARRAY) == GL_FALSE;
-      glClientActiveTextureARB(GL_TEXTURE0_ARB);
-      ret &= glIsEnabled(GL_TEXTURE_COORD_ARRAY) == GL_FALSE;
-   } else {
-      ret &= glIsEnabled(GL_TEXTURE_2D) == GL_FALSE;
-      glGetTexEnviv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, &temp);
-      ret &= temp == GL_REPLACE;
-
-      ret &= glIsEnabled(GL_TEXTURE_COORD_ARRAY) == GL_FALSE;
-   }
-
-   ret &= glIsEnabled(GL_LIGHTING) == GL_FALSE;
-
-   ret &= glIsEnabled(GL_COLOR_ARRAY)         == GL_FALSE;
-   ret &= glIsEnabled(GL_VERTEX_ARRAY)        == GL_FALSE;
-   ret &= glIsEnabled(GL_NORMAL_ARRAY)        == GL_FALSE;
-   if (dglDoesSupportFogCoord())
-      ret &= glIsEnabled(GL_FOG_COORDINATE_ARRAY_EXT) == GL_FALSE;
-#endif
-*/
-   return ret;
-}
-
-
-void DGLDevice::SetCanonicalState()
-{
-   /*
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
-// PUAP -Mat removed unsupported textureARB and Fog stuff
-   glDisable(GL_BLEND);
-   glDisable(GL_CULL_FACE);
-   glBlendFunc(GL_ONE, GL_ZERO);
-   glDisable(GL_LIGHTING);
-   if (dglDoesSupportARBMultitexture() == true) {
-      //glActiveTextureARB(GL_TEXTURE1_ARB);
-      glDisable(GL_TEXTURE_2D);
-      glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-      //glActiveTextureARB(GL_TEXTURE0_ARB);
-      glDisable(GL_TEXTURE_2D);
-      glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-   } else {
-      glDisable(GL_TEXTURE_2D);
-      glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-   }
-
-   glDisableClientState(GL_COLOR_ARRAY);
-   glDisableClientState(GL_VERTEX_ARRAY);
-   glDisableClientState(GL_NORMAL_ARRAY);
-   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-   //if (dglDoesSupportFogCoord())
-      //glDisableClientState(GL_FOG_COORDINATE_ARRAY_EXT);
-#else
-   glDisable(GL_BLEND);
-   glDisable(GL_CULL_FACE);
-   glBlendFunc(GL_ONE, GL_ZERO);
-   glDisable(GL_LIGHTING);
-   if (dglDoesSupportARBMultitexture() == true) {
-      glActiveTextureARB(GL_TEXTURE1_ARB);
-      glDisable(GL_TEXTURE_2D);
-      glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-      glActiveTextureARB(GL_TEXTURE0_ARB);
-      glDisable(GL_TEXTURE_2D);
-      glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-   } else {
-      glDisable(GL_TEXTURE_2D);
-      glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-   }
-
-   glDisableClientState(GL_COLOR_ARRAY);
-   glDisableClientState(GL_VERTEX_ARRAY);
-   glDisableClientState(GL_NORMAL_ARRAY);
-   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-   if (dglDoesSupportFogCoord())
-      glDisableClientState(GL_FOG_COORDINATE_ARRAY_EXT);
-#endif
-
-*/
-}
-
-void DGLDevice::GetTransformState(S32* mvDepth,
-                          S32* pDepth,
-                          S32* t0Depth,
-                          F32* t0Matrix,
-                          S32* t1Depth,
-                          F32* t1Matrix,
-                          S32* vp)
-{
-   /*
-   glGetIntegerv(GL_MODELVIEW_STACK_DEPTH, (GLint*)mvDepth);
-   glGetIntegerv(GL_PROJECTION_STACK_DEPTH, (GLint*)pDepth);
-
-   glGetIntegerv(GL_TEXTURE_STACK_DEPTH, (GLint*)t0Depth);
-   glGetFloatv(GL_TEXTURE_MATRIX, t0Matrix);
-   if (dglDoesSupportARBMultitexture())
-   {
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
-// PUAP -Mat removed unsupported textureARB stuff
-      //glActiveTextureARB(GL_TEXTURE1_ARB);
-      glGetIntegerv(GL_TEXTURE_STACK_DEPTH, (GLint*)t1Depth);
-      glGetFloatv(GL_TEXTURE_MATRIX, t1Matrix);
-      //glActiveTextureARB(GL_TEXTURE0_ARB);
-#else
-      glActiveTextureARB(GL_TEXTURE1_ARB);
-      glGetIntegerv(GL_TEXTURE_STACK_DEPTH, (GLint*)t1Depth);
-      glGetFloatv(GL_TEXTURE_MATRIX, t1Matrix);
-      glActiveTextureARB(GL_TEXTURE0_ARB);
-#endif
-   }
-   else
-   {
-      *t1Depth = 0;
-      for (U32 i = 0; i < 16; i++)
-         t1Matrix[i] = 0;
-   }
-   */
-   RectI v;
-   GetViewport(&v);
-   vp[0] = v.point.x;
-   vp[1] = v.point.y;
-   vp[2] = v.extent.x;
-   vp[3] = v.extent.y;
-}
-
-
-bool DGLDevice::CheckState(const S32 mvDepth, const S32 pDepth,
-                   const S32 t0Depth, const F32* t0Matrix,
-                   const S32 t1Depth, const F32* t1Matrix,
-                   const S32* vp)
-{
-   /*
-   GLint md, pd;
-   RectI v;
-
-   glGetIntegerv(GL_MODELVIEW_STACK_DEPTH,  &md);
-   glGetIntegerv(GL_PROJECTION_STACK_DEPTH, &pd);
-
-   GLint t0d, t1d;
-   GLfloat t0m[16], t1m[16];
-   glGetIntegerv(GL_TEXTURE_STACK_DEPTH, &t0d);
-   glGetFloatv(GL_TEXTURE_MATRIX, t0m);
-   if (dglDoesSupportARBMultitexture())
-   {
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
-// PUAP -Mat removed unsupported textureARB and Fog stuff
-      //glActiveTextureARB(GL_TEXTURE1_ARB);
-      glGetIntegerv(GL_TEXTURE_STACK_DEPTH, &t1d);
-      glGetFloatv(GL_TEXTURE_MATRIX, t1m);
-      //glActiveTextureARB(GL_TEXTURE0_ARB);
-#else
-      glActiveTextureARB(GL_TEXTURE1_ARB);
-      glGetIntegerv(GL_TEXTURE_STACK_DEPTH, &t1d);
-      glGetFloatv(GL_TEXTURE_MATRIX, t1m);
-      glActiveTextureARB(GL_TEXTURE0_ARB);
-#endif
-   }
-   else
-   {
-      t1d = 0;
-      for (U32 i = 0; i < 16; i++)
-         t1m[i] = 0;
-   }
-
-   GetViewport(&v);
-
-   return ((md == mvDepth) &&
-           (pd == pDepth) &&
-           (t0d == t0Depth) &&
-           (dMemcmp(t0m, t0Matrix, sizeof(F32) * 16) == 0) &&
-           (t1d == t1Depth) &&
-           (dMemcmp(t1m, t1Matrix, sizeof(F32) * 16) == 0) &&
-           ((v.point.x  == vp[0]) &&
-            (v.point.y  == vp[1]) &&
-            (v.extent.x == vp[2]) &&
-            (v.extent.y == vp[3])));
-    */
-   return true;
 }
 
 #if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)

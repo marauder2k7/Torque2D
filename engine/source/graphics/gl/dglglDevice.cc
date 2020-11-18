@@ -86,11 +86,9 @@ void DGLGLDevice::initGLstate()
 {
    Con::printf("Init GL");
 
-
    bool fullScreen = Con::getBoolVariable("$pref::Video::fullScreen");
 
    const char* resString = Con::getVariable((fullScreen ? "$pref::Video::resolution" : "$pref::Video::windowedRes"));
-
 
    // Get the video settings from the prefs:
    char* tempBuf = new char[dStrlen(resString) + 1];
@@ -192,6 +190,175 @@ void DGLGLDevice::initGLstate()
 
    glEnable(GL_FRAMEBUFFER_SRGB);
 }
+
+//------------------------------------------------------------------------------
+// DEBUG
+//------------------------------------------------------------------------------
+
+bool DGLGLDevice::IsInCanonicalState()
+{
+   bool ret = true;
+   // Canonical state:
+   //  BLEND disabled
+   //  TEXTURE_2D disabled on both texture units.
+   //  ActiveTexture set to 0
+   //  LIGHTING off
+   //  winding : clockwise ?
+   //  cullface : disabled
+
+   ret &= glIsEnabled(GL_BLEND) == GL_FALSE;
+   ret &= glIsEnabled(GL_CULL_FACE) == GL_FALSE;
+   GLint temp;
+
+   if (gglHasExtension(ARB_multitexture)) 
+   {
+      glActiveTextureARB(GL_TEXTURE1_ARB);
+      ret &= glIsEnabled(GL_TEXTURE_2D) == GL_FALSE;
+      glGetTexEnviv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, &temp);
+      ret &= temp == GL_REPLACE;
+
+      glActiveTextureARB(GL_TEXTURE0_ARB);
+      ret &= glIsEnabled(GL_TEXTURE_2D) == GL_FALSE;
+      glGetTexEnviv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, &temp);
+      ret &= temp == GL_REPLACE;
+
+      glClientActiveTextureARB(GL_TEXTURE1_ARB);
+      ret &= glIsEnabled(GL_TEXTURE_COORD_ARRAY) == GL_FALSE;
+      glClientActiveTextureARB(GL_TEXTURE0_ARB);
+      ret &= glIsEnabled(GL_TEXTURE_COORD_ARRAY) == GL_FALSE;
+   } 
+   else 
+   {
+      ret &= glIsEnabled(GL_TEXTURE_2D) == GL_FALSE;
+      glGetTexEnviv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, &temp);
+      ret &= temp == GL_REPLACE;
+
+      ret &= glIsEnabled(GL_TEXTURE_COORD_ARRAY) == GL_FALSE;
+   }
+
+   ret &= glIsEnabled(GL_LIGHTING) == GL_FALSE;
+
+   ret &= glIsEnabled(GL_COLOR_ARRAY)         == GL_FALSE;
+   ret &= glIsEnabled(GL_VERTEX_ARRAY)        == GL_FALSE;
+   ret &= glIsEnabled(GL_NORMAL_ARRAY)        == GL_FALSE;
+   if (gglHasExtension(EXT_fog_coord))
+      ret &= glIsEnabled(GL_FOG_COORDINATE_ARRAY_EXT) == GL_FALSE;
+
+   return ret;
+}
+
+void DGLGLDevice::SetCanonicalState()
+{
+
+   glDisable(GL_BLEND);
+   glDisable(GL_CULL_FACE);
+   glBlendFunc(GL_ONE, GL_ZERO);
+   glDisable(GL_LIGHTING);
+   if (gglHasExtension(ARB_multitexture)) 
+   {
+      glActiveTextureARB(GL_TEXTURE1_ARB);
+      glDisable(GL_TEXTURE_2D);
+      glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+      glActiveTextureARB(GL_TEXTURE0_ARB);
+      glDisable(GL_TEXTURE_2D);
+      glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+   } 
+   else 
+   {
+      glDisable(GL_TEXTURE_2D);
+      glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+   }
+
+   glDisableClientState(GL_COLOR_ARRAY);
+   glDisableClientState(GL_VERTEX_ARRAY);
+   glDisableClientState(GL_NORMAL_ARRAY);
+   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+   if (gglHasExtension(EXT_fog_coord))
+      glDisableClientState(GL_FOG_COORDINATE_ARRAY_EXT);
+}
+
+bool DGLGLDevice::CheckState(const S32 mvDepth, const S32 pDepth,
+   const S32 t0Depth, const F32* t0Matrix,
+   const S32 t1Depth, const F32* t1Matrix,
+   const S32* vp)
+{
+   GLint md, pd;
+   RectI v;
+
+   glGetIntegerv(GL_MODELVIEW_STACK_DEPTH,  &md);
+   glGetIntegerv(GL_PROJECTION_STACK_DEPTH, &pd);
+
+   GLint t0d, t1d;
+   GLfloat t0m[16], t1m[16];
+   glGetIntegerv(GL_TEXTURE_STACK_DEPTH, &t0d);
+   glGetFloatv(GL_TEXTURE_MATRIX, t0m);
+   if (gglHasExtension(ARB_multitexture))
+   {
+      glActiveTextureARB(GL_TEXTURE1_ARB);
+      glGetIntegerv(GL_TEXTURE_STACK_DEPTH, &t1d);
+      glGetFloatv(GL_TEXTURE_MATRIX, t1m);
+      glActiveTextureARB(GL_TEXTURE0_ARB);
+   }
+   else
+   {
+      t1d = 0;
+      for (U32 i = 0; i < 16; i++)
+         t1m[i] = 0;
+   }
+
+   GetViewport(&v);
+
+   return ((md == mvDepth) &&
+           (pd == pDepth) &&
+           (t0d == t0Depth) &&
+           (dMemcmp(t0m, t0Matrix, sizeof(F32) * 16) == 0) &&
+           (t1d == t1Depth) &&
+           (dMemcmp(t1m, t1Matrix, sizeof(F32) * 16) == 0) &&
+           ((v.point.x  == vp[0]) &&
+            (v.point.y  == vp[1]) &&
+            (v.extent.x == vp[2]) &&
+            (v.extent.y == vp[3])));
+
+   return true;
+}
+
+void DGLGLDevice::GetTransformState(S32* mvDepth,
+   S32* pDepth,
+   S32* t0Depth,
+   F32* t0Matrix,
+   S32* t1Depth,
+   F32* t1Matrix,
+   S32* vp)
+{
+   glGetIntegerv(GL_MODELVIEW_STACK_DEPTH, (GLint*)mvDepth);
+   glGetIntegerv(GL_PROJECTION_STACK_DEPTH, (GLint*)pDepth);
+
+   glGetIntegerv(GL_TEXTURE_STACK_DEPTH, (GLint*)t0Depth);
+   glGetFloatv(GL_TEXTURE_MATRIX, t0Matrix);
+   if (gglHasExtension(ARB_multitexture))
+   {
+      glActiveTextureARB(GL_TEXTURE1_ARB);
+      glGetIntegerv(GL_TEXTURE_STACK_DEPTH, (GLint*)t1Depth);
+      glGetFloatv(GL_TEXTURE_MATRIX, t1Matrix);
+      glActiveTextureARB(GL_TEXTURE0_ARB);
+   }
+   else
+   {
+      *t1Depth = 0;
+      for (U32 i = 0; i < 16; i++)
+         t1Matrix[i] = 0;
+   }
+   RectI v;
+   GetViewport(&v);
+   vp[0] = v.point.x;
+   vp[1] = v.point.y;
+   vp[2] = v.extent.x;
+   vp[3] = v.extent.y;
+}
+
+//------------------------------------------------------------------------------
+// DEBUG END
+//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 // CAMERA

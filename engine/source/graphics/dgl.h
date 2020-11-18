@@ -275,9 +275,9 @@ class Point3F;*/
     //--------------------------------------------------------------------------
     // Debug functions
     //--------------------------------------------------------------------------
-    virtual bool IsInCanonicalState();
+    virtual bool IsInCanonicalState() = 0;
 
-    virtual void SetCanonicalState();
+    virtual void SetCanonicalState() = 0;
 
     virtual void GetTransformState(S32* mvDepth,
        S32* pDepth,
@@ -285,12 +285,12 @@ class Point3F;*/
        F32* t0Matrix,
        S32* t1Depth,
        F32* t1Matrix,
-       S32* vp);
+       S32* vp) = 0;
 
     virtual bool CheckState(const S32 mvDepth, const S32 pDepth,
        const S32 t0Depth, const F32* t0Matrix,
        const S32 t1Depth, const F32* t1Matrix,
-       const S32* vp);
+       const S32* vp) = 0;
 
 };
 

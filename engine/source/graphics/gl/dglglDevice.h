@@ -40,6 +40,10 @@ public:
    virtual bool activate(U32 width, U32 height, U32 bpp, bool fullScreen);
    void shutdown();
    void initGLstate();
+   virtual bool IsInCanonicalState();
+   virtual void SetCanonicalState();
+   virtual bool CheckState(const S32 mvDepth, const S32 pDepth, const S32 t0Depth, const F32 * t0Matrix, const S32 t1Depth, const F32 * t1Matrix, const S32 * vp);
+   virtual void GetTransformState(S32 * mvDepth, S32 * pDepth, S32 * t0Depth, F32 * t0Matrix, S32 * t1Depth, F32 * t1Matrix, S32 * vp);
    virtual DGLDevice* create();
    virtual bool setScreenMode(U32 width, U32 height, U32 bpp, bool fullScreen, bool forceIt, bool repaint);
    virtual void enumerateVideoModes();
