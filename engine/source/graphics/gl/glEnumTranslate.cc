@@ -40,6 +40,7 @@ GLenum DGLGLInternalFormat[DGLFormat_COUNT];
 GLenum DGLGLTextureData[DGLFormat_COUNT];
 
 GLenum DGLGLTextureEnvironment[DGLTextureEnvironment_COUNT];
+GLenum DGLGLTextureEnvironmentPname[DGLTextureEnvironmentPname_COUNT];
 
 GLenum DGLGLAPIValues[DGLAPIValues_COUNT];
 
@@ -132,7 +133,7 @@ void DGLGLEnumTranslate::init()
    DGLGLTextureParam[DGLTextureParamMagFilter]  = GL_TEXTURE_MAG_FILTER;
    DGLGLTextureParam[DGLTextureParamMinFilter]  = GL_TEXTURE_MIN_FILTER;
    DGLGLTextureParam[DGLTextureParamWrapS]      = GL_TEXTURE_WRAP_S;
-   DGLGLTextureParam[DGLTextureParamWrapS]      = GL_TEXTURE_WRAP_T;
+   DGLGLTextureParam[DGLTextureParamWrapT]      = GL_TEXTURE_WRAP_T;
 
    // Texture format
    // These represent Symbolic base formats
@@ -212,8 +213,8 @@ void DGLGLEnumTranslate::init()
    DGLGLTextureEnvironment[DGLTexFilter]     = GL_TEXTURE_FILTER_CONTROL;
    DGLGLTextureEnvironment[DGLPointSprite]   = GL_POINT_SPRITE;
 
-   DGLGLTextureEnvironment[DGLTexEnvMode]    = GL_TEXTURE_ENV_MODE;
-   DGLGLTextureEnvironment[DGLTexEnvColor]   = GL_TEXTURE_ENV_COLOR;
+   DGLGLTextureEnvironmentPname[DGLTexEnvMode]    = GL_TEXTURE_ENV_MODE;
+   DGLGLTextureEnvironmentPname[DGLTexEnvColor]   = GL_TEXTURE_ENV_COLOR;
 
    DGLGLTextureEnvironment[DGLModulate]      = GL_MODULATE;
    DGLGLTextureEnvironment[DGLReplace]       = GL_REPLACE;

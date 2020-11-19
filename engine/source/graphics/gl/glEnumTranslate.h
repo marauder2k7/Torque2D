@@ -49,6 +49,7 @@ extern GLenum DGLGLInternalFormat[DGLFormat_COUNT];
 extern GLenum DGLGLTextureData[DGLFormat_COUNT];
 
 extern GLenum DGLGLTextureEnvironment[DGLTextureEnvironment_COUNT];
+extern GLenum DGLGLTextureEnvironmentPname[DGLTextureEnvironmentPname_COUNT];
 
 extern GLenum DGLGLAPIValues[DGLAPIValues_COUNT];
 

@@ -1,5 +1,5 @@
-#ifndef GLADWGL_H_
-#define GLADWGL_H_
+#ifndef _GLADWGL_H_
+#define _GLADWGL_H_
 
 #include "platform/platform.h"
 
@@ -8,4 +8,4 @@
 
 #define gglHasWExtension(EXTENSION) GLAD_WGL_##EXTENSION
 
-#endif // !GLADWGL_H_
+#endif // !_GLADWGL_H_

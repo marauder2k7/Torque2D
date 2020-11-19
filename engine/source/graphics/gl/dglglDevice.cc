@@ -86,33 +86,6 @@ void DGLGLDevice::initGLstate()
 {
    Con::printf("Init GL");
 
-   bool fullScreen = Con::getBoolVariable("$pref::Video::fullScreen");
-
-   const char* resString = Con::getVariable((fullScreen ? "$pref::Video::resolution" : "$pref::Video::windowedRes"));
-
-   // Get the video settings from the prefs:
-   char* tempBuf = new char[dStrlen(resString) + 1];
-   dStrcpy(tempBuf, resString);
-   char* temp = dStrtok(tempBuf, " x\0");
-   //MIN_RESOLUTION defined in platformWin32/platformGL.h
-   U32 width = (temp ? dAtoi(temp) : MIN_RESOLUTION_X);
-   temp = dStrtok(NULL, " x\0");
-   U32 height = (temp ? dAtoi(temp) : MIN_RESOLUTION_Y);
-   temp = dStrtok(NULL, "\0");
-   U32 bpp = (temp ? dAtoi(temp) : MIN_RESOLUTION_BIT_DEPTH);
-   delete[] tempBuf;
-
-   // If no device is specified, see which ones we have...
-   if (!DGLDevice::setDevice(Con::getVariable("$pref::Video::displayDevice"), width, height, bpp, fullScreen))
-   {
-      // First, try the default OpenGL device:
-      if (!DGLDevice::setDevice("OpenGL", width, height, bpp, fullScreen))
-      {
-         AssertFatal(false, "Could not find a compatible display device!");
-         return;
-      }
-   }
-
    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, (GLint*)&mMaxShaderTextures);
 
    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -183,10 +156,6 @@ void DGLGLDevice::initGLstate()
 #endif
 
    //PlatformGL::setVSync(smDisableVsync ? 0 : 1);
-
-   GLuint vao;
-   glGenVertexArrays(1, &vao);
-   glBindVertexArray(vao);
 
    glEnable(GL_FRAMEBUFFER_SRGB);
 }
@@ -642,17 +611,17 @@ void DGLGLDevice::SetLineWidth(F32 width)
 
 void DGLGLDevice::SetPolygonMode(DGLPolyMode face, DGLPolyMode mode)
 {
-   glPolygonMode(DGLGLPolyMode[face], DGLGLPolyMode[face]);
+   glPolygonMode(DGLGLPolyMode[face], DGLGLPolyMode[mode]);
 }
 
-void DGLGLDevice::SetTextureEnvironment(DGLTextureEnvironment target, DGLTextureEnvironment name, DGLTextureEnvironment param)
+void DGLGLDevice::SetTextureEnvironment(DGLTextureEnvironment target, DGLTextureEnvironmentPname name, DGLTextureEnvironment param)
 {
-   glTexEnvi(DGLGLTextureEnvironment[target], DGLGLTextureEnvironment[name], DGLGLTextureEnvironment[param]);
+   glTexEnvi(DGLGLTextureEnvironment[target], DGLGLTextureEnvironmentPname[name], DGLGLTextureEnvironment[param]);
 }
 
-void DGLGLDevice::SetTextureEnvironmentF(DGLTextureEnvironment target, DGLTextureEnvironment name, const F32 * val)
+void DGLGLDevice::SetTextureEnvironmentF(DGLTextureEnvironment target, DGLTextureEnvironmentPname name, const F32 * val)
 {
-   glTexEnvfv(DGLGLTextureEnvironment[target], DGLGLTextureEnvironment[name], val);
+   glTexEnvfv(DGLGLTextureEnvironment[target], DGLGLTextureEnvironmentPname[name], val);
 }
 
 void DGLGLDevice::SetRotate(F32 ang, F32 x, F32 y, F32 z)
@@ -680,6 +649,11 @@ void DGLGLDevice::SetReadPixels(U32 posx, U32 posy, S32 width, S32 height, void 
    glReadPixels(posx, posy, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 }
 
+void DGLGLDevice::DrawBuffer(DGLPolyMode poly)
+{
+   glDrawBuffer(DGLGLPolyMode[poly]);
+}
+
 
 //------------------------------------------------------------------------------
 // RENDER END
@@ -695,7 +669,7 @@ void DGLGLDevice::AreTexturesLoaded(S32 size, const U32* addr, bool isLoad)
 
 }
 
-void DGLGLDevice::LoadTexture(U32 n, U32 glName)
+void DGLGLDevice::LoadTexture(U32 n, U32 &glName)
 {
    glGenTextures(n, &glName);
 }
@@ -707,7 +681,7 @@ void DGLGLDevice::BindTexture(U32 glName)
 
 void DGLGLDevice::DeleteTextures(U32 n, const U32* glName)
 {
-   glDeleteTextures(1, glName);
+   glDeleteTextures(n, glName);
 }
 
 void DGLGLDevice::SetTextureParam(DGLTextureParam param, const DGLTextureFilter filter)
@@ -730,9 +704,9 @@ void DGLGLDevice::UploadTexture(U32 mip, DGLFormat inFmt, U32 width, U32 height,
 // TEXTURE END
 //------------------------------------------------------------------------------
 
-void DGLGLDevice::GetApiValue(DGLAPIValues inval, S32 *outVal)
+void DGLGLDevice::GetApiValue(DGLAPIValues inval, S32 &outVal)
 {
-   glGetIntegerv(DGLGLAPIValues[inval], outVal);
+   glGetIntegerv(DGLGLAPIValues[inval], &outVal);
 }
 
 

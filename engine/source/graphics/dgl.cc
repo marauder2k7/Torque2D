@@ -62,7 +62,6 @@ ColorF colorAlphaW(1.0f, 1.0f, 1.0f, 0.0f);
 DGLDevice::DGLDevice()
 {
    VECTOR_SET_ASSOCIATION(mVideoModeList);
-   mDeviceName = NULL;
    AssertFatal(smCurrentDevice == NULL, "Already a GFXDevice created! Bad!");
    smCurrentDevice = this;
 }
@@ -77,7 +76,6 @@ void DGLDevice::init()
    smIsFullScreen = false;
 
    destroy();
-
 }
 
 //------------------------------------------------------------------------------
@@ -114,6 +112,7 @@ bool DGLDevice::setDevice(const char * renderName, U32 width, U32 height, U32 bp
    S32 deviceIndex = NO_DEVICE;
    S32 iOpenGL = -1;
    S32 iD3D = -1;
+   Con::printf("SetDevice - Activate");
 
    bool bOpenglRender = true; //(bool)(dStricmp(renderName,"OpenGL") == 0);
    bool bD3DRender = false; //(bool)(dStricmp(renderName,"D3D") == 0);
@@ -137,7 +136,7 @@ bool DGLDevice::setDevice(const char * renderName, U32 width, U32 height, U32 bp
       Con::warnf(ConsoleLogEntry::General, "\"%s\" display device not found!", renderName);
       return false;
    }
-
+   
    // Change the display device:
    if (smDeviceList[deviceIndex] == NULL)
       return false;

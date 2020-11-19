@@ -352,7 +352,7 @@ void TextureManager::freeTexture( TextureObject* pTextureObject )
 {
     if((mDGLRender || mManagerState == Resurrecting) && pTextureObject->mGLTextureName)
     {
-        DGL->DeleteTextures(1, (const U32*)&pTextureObject->mGLTextureName);
+        DGL->DeleteTextures(1, (const U32*)pTextureObject->mGLTextureName);
 
         // Adjust metrics.
         mTextureResidentCount--;
@@ -562,7 +562,6 @@ void TextureManager::refresh( TextureObject* pTextureObject )
     //glBindTexture( GL_TEXTURE_2D, pTextureObject->mGLTextureName );
 
     DGL->BindTexture(pTextureObject->mGLTextureName);
-
     // Are we forcing to 16-bit?
     if( pSourceBitmap->mForce16Bit )
     {
@@ -677,7 +676,6 @@ void TextureManager::createGLName( TextureObject* pTextureObject )
 
     // Generate texture name.
     DGL->LoadTexture(1, pTextureObject->mGLTextureName);
-
     // Fetch source/dest formats.
     DGLFormat sourceFormat;
     getSourceDestByteFormat(pTextureObject->mpBitmap, &sourceFormat);

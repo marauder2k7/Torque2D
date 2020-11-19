@@ -111,7 +111,6 @@ GuiCanvas::~GuiCanvas()
 
 bool GuiCanvas::onAdd()
 {
-
    bool parentRet = Parent::onAdd();
    return parentRet;
 }
@@ -1185,14 +1184,13 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
 {
    PROFILE_START(CanvasPreRender);
 
-/*#if !defined TORQUE_OS_IOS && !defined TORQUE_OS_ANDROID && !defined TORQUE_OS_EMSCRIPTEN
+#if !defined TORQUE_OS_IOS && !defined TORQUE_OS_ANDROID && !defined TORQUE_OS_EMSCRIPTEN
     
    if(mRenderFront)
-      glDrawBuffer(GL_FRONT);
+      DGL->DrawBuffer(DGLFront);
    else
-      glDrawBuffer(GL_BACK);
+      DGL->DrawBuffer(DGLBack);
 #endif
-*/
    // Make sure the root control is the size of the canvas.
    Point2I size = Platform::getWindowSize();
 

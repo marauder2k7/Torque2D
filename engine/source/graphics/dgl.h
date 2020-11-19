@@ -106,10 +106,11 @@ class Point3F;*/
     virtual bool setScreenMode(U32 width, U32 height, U32 bpp, bool fullScreen, bool forceIt = false, bool repaint = true) = 0;
     virtual bool setResolution(U32 width, U32 height, U32 bpp);
     virtual bool toggleFullScreen();
-    virtual DGLDevice* create() = 0;
+    //virtual DGLDevice* create() = 0;
 
     bool prevRes();
     bool nextRes();
+    virtual void enumerateVideoModes() = 0;
     const char* getResolutionList();
     bool isFullScreenOnly() { return(mFullScreenOnly); }
 
@@ -180,7 +181,7 @@ class Point3F;*/
     void DrawCircleFill(const Point2I &center, const F32 radius, const ColorI &color);
     /// @}
 
-    virtual void GetApiValue(DGLAPIValues inval, S32 *outVal) = 0;
+    virtual void GetApiValue(DGLAPIValues inval, S32 &outVal) = 0;
     //------------------------------------------------------------------------------------------
     // RENDER FUNCTIONS
     // Pass these off to the api's.
@@ -202,13 +203,14 @@ class Point3F;*/
     virtual void SetColorI(U32 r, U32 g, U32 b, U32 a) = 0;
     virtual void SetLineWidth(F32 width) = 0;
     virtual void SetPolygonMode(DGLPolyMode face, DGLPolyMode mode) = 0;
-    virtual void SetTextureEnvironment(DGLTextureEnvironment target, DGLTextureEnvironment name, DGLTextureEnvironment param) = 0;
-    virtual void SetTextureEnvironmentF(DGLTextureEnvironment target, DGLTextureEnvironment name, const F32 *val) = 0;
+    virtual void SetTextureEnvironment(DGLTextureEnvironment target, DGLTextureEnvironmentPname name, DGLTextureEnvironment param) = 0;
+    virtual void SetTextureEnvironmentF(DGLTextureEnvironment target, DGLTextureEnvironmentPname name, const F32 *val) = 0;
     virtual void SetRotate(F32 ang, F32 x, F32 y, F32 z) = 0;
     virtual void SetTranslate(F32 x, F32 y, F32 z) = 0;
     virtual void SetClipPlane(DGLRenderState clipPlane, const F64 *side) = 0;
     virtual void SetReadBuffer(DGLPolyMode poly) = 0;
     virtual void SetReadPixels(U32 posx, U32 posy, S32 width, S32 height, void * pixels) = 0;
+    virtual void DrawBuffer(DGLPolyMode poly) = 0;
 
     //------------------------------------------------------------------------------------------
     // DRAW FUNCTIONS
@@ -222,7 +224,7 @@ class Point3F;*/
     // Pass these off to the api's.
     //------------------------------------------------------------------------------------------
     virtual void AreTexturesLoaded(S32 size, const U32* addr, bool isLoad) = 0;
-    virtual void LoadTexture(U32 n, U32 glName) = 0;
+    virtual void LoadTexture(U32 n, U32 &glName) = 0;
     virtual void DeleteTextures(U32 n, const U32* glName) = 0;
     virtual void SetTextureParam(DGLTextureParam param, const DGLTextureFilter filter) = 0;
     virtual void BindTexture(U32 glName) = 0;

@@ -170,14 +170,19 @@ enum DGLTextureEnvironment
    DGLTexEnvi,
    DGLTexFilter,
    DGLPointSprite,
-   //parameter name
-   DGLTexEnvMode,
-   DGLTexEnvColor,
    //parameter
    DGLModulate,
    DGLReplace,
    DGLTexBlend,
    DGLTextureEnvironment_COUNT
+};
+
+enum DGLTextureEnvironmentPname
+{
+   DGLTextureEnvironmentPname_FIRST = 0,
+   DGLTexEnvMode,
+   DGLTexEnvColor,
+   DGLTextureEnvironmentPname_COUNT
 };
 
 

@@ -1,5 +1,5 @@
-#ifndef GLADGL_H_
-#define GLADGL_H_
+#ifndef _GLADGL_H_
+#define _GLADGL_H_
 
 #include <glad/glad.h>
 

@@ -327,7 +327,7 @@ void Scroller::sceneRender( const SceneRenderState* pSceneRenderState, const Sce
 
     //This is to prevent some android devices from throwing opengl errors. For instance the tegra 3 only supports 1
     int maxClip = 4;
-    DGL->GetApiValue(DGLMaxClip, (S32*)maxClip);
+    DGL->GetApiValue(DGLMaxClip, (S32&)maxClip);
 
     DGL->SetClipPlane(DGLRSClipPlane0, left);
 

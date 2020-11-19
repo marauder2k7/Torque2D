@@ -25,6 +25,7 @@
 #include "platformWin32/winWindow.h"
 #include "platformWin32/platformGL.h"
 #include "graphics/dgl.h"
+#include "graphics/gl/dglglDevice.h"
 #include "platform/event.h"
 #include "console/console.h"
 #include "platformWin32/winConsole.h"
@@ -1282,8 +1283,6 @@ static void InitOpenGL()
    U32 bpp = ( temp ? dAtoi( temp ) : MIN_RESOLUTION_BIT_DEPTH );
    delete [] tempBuf;
 
-
-
    // If no device is specified, see which ones we have...
    if ( !DGL->setDevice( Con::getVariable( "$pref::Video::displayDevice" ), width, height, bpp, fullScreen ) )
    {
@@ -1412,8 +1411,8 @@ void Platform::initWindow(const Point2I &initialSize, const char *name)
    DGLDevice::init();
    //Video::init();
 
-   DGL->create();
-
+   DGLDevice::installDevice(DGLGLDevice::create());
+   DGL->enumerateVideoModes();
    PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE);
 
    gWindowCreated = true;
@@ -1425,6 +1424,7 @@ void Platform::initWindow(const Point2I &initialSize, const char *name)
    PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE);
    InitWindow(initialSize);
    PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE);
+   Con::printf("InitOpenGL");
    InitOpenGL();
    PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE);
 }
