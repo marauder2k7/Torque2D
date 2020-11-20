@@ -1,3 +1,6 @@
+#ifndef _DGLENUMS_H_
+#include "graphics/dglEnums.h"
+#endif
 #ifndef _MMATH_H_
 #include "math/mMath.h"
 #endif // !1

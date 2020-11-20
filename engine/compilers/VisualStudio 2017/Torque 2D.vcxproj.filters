@@ -3292,6 +3292,9 @@
     <ClInclude Include="..\..\source\graphics\dglStructs.h">
       <Filter>graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\graphics\dglAdapter.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\source\math\mMath_ASM.asm">

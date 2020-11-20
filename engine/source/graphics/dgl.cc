@@ -24,7 +24,6 @@
 #include "graphics/TextureManager.h"
 #include "graphics/dgl.h"
 #include "game/gameInterface.h"
-#include "graphics/gl/dglglInit.h"
 
 #include "graphics/gColor.h"
 #include "math/mPoint.h"
@@ -63,6 +62,7 @@ DGLDevice::DGLDevice()
 {
    VECTOR_SET_ASSOCIATION(mVideoModeList);
    AssertFatal(smCurrentDevice == NULL, "Already a GFXDevice created! Bad!");
+   mProjectionMatrix.identity();
    smCurrentDevice = this;
 }
 
@@ -85,6 +85,7 @@ void DGLDevice::destroy()
    if (smCurrentDevice)
    {
       smCritical = true;
+      Game->textureKill();
       smCurrentDevice->shutdown();
       smCritical = false;
    }
@@ -740,16 +741,16 @@ U32 DGLDevice::DrawTextN(GFont*          font,
 
    U32 nCharCount = 0;
 
-   Point2I     pt;
-   UTF16       c;
-   pt.x                 = 0;
+   Point2I        pt;
+   UTF16          c;
+   pt.x           = 0;
 
-   ColorI                  currentColor;
-   S32                     currentPt = 0;
+   ColorI         currentColor;
+   S32            currentPt = 0;
 
-   TextureObject *lastTexture = NULL;
+   TextureObject  *lastTexture = NULL;
 
-   currentColor      = sg_bitmapModulation;
+   currentColor   = sg_bitmapModulation;
 
    FrameTemp<TextVertex> vert(4*n);
 
@@ -765,7 +766,6 @@ U32 DGLDevice::DrawTextN(GFont*          font,
 
    EnableClientState(DGLCSColorArray);
    SetColorPoint(4, sizeof(TextVertex), &(vert[0].c));
-
 
    EnableClientState(DGLCSTextCoordArray);
    SetTexPoint(2, sizeof(TextVertex), &(vert[0].t));

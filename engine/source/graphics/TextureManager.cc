@@ -352,7 +352,7 @@ void TextureManager::freeTexture( TextureObject* pTextureObject )
 {
     if((mDGLRender || mManagerState == Resurrecting) && pTextureObject->mGLTextureName)
     {
-        DGL->DeleteTextures(1, (const U32*)pTextureObject->mGLTextureName);
+        DGL->DeleteTextures(1, &pTextureObject->mGLTextureName);
 
         // Adjust metrics.
         mTextureResidentCount--;

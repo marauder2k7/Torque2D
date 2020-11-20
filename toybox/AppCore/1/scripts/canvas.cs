@@ -34,7 +34,7 @@ function initializeCanvas(%windowName)
         return;
     }
 
-    videoSetGammaCorrection($pref::OpenGL::gammaCorrection);
+    //videoSetGammaCorrection($pref::OpenGL::gammaCorrection);
 
     if ( !createCanvas(%windowName) )
     {
@@ -60,14 +60,6 @@ function initializeCanvas(%windowName)
             %resolution = $pref::Video::defaultResolution;
     }
 
-    if ($platform $= "windows" || $platform $= "macos")
-    {
-        setScreenMode( %resolution._0, %resolution._1, %resolution._2, $pref::Video::fullScreen );
-    }
-    else
-    {
-        setScreenMode( %resolution._0, %resolution._1, %resolution._2, false );
-    }
 
     $canvasCreated = true;
 }

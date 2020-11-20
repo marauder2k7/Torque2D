@@ -111,6 +111,7 @@ GuiCanvas::~GuiCanvas()
 
 bool GuiCanvas::onAdd()
 {
+
    bool parentRet = Parent::onAdd();
    return parentRet;
 }
@@ -1365,6 +1366,7 @@ void GuiCanvas::swapBuffers()
 {
    PROFILE_START(SwapBuffers);
    //flip the surface
+   DGL->swapBuffers();
    PROFILE_END();
 }
 
@@ -1421,6 +1423,7 @@ void GuiCanvas::addUpdateRegion(Point2I pos, Point2I ext)
 
 void GuiCanvas::resetUpdateRegions()
 {
+   
    //DEBUG - get surface width and height
    mOldUpdateRects[0].set(mBounds.point, mBounds.extent);
    mOldUpdateRects[1] = mOldUpdateRects[0];

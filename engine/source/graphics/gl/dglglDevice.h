@@ -12,6 +12,7 @@ class DGLGLDevice : public DGLDevice
 private:
    U32         mMaxShaderTextures;
    void*       mContext;
+
 protected:
    bool        mRestoreGamma;
    U16         mOriginalRamp[256 * 3];
@@ -65,6 +66,7 @@ public:
    //------------------------------------------------------------------------------
    // RENDER
    //------------------------------------------------------------------------------
+   virtual void swapBuffers();
    virtual void EnableState(DGLRenderState rs);
    virtual void DisableState(DGLRenderState rs);
    virtual void EnableClientState(DGLClientState cs);

@@ -75,6 +75,7 @@ DGLGLDevice::DGLGLDevice() :
    mMaxShaderTextures(2),
    mContext(NULL)
 {
+   memset(&mCapabilities, 0, sizeof(GLCapabilities));
    mDeviceName = "OpenGL";
    loadGlCore();
    DGLGLEnumTranslate::init();
@@ -84,8 +85,6 @@ DGLGLDevice::DGLGLDevice() :
 
 void DGLGLDevice::initGLstate()
 {
-   Con::printf("Init GL");
-
    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, (GLint*)&mMaxShaderTextures);
 
    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -155,9 +154,14 @@ void DGLGLDevice::initGLstate()
    }
 #endif
 
-   //PlatformGL::setVSync(smDisableVsync ? 0 : 1);
+   PlatformGL::setVSync(smDisableVSync ? 0 : 1);
 
-   glEnable(GL_FRAMEBUFFER_SRGB);
+   //Luma:	Clear window at first, as it is showing previous gl color buffer stuff.
+   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+   glClear(GL_COLOR_BUFFER_BIT);
+
+   //enable sRGB
+   //glEnable(GL_FRAMEBUFFER_SRGB);
 }
 
 //------------------------------------------------------------------------------

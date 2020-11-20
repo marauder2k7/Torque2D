@@ -23,17 +23,14 @@
 #ifndef _DGL_H_
 #define _DGL_H_
 
+#ifndef _DGLADAPTER_H_
+#include "graphics/dglAdapter.h"
+#endif // !_DGLADAPTER_H_
+
+
 #ifndef _PLATFORM_H_
 #include "platform/platform.h"
 #endif
-#ifndef _PLATFORMGL_H_
-#include "platform/platformGL.h"
-#endif
-#ifndef _DGLENUMS_H_
-#include "graphics/dglEnums.h"
-#endif
-
-#include "graphics/dglStructs.h"
 
 /*class TextureObject;
 class GFont;
@@ -72,7 +69,6 @@ class Point3F;*/
     static Vector<DGLDevice *>   smDeviceList;
     static DGLDevice*            smCurrentDevice;
     static bool                  smCritical;
-    static bool                  smDisableVSync;
 
  protected:
 
@@ -80,6 +76,9 @@ class Point3F;*/
     bool                         mFullScreenOnly;
     static DGLVideoMode          smCurrentRes;
     static bool                  smIsFullScreen;
+    MatrixF mProjectionMatrix;
+    /// The global vsync state.
+    static bool smDisableVSync;
 
  public:
 
@@ -186,6 +185,7 @@ class Point3F;*/
     // RENDER FUNCTIONS
     // Pass these off to the api's.
     //------------------------------------------------------------------------------------------
+    virtual void swapBuffers() = 0;
     virtual void EnableState(DGLRenderState rs) = 0;
     virtual void DisableState(DGLRenderState rs) = 0;
     virtual void EnableClientState(DGLClientState cs) = 0;

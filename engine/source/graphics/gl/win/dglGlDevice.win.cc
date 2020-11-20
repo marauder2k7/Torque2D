@@ -31,6 +31,134 @@ void CreatePixelFormat(PIXELFORMATDESCRIPTOR *mPFD, S32 colorBits, S32 depthBits
    *mPFD = src;
 }
 
+S32 ChooseBestPixelFormat(HDC hDC, PIXELFORMATDESCRIPTOR *pPFD)
+{
+   PIXELFORMATDESCRIPTOR pfds[MAX_PFDS + 1];
+   S32 i;
+   S32 bestMatch = 0;
+
+   S32 maxPFD = DescribePixelFormat(hDC, 1, sizeof(PIXELFORMATDESCRIPTOR), &pfds[0]);
+   if (maxPFD > MAX_PFDS)
+      maxPFD = MAX_PFDS;
+
+   bool accelerated = false;
+
+   for (i = 1; i <= maxPFD; i++)
+   {
+      DescribePixelFormat(hDC, i, sizeof(PIXELFORMATDESCRIPTOR), &pfds[i]);
+
+      // make sure this has hardware acceleration:
+      if ((pfds[i].dwFlags & PFD_GENERIC_FORMAT) != 0)
+         continue;
+
+      // verify pixel type
+      if (pfds[i].iPixelType != PFD_TYPE_RGBA)
+         continue;
+
+      // verify proper flags
+      if (((pfds[i].dwFlags & pPFD->dwFlags) & pPFD->dwFlags) != pPFD->dwFlags)
+         continue;
+
+      accelerated = !(pfds[i].dwFlags & PFD_GENERIC_FORMAT);
+
+      //
+      // selection criteria (in order of priority):
+      //
+      //  PFD_STEREO
+      //  colorBits
+      //  depthBits
+      //  stencilBits
+      //
+      if (bestMatch)
+      {
+         // check stereo
+         if ((pfds[i].dwFlags & PFD_STEREO) && (!(pfds[bestMatch].dwFlags & PFD_STEREO)) && (pPFD->dwFlags & PFD_STEREO))
+         {
+            bestMatch = i;
+            continue;
+         }
+
+         if (!(pfds[i].dwFlags & PFD_STEREO) && (pfds[bestMatch].dwFlags & PFD_STEREO) && (pPFD->dwFlags & PFD_STEREO))
+         {
+            bestMatch = i;
+            continue;
+         }
+
+         // check color
+         if (pfds[bestMatch].cColorBits != pPFD->cColorBits)
+         {
+            // prefer perfect match
+            if (pfds[i].cColorBits == pPFD->cColorBits)
+            {
+               bestMatch = i;
+               continue;
+            }
+            // otherwise if this PFD has more bits than our best, use it
+            else if (pfds[i].cColorBits > pfds[bestMatch].cColorBits)
+            {
+               bestMatch = i;
+               continue;
+            }
+         }
+
+         // check depth
+         if (pfds[bestMatch].cDepthBits != pPFD->cDepthBits)
+         {
+            // prefer perfect match
+            if (pfds[i].cDepthBits == pPFD->cDepthBits)
+            {
+               bestMatch = i;
+               continue;
+            }
+            // otherwise if this PFD has more bits than our best, use it
+            else if (pfds[i].cDepthBits > pfds[bestMatch].cDepthBits)
+            {
+               bestMatch = i;
+               continue;
+            }
+         }
+
+         // check stencil
+         if (pfds[bestMatch].cStencilBits != pPFD->cStencilBits)
+         {
+            // prefer perfect match
+            if (pfds[i].cStencilBits == pPFD->cStencilBits)
+            {
+               bestMatch = i;
+               continue;
+            }
+            // otherwise if this PFD has more bits than our best, use it
+            else if ((pfds[i].cStencilBits > pfds[bestMatch].cStencilBits) &&
+               (pPFD->cStencilBits > 0))
+            {
+               bestMatch = i;
+               continue;
+            }
+         }
+      }
+      else
+      {
+         bestMatch = i;
+      }
+   }
+
+   if (!bestMatch)
+      return 0;
+
+   else if (pfds[bestMatch].dwFlags & PFD_GENERIC_ACCELERATED)
+   {
+      // MCD
+   }
+   else
+   {
+      // ICD
+   }
+
+   *pPFD = pfds[bestMatch];
+
+   return bestMatch;
+}
+
 extern void loadGlCore();
 extern void loadGlExtensions(void* context);
 
@@ -119,61 +247,93 @@ bool DGLGLDevice::activate(U32 width, U32 height, U32 bpp, bool fullScreen)
 {
    Con::printf("Activating the OpenGL display device...");
 
-   bool needResurrect = false;
-
-   // If the rendering context exists, delete it:
-   if (winState.hGLRC)
+   if (!winState.appWindow)
    {
-      Con::printf("Killing the texture manager...");
-      Game->textureKill();
-      needResurrect = true;
-
-      Con::printf("Making the rendering context not current...");
-      if (!wglMakeCurrent(NULL, NULL))
+      Con::printf("Creating a new %swindow...", (fullScreen ? "full-screen " : ""));
+      winState.appWindow = CreateOpenGLWindow(width, height, false, true);
+      if (!winState.appWindow)
       {
-         AssertFatal(false, "OpenGLDevice::activate\ndwglMakeCurrent( NULL, NULL ) failed!");
+         AssertFatal(false, "Failed to create a new window!");
          return false;
       }
-
-      Con::printf("Deleting the rendering context ...");
-      if (!wglDeleteContext(winState.hGLRC))
-      {
-         AssertFatal(false, "OpenGLDevice::activate\ndwglDeleteContext failed!");
-         return false;
-      }
-      winState.hGLRC = NULL;
    }
 
-   // [neo, 5/31/2007 - #3174]
-   if (winState.appMenu)
+  winState.appDC = GetDC(winState.appWindow);
+  if (!winState.appDC)
+  {
+     AssertFatal(false, "GetDC failed to get a valid device context!");
+     return false;
+  }
+
+   PIXELFORMATDESCRIPTOR pfd;
+   CreatePixelFormat(&pfd, 32, 0, 0); // 32 bit color... We do not need depth or stencil, OpenGL renders into a FBO and then copy the image to window
+   S32 chosenFormat = ChooseBestPixelFormat(winState.appDC, &pfd);
+   if (!SetPixelFormat(winState.appDC, chosenFormat, &pfd))
    {
-      DestroyMenu(winState.appMenu);
-
-      winState.appMenu = NULL;
+      AssertFatal(false, "DGLDevice::init - cannot get the one and only pixel format we check for.");
    }
+   Con::printf("  Pixel format set:");
+   Con::printf("  %d color bits, %d depth bits, %d stencil bits", pfd.cColorBits, pfd.cDepthBits, pfd.cStencilBits);
 
-   // If the window already exists, kill it so we can start fresh:
-   if (winState.appWindow)
+   int OGL_MAJOR = 3;
+   int OGL_MINOR = 1;
+
+#if TORQUE_DEBUG
+   int debugFlag = WGL_CONTEXT_DEBUG_BIT_ARB;
+#else
+   int debugFlag = 0;
+#endif
+
+   // Create a temp rendering context, needed a current context to use wglCreateContextAttribsARB
+   HGLRC tempGLRC = wglCreateContext(winState.appDC);
+   if (!wglMakeCurrent(winState.appDC, tempGLRC))
+      AssertFatal(false, "Couldn't make temp GL context.");
+
+   if (gglHasWExtension(ARB_create_context))
    {
-      if (winState.appDC)
-      {
-         Con::printf("Releasing the device context...");
-         ReleaseDC(winState.appWindow, winState.appDC);
-         winState.appDC = NULL;
-      }
+      int const create_attribs[] = {
+               WGL_CONTEXT_MAJOR_VERSION_ARB, OGL_MAJOR,
+               WGL_CONTEXT_MINOR_VERSION_ARB, OGL_MINOR,
+               WGL_CONTEXT_FLAGS_ARB, /*WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB |*/ debugFlag,
+               WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+               //WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+               0
+      };
 
-      Con::printf("Destroying the window...");
-      DestroyWindow(winState.appWindow);
-      winState.appWindow = NULL;
+      Con::printf("make attrib context");
+      mContext = wglCreateContextAttribsARB(winState.appDC, 0, create_attribs);
+      if (!mContext)
+      {
+         AssertFatal(0, "");
+      }
    }
+   else
+      mContext = wglCreateContext(winState.appDC);
+
+   winState.hGLRC = (HGLRC)mContext;
+   // Delete temp rendering context
+   wglMakeCurrent(NULL, NULL);
+   wglDeleteContext(tempGLRC);
+
+   if (!wglMakeCurrent(winState.appDC, (HGLRC)mContext))
+      AssertFatal(false, "DGLGLDevice::init - cannot make our context current. Or maybe we can't create it.");
+
+   // Change the window style:
+   Con::printf("Changing the window style...");
+   S32 windowStyle = WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+   windowStyle |= (WS_OVERLAPPEDWINDOW);
+
+   if (winState.appWindow && !SetWindowLong(winState.appWindow, GWL_STYLE, windowStyle))
+      Con::errorf("SetWindowLong failed to change the window style!");
+
+   // Doesn't hurt to do this even it isn't necessary:
+   ShowWindow(winState.appWindow, SW_SHOW);
+   SetForegroundWindow(winState.appWindow);
+   SetFocus(winState.appWindow);
 
    loadGlCore();
-   
-   // Set the resolution:
-   if (!setScreenMode(width, height, bpp, (fullScreen || mFullScreenOnly), true, false))
-      return false;
-
    loadGlExtensions(winState.hGLRC);
+
    // Output some driver info to the console:
    const char* vendorString = (const char*)glGetString(GL_VENDOR);
    const char* rendererString = (const char*)glGetString(GL_RENDERER);
@@ -195,53 +355,55 @@ bool DGLGLDevice::activate(U32 width, U32 height, U32 bpp, bool fullScreen)
 
 //------------------------------------------------------------------------------
 
+void DGLGLDevice::swapBuffers()
+{
+   SwapBuffers(GetDC(winState.appWindow));
+}
+
 DGLDevice* DGLGLDevice::create()
 {
+   WNDCLASS windowclass;
+   dMemset(&windowclass, 0, sizeof(WNDCLASS));
 
-   Con::printf("  DGL Device: Test Create");
-   bool fullScreenOnly = false;
+   windowclass.lpszClassName = L"GFX-OpenGL";
+   windowclass.style = CS_OWNDC;
+   windowclass.lpfnWndProc = DefWindowProc;
+   windowclass.hInstance = winState.appInstance;
 
-   WNDCLASS wc;
-   dMemset(&wc, 0, sizeof(wc));
-   wc.style          = CS_OWNDC;
-   wc.lpfnWndProc    = DefWindowProc;
-   wc.hInstance      = winState.appInstance;
-   wc.lpszClassName  = dT("OGLTest");
-   RegisterClass(&wc);
+   if (!RegisterClass(&windowclass))
+      AssertFatal(false, "Failed to register the window class for the GL test window.");
 
-   //Test window.
-   HWND test = CreateWindow(dT("OGLTest"), dT(""), WS_POPUP, 0, 0, MIN_RESOLUTION_X, MIN_RESOLUTION_Y, NULL, NULL, winState.appInstance, NULL);
-   AssertFatal(test != NULL, "Failed to create the window for the GL test window.");
+   // Now create a window
+   HWND hwnd = CreateWindow(L"GFX-OpenGL", L"", WS_POPUP, 0, 0, 640, 480,
+      NULL, NULL, winState.appInstance, NULL);
+   AssertFatal(hwnd != NULL, "Failed to create the window for the GL test window.");
 
-   // Test device context.
-   HDC tempDc = GetDC(test);
-   AssertFatal(tempDc != NULL, "Failed to create device context for test");
+   // Create a device context
+   HDC tempDC = GetDC(hwnd);
+   AssertFatal(tempDC != NULL, "Failed to create device context");
 
-   // Pixel format descriptor.
+   // Create pixel format descriptor...
    PIXELFORMATDESCRIPTOR pfd;
-   // Not testing for 16bit for the time being. 
    CreatePixelFormat(&pfd, 32, 0, 0, false);
-   if (!SetPixelFormat(tempDc, ChoosePixelFormat(tempDc, &pfd), &pfd))
-   {
-      AssertFatal(false, "unable to set pixel format");
-   }
-   
-   // Create a temp rendering context.
-   HGLRC tempGLRC = wglCreateContext(tempDc);
-   if (!wglMakeCurrent(tempDc, tempGLRC))
-      AssertFatal(false, "Unable to make temp current");
+   if (!SetPixelFormat(tempDC, ChoosePixelFormat(tempDC, &pfd), &pfd))
+      AssertFatal(false, "I don't know who's responcible for this, but I want caught...");
+
+   // Create a rendering context!
+   HGLRC tempGLRC = wglCreateContext(tempDC);
+   if (!wglMakeCurrent(tempDC, tempGLRC))
+      AssertFatal(false, "I want them caught and killed.");
 
    Con::printf("  DGL Device: Test LoadGLAD");
    // Core GL. 
    loadGlCore();
-   loadGlExtensions(tempDc);
+   loadGlExtensions(tempDC);
 
    // Cleanup.
    wglMakeCurrent(NULL, NULL);
    wglDeleteContext(tempGLRC);
-   ReleaseDC(test, tempDc);
-   DestroyWindow(test);
-   UnregisterClass(dT("OGLTest"), winState.appInstance);
+   ReleaseDC(hwnd, tempDC);
+   DestroyWindow(hwnd);
+   UnregisterClass(L"GFX-OpenGL", winState.appInstance);
 
    DGLGLDevice* newOGLDevice = new DGLGLDevice();
    newOGLDevice->enumerateVideoModes();

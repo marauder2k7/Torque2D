@@ -799,7 +799,6 @@ static LRESULT PASCAL WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
          S32 nWidth, nHeight;
          nWidth  = LOWORD(lParam);
          nHeight = HIWORD(lParam);
-
          Platform::setWindowSize( nWidth, nHeight );
          
          Game->gameReactivate();
@@ -1424,7 +1423,6 @@ void Platform::initWindow(const Point2I &initialSize, const char *name)
    PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE);
    InitWindow(initialSize);
    PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE);
-   Con::printf("InitOpenGL");
    InitOpenGL();
    PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE);
 }
