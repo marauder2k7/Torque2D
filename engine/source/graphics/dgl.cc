@@ -762,13 +762,13 @@ U32 DGLDevice::DrawTextN(GFont*          font,
 
    // Enable states and link our arrays.
    EnableClientState(DGLCSVertexArray);
-   SetVertexPoint(2, sizeof(TextVertex), &(vert[0].p));
+   SetVertexPoint(2, sizeof(TextVertex), &vert[0].p);
 
    EnableClientState(DGLCSColorArray);
-   SetColorPoint(4, sizeof(TextVertex), &(vert[0].c));
+   SetColorPointU(4, sizeof(TextVertex), &vert[0].c);
 
    EnableClientState(DGLCSTextCoordArray);
-   SetTexPoint(2, sizeof(TextVertex), &(vert[0].t));
+   SetTexPoint(2, sizeof(TextVertex), &vert[0].t);
 
    // first build the point, color, and coord arrays
    U32 i;

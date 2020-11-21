@@ -89,29 +89,35 @@ void DGLGLDevice::initGLstate()
 
    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
+   Con::printf("  Extended Capabilities:");
    // Capabilities
    if (gglHasExtension(EXT_texture_filter_anisotropic))
    {
+      Con::printf("  Anistropic Filtering");
       mCapabilities.anisotropicFiltering = true;
    }
 
    if (gglHasExtension(ARB_buffer_storage))
    {
+      Con::printf("  Buffer Storage");
       mCapabilities.bufferStorage = true;
    }
 
    if (gglHasExtension(ARB_texture_storage))
    {
+      Con::printf("  Texture Storage");
       mCapabilities.textureStorage = true;
    }
 
    if (gglHasExtension(ARB_copy_image))
    {
+      Con::printf("  Copy Image");
       mCapabilities.copyImage = true;
    }
 
    if (gglHasExtension(ARB_vertex_attrib_binding))
    {
+      Con::printf("  Vertex Attribute Binding");
       mCapabilities.vertexAttributeBinding = true;
    }
 
@@ -127,6 +133,7 @@ void DGLGLDevice::initGLstate()
 
    if (gglHasExtension(SGIS_texture_edge_clamp))
    {
+      Con::printf("  Texture Clamping");
       smEdgeClamp = true;
    }
 
@@ -574,6 +581,13 @@ void DGLGLDevice::SetColorPoint(U32 size, U32 stride, const void * pointer)
    // We only use float here as this is all that is used in the engine.
    // this function should be removed asap when the shaders are implemented.
    glColorPointer(size, GL_FLOAT, stride, pointer);
+}
+
+void DGLGLDevice::SetColorPointU(U32 size, U32 stride, const void * pointer)
+{
+   // We only use float here as this is all that is used in the engine.
+   // this function should be removed asap when the shaders are implemented.
+   glColorPointer(size, GL_UNSIGNED_BYTE, stride, pointer);
 }
 
 void DGLGLDevice::SetTexPoint(U32 size, U32 stride, const void * pointer)

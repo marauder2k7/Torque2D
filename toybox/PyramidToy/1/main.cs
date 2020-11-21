@@ -31,7 +31,7 @@ function PyramidToy::create( %this )
     
     // Configure the toy.
     PyramidToy.BlockSize = 1.5;
-    PyramidToy.BlockCount = 15;
+    PyramidToy.BlockCount = 12;
     PyramidToy.GroundWidth = 140;
     
     // Set the camera.

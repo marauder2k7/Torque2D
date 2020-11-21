@@ -195,6 +195,7 @@ class Point3F;*/
     virtual void SetOrthoState(F32 wMin, F32 wMax, F32 hMin, F32 hMax, F32 mNear, U32 mFar) = 0;
     virtual void SetVertexPoint(U32 size, U32 stride, const void *pointer) = 0;
     virtual void SetColorPoint(U32 size, U32 stride, const void * pointer) = 0;
+    virtual void SetColorPointU(U32 size, U32 stride, const void * pointer) = 0;
     virtual void SetTexPoint(U32 size, U32 stride, const void * pointer) = 0;
     virtual void ClearBuffer(DGLBufferBit bit) = 0;
     virtual void ClearColor(F32 r, F32 g, F32 b, F32 a) = 0;
