@@ -20,5 +20,8 @@ namespace GLAD
    void gglPerformExtensionBinds(void *context)
    {
 
+   #ifdef TORQUE_OS_WIN32
+      gladLoadWGL(wglGetCurrentDC());
+   #endif // TORQUE_OS_WIN32
    }
 }

@@ -276,194 +276,103 @@ void DGLDevice::SetTextAnchorColor(const ColorF& in_rColor)
 
 void DGLDevice::DrawBlendBox(RectI &bounds, ColorF &c1, ColorF &c2, ColorF &c3, ColorF &c4)
 {
-   F32 l = (F32)(bounds.point.x + 1);
-   F32 r = (F32)(bounds.point.x + bounds.extent.x - 2);
-   F32 t = (F32)(bounds.point.y + 1);
-   F32 b = (F32)(bounds.point.y + bounds.extent.y - 2);
+   F32 left = bounds.point.x, right = bounds.point.x + bounds.extent.x - 1;
+   F32 top = bounds.point.y, bottom = bounds.point.y + bounds.extent.y - 1;
 
-   // Gl draw function
-   /*glEnable(GL_BLEND);
-   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-   glDisable(GL_TEXTURE_2D);
+   EnableState(DGLRSBlend);
+   setBlendFunc(DGLBlendSrcAlpha, DGLBlendInvSrcAlpha);
+   DisableState(DGLRSTexture2D);
 
-   glBegin(GL_QUADS);
+   const F32 verts[] = {
+       left, top,
+       right,  top,
+       left,  bottom,
+       right,   bottom,
+   };
+   const U32 squareColors[] = {
+       static_cast<U32>(255 * c1.red),  static_cast<U32>(255 * c1.green),  static_cast<U32>(255 * c1.blue),  static_cast<U32>(255 * c1.alpha),
+       static_cast<U32>(255 * c2.red),  static_cast<U32>(255 * c2.green),  static_cast<U32>(255 * c2.blue),  static_cast<U32>(255 * c2.alpha),
+       static_cast<U32>(255 * c3.red),  static_cast<U32>(255 * c3.green),  static_cast<U32>(255 * c3.blue),  static_cast<U32>(255 * c3.alpha),
+       static_cast<U32>(255 * c4.red),  static_cast<U32>(255 * c4.green),  static_cast<U32>(255 * c4.blue),  static_cast<U32>(255 * c4.alpha),
+   };
 
-   // Color
-   glColor4fv(c2.address());
-   glVertex2f(l, t);
-   glColor4fv(c2.address());
-   glVertex2f(r, t);
-   glColor4fv(c2.address());
-   glVertex2f(r, b);
-   glColor4fv(c2.address());
-   glVertex2f(l, b);
+   SetVertexPoint(2, 0, verts);
+   EnableClientState(DGLCSVertexArray);
+   SetColorPoint(4, 0, squareColors);
+   EnableClientState(DGLCSColorArray);
 
-   // White
-   glColor4fv(c1.address());
-   glVertex2f(l, t);
-   glColor4fv(colorAlphaW.address());
-   glVertex2f(r, t);
-   glColor4fv(colorAlphaW.address());
-   glVertex2f(r, b);
-   glColor4fv(c1.address());
-   glVertex2f(l, b);
-
-   // Black
-   glColor4fv(c3.address());
-   glVertex2f(l, t);
-   glColor4fv(c3.address());
-   glVertex2f(r, t);
-   glColor4fv(c4.address());
-   glVertex2f(r, b);
-   glColor4fv(c4.address());
-   glVertex2f(l, b);
-
-   // Top right
-   glColor4fv(c2.address());
-   glVertex2f(r, t);
-   glColor4fv(c2.address());
-   glVertex2f(r, t + 1);
-   glColor4fv(c2.address());
-   glVertex2f(r - 1, t + 1);
-   glColor4fv(c2.address());
-   glVertex2f(r - 1, t);
-
-   // Top-Right Corner
-   glColor4fv(c2.address());
-   glVertex2f(r, t);
-   glColor4fv(c2.address());
-   glVertex2f(r, t - 1);
-   glColor4fv(c2.address());
-   glVertex2f(r + 1, t - 1);
-   glColor4fv(c2.address());
-   glVertex2f(r + 1, t);
-
-   // Top-Right Corner
-   glColor4fv(c1.address());
-   glVertex2f(l, t);
-   glColor4fv(c1.address());
-   glVertex2f(l, t - 1);
-   glColor4fv(c1.address());
-   glVertex2f(l - 1, t - 1);
-   glColor4fv(c1.address());
-   glVertex2f(l - 1, t);
-
-   // Top row
-   glColor4fv(c1.address());
-   glVertex2f(l, t);
-   glColor4fv(c1.address());
-   glVertex2f(l, t - 1);
-   glColor4fv(c2.address());
-   glVertex2f(r, t - 1);
-   glColor4fv(c2.address());
-   glVertex2f(r, t);
-
-
-   // Right side
-   glColor4fv(c2.address());
-   glVertex2f(r, t);
-   glColor4fv(c2.address());
-   glVertex2f(r + 1, t);
-   glColor4fv(c4.address());
-   glVertex2f(r + 1, b);
-   glColor4fv(c4.address());
-   glVertex2f(r, b);
-
-   // Left side
-   glColor4fv(c1.address());
-   glVertex2f(l, t);
-   glColor4fv(c1.address());
-   glVertex2f(l - 1, t);
-   glColor4fv(c4.address());
-   glVertex2f(l - 1, b);
-   glColor4fv(c4.address());
-   glVertex2f(l, b);
-
-   // Bottom row
-   glColor4fv(c4.address());
-   glVertex2f(l - 1, b);
-   glColor4fv(c4.address());
-   glVertex2f(l - 1, b + 1);
-   glColor4fv(c4.address());
-   glVertex2f(r + 1, b + 1);
-   glColor4fv(c4.address());
-   glVertex2f(r + 1, b);
-
-   glEnd();*/
+   DrawArrays(DGLTriangleStrip, 0, 4);
 }
 
 /// Function to draw a set of boxes blending throughout an array of colors
 void DGLDevice::DrawBlendRangeBox(RectI &bounds, bool vertical, U8 numColors, ColorI *colors)
 {
-   F32 l = (F32)bounds.point.x;
-   F32 r = (F32)(bounds.point.x + bounds.extent.x - 1);
-   F32 t = (F32)bounds.point.y + 1;
-   F32 b = (F32)(bounds.point.y + bounds.extent.y - 2);
+   S32 left = bounds.point.x, right = bounds.point.x + bounds.extent.x - 1;
+   S32 top = bounds.point.y, bottom = bounds.point.y + bounds.extent.y - 1;
 
    // Calculate increment value
-   F32 x_inc = F32((r - l) / (numColors - 1));
-   F32 y_inc = F32((b - t) / (numColors - 1));
+   S32 x_inc = S32(mFloor((right - left) / (numColors - 1)));
+   S32 y_inc = S32(mFloor((bottom - top) / (numColors - 1)));
 
-   /*
-   glEnable(GL_BLEND);
-   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-   glDisable(GL_TEXTURE_2D);
 
-   glBegin(GL_QUADS);
-   if (!vertical)  // Horizontal (+x)
-   {
-      glColor4ub(colors[0].red, colors[0].green, colors[0].blue, colors[0].alpha);
-      glVertex2f(l, t);
-      glVertex2f(l, b);
-      glVertex2f(l - 1, b);
-      glVertex2f(l - 1, t);
-      glVertex2f(r, t);
-      glVertex2f(r, b);
-      glVertex2f(r + 1, b);
-      glVertex2f(r + 1, t);
-   }
-   else   // Vertical (+y)
-   {
-      glColor4ub(colors[0].red, colors[0].green, colors[0].blue, colors[0].alpha);
-      glVertex2f(l, t);
-      glVertex2f(r, t);
-      glVertex2f(r, t - 1);
-      glVertex2f(l, t - 1);
-      glVertex2f(l, b);
-      glVertex2f(r, b);
-      glVertex2f(r, b + 1);
-      glVertex2f(l, b + 1);
-   }
+   EnableState(DGLRSBlend);
+   setBlendFunc(DGLBlendSrcAlpha, DGLBlendInvSrcAlpha);
+   DisableState(DGLRSTexture2D);
+
+   F32 verts[] = {
+       0.0f,	0.0f,	0.0f,	0.0f,
+       0.0f,	0.0f,	0.0f,	0.0f,
+   };
+
+   SetVertexPoint(2, 0, verts);
+   EnableClientState(DGLCSVertexArray);
 
    for (U16 i = 0; i < numColors - 1; i++)
    {
-      if (!vertical)  // Horizontal (+x)
+      // If we are at the end, x_inc and y_inc need to go to the end (otherwise there is a rendering bug)
+      if (i == numColors - 2)
       {
-         // First color
-         glColor4ub(colors[i].red, colors[i].green, colors[i].blue, colors[i].alpha);
-         glVertex2f(l, t);
-         glVertex2f(l, b);
-         // Second color
-         glColor4ub(colors[i + 1].red, colors[i + 1].green, colors[i + 1].blue, colors[i + 1].alpha);
-         glVertex2f(l + x_inc, b);
-         glVertex2f(l + x_inc, t);
-         l += x_inc;
+         x_inc += right - left - 1;
+         y_inc += bottom - top - 1;
       }
-      else  // Vertical (+y)
+
+      if (vertical)  // Vertical (+y)		colors go up and down
       {
          // First color
-         glColor4ub(colors[i].red, colors[i].green, colors[i].blue, colors[i].alpha);
-         glVertex2f(l, t);
-         glVertex2f(r, t);
+         SetColorI(colors[i].red, colors[i].green, colors[i].blue, colors[i].alpha);
+         verts[0] = (F32)left;
+         verts[1] = (F32)top;
+         verts[2] = (F32)(left + x_inc);
+         verts[3] = (F32)top;
          // Second color
-         glColor4ub(colors[i + 1].red, colors[i + 1].green, colors[i + 1].blue, colors[i + 1].alpha);
-         glVertex2f(r, t + y_inc);
-         glVertex2f(l, t + y_inc);
-         t += y_inc;
+         SetColorI(colors[i + 1].red, colors[i + 1].green, colors[i + 1].blue, colors[i + 1].alpha);
+
+         verts[4] = (F32)left;
+         verts[5] = (F32)bottom;
+         verts[6] = (F32)(left + x_inc);
+         verts[7] = (F32)bottom;
+         DrawArrays(DGLTriangleStrip, 0, 4);
+         left += x_inc;
+      }
+      else  // Horizontal (+x)	colors go lateral
+      {
+         // First color
+         SetColorI(colors[i].red, colors[i].green, colors[i].blue, colors[i].alpha);
+         verts[0] = (F32)left;
+         verts[1] = (F32)(top + y_inc);
+         verts[2] = (F32)right;
+         verts[3] = (F32)(top + y_inc);
+
+         // Second color
+         SetColorI(colors[i + 1].red, colors[i + 1].green, colors[i + 1].blue, colors[i + 1].alpha);
+         verts[4] = (F32)left;
+         verts[5] = (F32)top;
+         verts[6] = (F32)right;
+         verts[7] = (F32)top;
+         DrawArrays(DGLTriangleStrip, 0, 4);
+         top += y_inc;
       }
    }
-   glEnd();
-   */
 
 }
 

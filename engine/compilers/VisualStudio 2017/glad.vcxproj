@@ -71,9 +71,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IntDir>glad.dir\Release\</IntDir>
+    <IntDir>.\../../Link/Release/glad\</IntDir>
     <TargetName>glad</TargetName>
     <TargetExt>.lib</TargetExt>
+    <OutDir>.\../../Link/Release\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IntDir>.\../../Link/Debug/glad\</IntDir>

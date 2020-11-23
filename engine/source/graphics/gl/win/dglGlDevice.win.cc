@@ -4,6 +4,9 @@
 #include "graphics/gl/dglglDevice.h"
 #include "game/gameInterface.h"
 
+
+#  pragma comment(lib, "opengl32.lib") 
+
 void CreatePixelFormat(PIXELFORMATDESCRIPTOR *mPFD, S32 colorBits, S32 depthBits, S32 stencilBits)
 {
    PIXELFORMATDESCRIPTOR src =
@@ -265,6 +268,8 @@ bool DGLGLDevice::activate(U32 width, U32 height, U32 bpp, bool fullScreen)
      return false;
   }
 
+  
+
    PIXELFORMATDESCRIPTOR pfd;
    CreatePixelFormat(&pfd, 32, 0, 0); // 32 bit color... We do not need depth or stencil, OpenGL renders into a FBO and then copy the image to window
    S32 chosenFormat = ChooseBestPixelFormat(winState.appDC, &pfd);
@@ -334,7 +339,7 @@ bool DGLGLDevice::activate(U32 width, U32 height, U32 bpp, bool fullScreen)
    SetFocus(winState.appWindow);
 
    loadGlCore();
-   loadGlExtensions(winState.hGLRC);
+   loadGlExtensions(winState.appDC);
 
    // Output some driver info to the console:
    const char* vendorString = (const char*)glGetString(GL_VENDOR);
@@ -349,6 +354,12 @@ bool DGLGLDevice::activate(U32 width, U32 height, U32 bpp, bool fullScreen)
       Con::printf("  Version: %s", versionString);
 
    Con::setVariable("$pref::Video::displayDevice", mDeviceName);
+
+   if (gglHasWExtension(EXT_swap_control))
+   {
+      Con::printf("  VSync Supported");
+      smDisableVSync = false;
+   }
 
    initGLstate();
 

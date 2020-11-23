@@ -70,6 +70,7 @@ void LightObject::sceneRender(const SceneRenderState * sceneRenderState, const S
    b2World* mWorld = scene->getWorld();
 
    Vector<F32> lightVerts;
+   Vector<F32> colorPoint;
 
    DGL->EnableState(DGLRSBlend);
    DGL->DisableState(DGLRSTexture2D);
@@ -79,9 +80,12 @@ void LightObject::sceneRender(const SceneRenderState * sceneRenderState, const S
    
    DGL->setBlendFunc((DGLBlend)mSrcLightBlend, (DGLBlend)mDstLightBlend);
    // Creates the fading dark region.
-   //DGL->SetColorF(mLightColor.red,mLightColor.green,mLightColor.blue,mLightColor.alpha);
-   //lightVerts.push_back(0.0f);
-   //lightVerts.push_back(0.0f);
+   colorPoint.push_back(mLightColor.red);
+   colorPoint.push_back(mLightColor.green);
+   colorPoint.push_back(mLightColor.blue);
+   colorPoint.push_back(mLightColor.alpha);
+   lightVerts.push_back(0.0f);
+   lightVerts.push_back(0.0f);
    //check scene objects
    U32 objCount = scene->getSceneObjectCount();
    for (U32 i = 0; i < objCount; i++)
@@ -185,20 +189,28 @@ void LightObject::sceneRender(const SceneRenderState * sceneRenderState, const S
    //triangle fan
    for (S32 m = 0; m < bList.size(); m++)
    {
-      DGL->SetColorF((mLightColor.red - (mLightColor.red * bList[m].l)), mLightColor.green - (mLightColor.green * bList[m].l), mLightColor.blue - (mLightColor.blue * bList[m].l), mLightColor.alpha - (mLightColor.alpha * bList[m].l));
+      colorPoint.push_back((mLightColor.green - (mLightColor.green * bList[m].l)));
+      colorPoint.push_back((mLightColor.green - (mLightColor.green * bList[m].l)));
+      colorPoint.push_back((mLightColor.blue - (mLightColor.blue * bList[m].l)));
+      colorPoint.push_back((mLightColor.alpha - (mLightColor.alpha * bList[m].l)));
       lightVerts.push_back(bList[m].x);
       lightVerts.push_back(bList[m].y);
-
    }
    //close off the circle
-   //DGL->SetColorF(mLightColor.red - (mLightColor.red * bList[0].l), mLightColor.green - (mLightColor.green * bList[0].l), mLightColor.blue - (mLightColor.blue * bList[0].l), mLightColor.alpha - (mLightColor.alpha * bList[0].l));
+   colorPoint.push_back((mLightColor.green - (mLightColor.green * bList[0].l)));
+   colorPoint.push_back((mLightColor.green - (mLightColor.green * bList[0].l)));
+   colorPoint.push_back((mLightColor.blue - (mLightColor.blue * bList[0].l)));
+   colorPoint.push_back((mLightColor.alpha - (mLightColor.alpha * bList[0].l)));
    lightVerts.push_back(bList[0].x);
    lightVerts.push_back(bList[0].y);
-   DGL->EnableClientState(DGLCSVertexArray);
-   DGL->SetVertexPoint(2, 0, lightVerts.address());
    
-   DGL->DrawArrays(DGLTriangleFan, 0, (lightVerts.size()/2));
+   DGL->SetVertexPoint(2, 0, lightVerts.address());
+   DGL->EnableClientState(DGLCSVertexArray);
+   DGL->SetColorPoint(4, 0, colorPoint.address());
+   DGL->EnableClientState(DGLCSColorArray);
+   DGL->DrawArrays(DGLTriangleFan, 0, bList.size() + 2);
    DGL->DisableClientState(DGLCSVertexArray);
+   DGL->DisableClientState(DGLCSColorArray);
    DGL->DisableState(DGLRSBlend);
    DGL->PopMatrix();
 }

@@ -33,7 +33,7 @@
 #define MIN_RESOLUTION_XY_STRING	"320 320"
 
 #ifdef _MSC_VER                         // Check if MS Visual C compiler
-#  pragma comment(lib, "opengl32.lib")  // Load opengl Lib. we are using glad
+ // Load opengl Lib. we are using glad
 #endif
 
 enum WinConstants { MAX_PFDS = 256 };

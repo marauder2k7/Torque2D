@@ -137,6 +137,7 @@ void DGLGLDevice::initGLstate()
       smEdgeClamp = true;
    }
 
+
 #if TORQUE_DEBUG
    if (gglHasExtension(ARB_debug_output))
    {
@@ -162,6 +163,11 @@ void DGLGLDevice::initGLstate()
 #endif
 
    PlatformGL::setVSync(smDisableVSync ? 0 : 1);
+
+   //OpenGL 3 need a binded VAO for render
+   //GLuint vao;
+   //glGenVertexArrays(1, &vao);
+   //glBindVertexArray(vao);
 
    //Luma:	Clear window at first, as it is showing previous gl color buffer stuff.
    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
