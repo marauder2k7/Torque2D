@@ -47,6 +47,9 @@ include $(CLEAR_VARS)
 LOCAL_MODULE    := torque2d
 LOCAL_C_INCLUDES := $(LOCAL_PATH) \
 					$(LOCAL_PATH)/../../../../../../lib/ljpeg \
+					$(LOCAL_PATH)/../../../../../../lib/glad \
+					$(LOCAL_PATH)/../../../../../../lib/glad/include \
+					$(LOCAL_PATH)/../../../../../../lib/glad/src \
 					$(LOCAL_PATH)/../../../../../../lib/lpng \
 					$(LOCAL_PATH)/../../../../../../lib/libogg \
 					$(LOCAL_PATH)/../../../../../../lib/libogg/include \
@@ -72,6 +75,7 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH) \
 					$(LOCAL_PATH)/../../../../../../source/Box2D/Dynamics \
 					$(LOCAL_PATH)/../../../../../../source/Box2D/Dynamics/Contacts \
 					$(LOCAL_PATH)/../../../../../../source/Box2D/Dynamics/Joints \
+					$(LOCAL_PATH)/../../../../../../source/Box2D/Particle \
 					$(LOCAL_PATH)/../../../../../../source/Box2D/Rope \
     				$(LOCAL_PATH)/../../../../../../source/collection \
     				$(LOCAL_PATH)/../../../../../../source/component \
@@ -81,7 +85,6 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH) \
     				$(LOCAL_PATH)/../../../../../../source/debug/remote \
     				$(LOCAL_PATH)/../../../../../../source/delegates \
     				$(LOCAL_PATH)/../../../../../../source/game \
-    				$(LOCAL_PATH)/../../../../../../source/graphics \
     				$(LOCAL_PATH)/../../../../../../source/gui \
     				$(LOCAL_PATH)/../../../../../../source/gui/buttons \
     				$(LOCAL_PATH)/../../../../../../source/gui/containers \
@@ -107,9 +110,13 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH) \
     				$(LOCAL_PATH)/../../../../../../source/platformAndroid \
     				$(LOCAL_PATH)/../../../../../../source/sim \
     				$(LOCAL_PATH)/../../../../../../source/spine \
-    				$(LOCAL_PATH)/../../../../../../source/string
+    				$(LOCAL_PATH)/../../../../../../source/string \
+    				$(LOCAL_PATH)/../../../../../../source/graphics \
+    				$(LOCAL_PATH)/../../../../../../source/graphics/gl \
+    				$(LOCAL_PATH)/../../../../../../source/graphics/gl/android
+#    				$(LOCAL_PATH)/../../../../../../source/graphics/gl/win \
 #    				$(LOCAL_PATH)/../../../../../../source/testing \
-#    				$(LOCAL_PATH)/../../../../../../source/testing/tests \
+#    				$(LOCAL_PATH)/../../../../../../source/testing/tests
 
 
 LOCAL_SRC_FILES :=  ../../../../../../lib/ljpeg/jcapimin.c \
@@ -197,6 +204,8 @@ LOCAL_SRC_FILES :=  ../../../../../../lib/ljpeg/jcapimin.c \
                     ../../../../../../lib/libvorbis/synthesis.c \
                     ../../../../../../lib/libvorbis/vorbisfile.c \
                     ../../../../../../lib/libvorbis/window.c \
+                    ../../../../../../lib/glad/src/glad.c \
+                    ../../../../../../lib/glad/src/glad_egl.c \
 					../../../../../../source/2d/assets/AnimationAsset.cc \
 					../../../../../../source/2d/assets/FontAsset.cc \
 					../../../../../../source/2d/assets/ImageAsset.cc \
@@ -204,7 +213,7 @@ LOCAL_SRC_FILES :=  ../../../../../../lib/ljpeg/jcapimin.c \
 					../../../../../../source/2d/assets/ParticleAssetEmitter.cc \
 					../../../../../../source/2d/assets/ParticleAssetField.cc \
 					../../../../../../source/2d/assets/ParticleAssetFieldCollection.cc \
-					../../../../../../source/2d/assets/SkeletonAsset.cc \
+					../../../../../../source/2d/assets/SpineAsset.cc \
 					../../../../../../source/2d/controllers/AmbientForceController.cc \
 					../../../../../../source/2d/controllers/BuoyancyController.cc \
 					../../../../../../source/2d/controllers/core/GroupedSceneController.cc \
@@ -234,7 +243,6 @@ LOCAL_SRC_FILES :=  ../../../../../../lib/ljpeg/jcapimin.c \
 					../../../../../../source/2d/sceneobject/SceneObjectSet.cc \
 					../../../../../../source/2d/sceneobject/Scroller.cc \
 					../../../../../../source/2d/sceneobject/ShapeVector.cc \
-					../../../../../../source/2d/sceneobject/SkeletonObject.cc \
 					../../../../../../source/2d/sceneobject/Sprite.cc \
 					../../../../../../source/2d/sceneobject/TextSprite.cc \
 					../../../../../../source/2d/sceneobject/Trigger.cc \
@@ -279,9 +287,12 @@ LOCAL_SRC_FILES :=  ../../../../../../lib/ljpeg/jcapimin.c \
 					../../../../../../source/Box2D/Common/b2BlockAllocator.cpp \
 					../../../../../../source/Box2D/Common/b2Draw.cpp \
 					../../../../../../source/Box2D/Common/b2Math.cpp \
+					../../../../../../source/Box2D/Common/b2FreeList.cpp \
 					../../../../../../source/Box2D/Common/b2Settings.cpp \
 					../../../../../../source/Box2D/Common/b2StackAllocator.cpp \
+					../../../../../../source/Box2D/Common/b2Stat.cpp \
 					../../../../../../source/Box2D/Common/b2Timer.cpp \
+					../../../../../../source/Box2D/Common/b2TrackedBlock.cpp \
 					../../../../../../source/Box2D/Dynamics/b2Body.cpp \
 					../../../../../../source/Box2D/Dynamics/b2ContactManager.cpp \
 					../../../../../../source/Box2D/Dynamics/b2Fixture.cpp \
@@ -309,6 +320,11 @@ LOCAL_SRC_FILES :=  ../../../../../../lib/ljpeg/jcapimin.c \
 					../../../../../../source/Box2D/Dynamics/Joints/b2RopeJoint.cpp \
 					../../../../../../source/Box2D/Dynamics/Joints/b2WeldJoint.cpp \
 					../../../../../../source/Box2D/Dynamics/Joints/b2WheelJoint.cpp \
+					../../../../../../source/Box2D/Particle/b2Particle.cpp \
+					../../../../../../source/Box2D/Particle/b2ParticleAssembly.cpp \
+					../../../../../../source/Box2D/Particle/b2ParticleGroup.cpp \
+					../../../../../../source/Box2D/Particle/b2ParticleSystem.cpp \
+					../../../../../../source/Box2D/Particle/b2VoronoiDiagram.cpp \
 					../../../../../../source/Box2D/Rope/b2Rope.cpp \
 					../../../../../../source/collection/bitTables.cc \
 					../../../../../../source/collection/hashTable.cc \
@@ -332,9 +348,8 @@ LOCAL_SRC_FILES :=  ../../../../../../lib/ljpeg/jcapimin.c \
 					../../../../../../source/graphics/bitmapBmp.cc \
 					../../../../../../source/graphics/bitmapJpeg.cc \
 					../../../../../../source/graphics/bitmapPng.cc \
-					../../../../../../source/graphics/color.cc \
+					../../../../../../source/graphics/gColor.cc \
 					../../../../../../source/graphics/dgl.cc \
-					../../../../../../source/graphics/dglMatrix.cc \
 					../../../../../../source/graphics/DynamicTexture.cc \
 					../../../../../../source/graphics/gBitmap.cc \
 					../../../../../../source/graphics/gFont.cc \
@@ -344,17 +359,18 @@ LOCAL_SRC_FILES :=  ../../../../../../lib/ljpeg/jcapimin.c \
 					../../../../../../source/graphics/TextureDictionary.cc \
 					../../../../../../source/graphics/TextureHandle.cc \
 					../../../../../../source/graphics/TextureManager.cc \
+					../../../../../../source/graphics/gl/glEnumTranslate.cc \
+					../../../../../../source/graphics/gl/dglglDevice.cc \
+					../../../../../../source/graphics/gl/glad/gladGL.cc \
+					../../../../../../source/graphics/gl/android/dglGlDevice.and.cc \
 					../../../../../../source/gui/containers/guiGridCtrl.cc \
 					../../../../../../source/gui/guiArrayCtrl.cc \
-					../../../../../../source/gui/guiBackgroundCtrl.cc \
-					../../../../../../source/gui/guiBitmapBorderCtrl.cc \
 					../../../../../../source/gui/guiBitmapCtrl.cc \
 					../../../../../../source/gui/guiBubbleTextCtrl.cc \
 					../../../../../../source/gui/guiCanvas.cc \
 					../../../../../../source/gui/guiColorPicker.cc \
 					../../../../../../source/gui/guiConsole.cc \
 					../../../../../../source/gui/guiConsoleEditCtrl.cc \
-					../../../../../../source/gui/guiConsoleTextCtrl.cc \
 					../../../../../../source/gui/guiControl.cc \
 					../../../../../../source/gui/guiDefaultControlRender.cc \
 					../../../../../../source/gui/guiFadeinBitmapCtrl.cc \
@@ -369,12 +385,10 @@ LOCAL_SRC_FILES :=  ../../../../../../lib/ljpeg/jcapimin.c \
 					../../../../../../source/gui/guiProgressCtrl.cc \
 					../../../../../../source/gui/guiScriptNotifyControl.cc \
 					../../../../../../source/gui/guiSliderCtrl.cc \
-					../../../../../../source/gui/guiTabPageCtrl.cc \
 					../../../../../../source/gui/guiTextCtrl.cc \
 					../../../../../../source/gui/guiTextEditCtrl.cc \
 					../../../../../../source/gui/guiTextEditSliderCtrl.cc \
 					../../../../../../source/gui/guiTextListCtrl.cc \
-					../../../../../../source/gui/guiTickCtrl.cc \
 					../../../../../../source/gui/guiTreeViewCtrl.cc \
 					../../../../../../source/gui/guiTypes.cc \
 					../../../../../../source/gui/language/lang.cc \
@@ -498,7 +512,6 @@ LOCAL_SRC_FILES :=  ../../../../../../lib/ljpeg/jcapimin.c \
 					../../../../../../source/platform/platformNetAsync.cpp \
 					../../../../../../source/platform/platformNet_ScriptBinding.cc \
 					../../../../../../source/platform/platformString.cc \
-					../../../../../../source/platform/platformVideo.cc \
 					../../../../../../source/platform/menus/popupMenu.cc \
 					../../../../../../source/platform/nativeDialogs/msgBox.cpp \
 					../../../../../../source/platform/Tickable.cc \
@@ -511,14 +524,10 @@ LOCAL_SRC_FILES :=  ../../../../../../lib/ljpeg/jcapimin.c \
 					../../../../../../source/platformAndroid/AndroidEvents.cpp \
 					../../../../../../source/platformAndroid/AndroidFileio.cpp \
 					../../../../../../source/platformAndroid/AndroidFont.cpp \
-					../../../../../../source/platformAndroid/AndroidGL.cpp \
-					../../../../../../source/platformAndroid/AndroidGL2ES.cpp \
 					../../../../../../source/platformAndroid/AndroidInput.cpp \
 					../../../../../../source/platformAndroid/AndroidMath.cpp \
 					../../../../../../source/platformAndroid/AndroidMemory.cpp \
 					../../../../../../source/platformAndroid/AndroidMutex.cpp \
-					../../../../../../source/platformAndroid/AndroidOGLVideo.cpp \
-					../../../../../../source/platformAndroid/AndroidOutlineGL.cpp \
 					../../../../../../source/platformAndroid/AndroidPlatform.cpp \
 					../../../../../../source/platformAndroid/AndroidProcessControl.cpp \
 					../../../../../../source/platformAndroid/AndroidProfiler.cpp \
@@ -549,24 +558,41 @@ LOCAL_SRC_FILES :=  ../../../../../../lib/ljpeg/jcapimin.c \
 					../../../../../../source/spine/AnimationState.c \
 					../../../../../../source/spine/AnimationStateData.c \
 					../../../../../../source/spine/Atlas.c \
+					../../../../../../source/spine/Array.c \
 					../../../../../../source/spine/AtlasAttachmentLoader.c \
 					../../../../../../source/spine/Attachment.c \
 					../../../../../../source/spine/AttachmentLoader.c \
 					../../../../../../source/spine/Bone.c \
 					../../../../../../source/spine/BoneData.c \
 					../../../../../../source/spine/BoundingBoxAttachment.c \
+					../../../../../../source/spine/ClippingAttachment.c \
+					../../../../../../source/spine/Color.c \
 					../../../../../../source/spine/Event.c \
 					../../../../../../source/spine/EventData.c \
 					../../../../../../source/spine/extension.c \
+					../../../../../../source/spine/IkConstraint.c \
+					../../../../../../source/spine/IkConstraintData.c \
 					../../../../../../source/spine/Json.c \
+					../../../../../../source/spine/MeshAttachment.c \
+					../../../../../../source/spine/PathAttachment.c \
+					../../../../../../source/spine/PathConstraint.c \
+					../../../../../../source/spine/PathConstraintData.c \
+					../../../../../../source/spine/PointAttachment.c \
 					../../../../../../source/spine/RegionAttachment.c \
 					../../../../../../source/spine/Skeleton.c \
+					../../../../../../source/spine/SkeletonBinary.c \
 					../../../../../../source/spine/SkeletonBounds.c \
+					../../../../../../source/spine/SkeletonClipping.c \
 					../../../../../../source/spine/SkeletonData.c \
 					../../../../../../source/spine/SkeletonJson.c \
 					../../../../../../source/spine/Skin.c \
 					../../../../../../source/spine/Slot.c \
 					../../../../../../source/spine/SlotData.c \
+					../../../../../../source/spine/TransformConstraint.c \
+					../../../../../../source/spine/TransformConstraintData.c \
+					../../../../../../source/spine/Triangulator.c \
+					../../../../../../source/spine/VertexAttachment.c \
+					../../../../../../source/spine/VertexEffect.c \
 					../../../../../../source/string/findMatch.cc \
 					../../../../../../source/string/stringBuffer.cc \
 					../../../../../../source/string/stringStack.cc \
@@ -577,15 +603,11 @@ LOCAL_SRC_FILES :=  ../../../../../../lib/ljpeg/jcapimin.c \
 					../../../../../../source/gui/buttons/guiCheckBoxCtrl.cc \
 					../../../../../../source/gui/buttons/guiRadioCtrl.cc \
 					../../../../../../source/gui/containers/guiAutoScrollCtrl.cc \
-					../../../../../../source/gui/containers/guiCtrlArrayCtrl.cc \
 					../../../../../../source/gui/containers/guiDragAndDropCtrl.cc \
-					../../../../../../source/gui/containers/guiDynamicCtrlArrayCtrl.cc \
 					../../../../../../source/gui/containers/guiFormCtrl.cc \
-					../../../../../../source/gui/containers/guiFrameCtrl.cc \
 					../../../../../../source/gui/containers/guiPaneCtrl.cc \
 					../../../../../../source/gui/containers/guiRolloutCtrl.cc \
 					../../../../../../source/gui/containers/guiScrollCtrl.cc \
-					../../../../../../source/gui/containers/guiStackCtrl.cc \
 					../../../../../../source/gui/containers/guiTabBookCtrl.cc \
 					../../../../../../source/gui/containers/guiWindowCtrl.cc \
 					../../../../../../source/gui/editor/guiControlListPopup.cc \
@@ -593,11 +615,10 @@ LOCAL_SRC_FILES :=  ../../../../../../lib/ljpeg/jcapimin.c \
 					../../../../../../source/gui/editor/guiEditCtrl.cc \
 					../../../../../../source/gui/editor/guiFilterCtrl.cc \
 					../../../../../../source/gui/editor/guiGraphCtrl.cc \
-					../../../../../../source/gui/editor/guiImageList.cc \
 					../../../../../../source/gui/editor/guiInspector.cc \
 					../../../../../../source/gui/editor/guiInspectorTypes.cc \
-					../../../../../../source/gui/editor/guiMenuBar.cc \
-					../../../../../../source/gui/editor/guiSeparatorCtrl.cc
+					../../../../../../source/gui/editor/guiMenuBar.cc
+#                   ../../../../../../source/graphics/gl/win/dglGlDevice.win.cc \
 #					../../../../../../source/testing/tests/platformFileIoTests.cc \
 #					../../../../../../source/testing/tests/platformMemoryTests.cc \
 #					../../../../../../source/testing/tests/platformStringTests.cc \
@@ -610,7 +631,7 @@ else
 	LOCAL_CFLAGS := -DENABLE_CONSOLE_MSGS -D__ANDROID__ -DTORQUE_OS_ANDROID -DGL_GLEXT_PROTOTYPES -O3 -fsigned-char
 	LOCAL_CPPFLAGS := -std=gnu++11 -frtti $(LOCAL_CFLAGS)
 endif
-LOCAL_LDLIBS    := -llog -landroid -lEGL -lGLESv1_CM -lz -lOpenSLES -L../../../../../../lib/openal/Android/$(TARGET_ARCH_ABI)
+LOCAL_LDLIBS    := -llog -landroid -lEGL -lGLESv2 -lz -lOpenSLES -L../../../../../../lib/openal/Android/$(TARGET_ARCH_ABI)
 LOCAL_STATIC_LIBRARIES := freetype-prebuilt
 LOCAL_SHARED_LIBRARIES := libopenal-prebuilt
 

@@ -315,8 +315,6 @@ bool DGLGLDevice::activate(U32 width, U32 height, U32 bpp, bool fullScreen)
    else
       mContext = wglCreateContext(winState.appDC);
 
-   Con::printf("OpenGL %d.%d", GLVersion.major, GLVersion.minor);
-
    winState.hGLRC = (HGLRC)mContext;
    // Delete temp rendering context
    wglMakeCurrent(NULL, NULL);

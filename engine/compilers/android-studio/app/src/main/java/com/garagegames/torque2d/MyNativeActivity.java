@@ -1,9 +1,10 @@
 package com.garagegames.torque2d;
 
 import android.app.NativeActivity;
+import android.util.Log;
 import android.view.View;
 import android.os.Bundle;
-
+import android.opengl.GLES20;
 
 public class MyNativeActivity extends NativeActivity {
   static {

@@ -1265,11 +1265,6 @@ bool DGLDevice::PointToScreen( Point3F &point3D, Point3F &screenPoint )
    return (true);
 }
 
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
-GLfloat gVertexFloats[8];
-GLfloat gTextureVerts[8];
-#endif
-
 //------------------------------------------------------------------------------
 bool DGLDevice::prevRes()
 {

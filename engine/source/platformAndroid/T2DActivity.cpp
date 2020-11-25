@@ -25,6 +25,7 @@
 #include "platformAndroid/AndroidWindow.h"
 #include "platformAndroid/platformAndroid.h"
 #include "graphics/dgl.h"
+#include "graphics/gl/dglglDevice.h"
 #include "platform/event.h"
 #include "game/gameInterface.h"
 
@@ -728,69 +729,24 @@ static int engine_init_display(struct engine* engine) {
      * Below, we select an EGLConfig with at least 8 bits per color
      * component compatible with on-screen windows
      */
-    const EGLint attribs[] = {
-            EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-            EGL_BLUE_SIZE, 8,
-            EGL_GREEN_SIZE, 8,
-            EGL_RED_SIZE, 8,
-            //EGL_ALPHA_SIZE, 8,
-            //EGL_DEPTH_SIZE, 24,
-            EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
-            EGL_NONE
-    };
+	adprintf("Install Device");
+	bool ok = DGLDevice::installDevice(DGLGLDevice::create());
+	if(!ok)
+	{
+		adprintf("Install Device faled");
+	}
+	adprintf("Device Installed");
 
-    static const EGLint ctx_attribs[] = {
-          EGL_CONTEXT_CLIENT_VERSION, 1,
-          EGL_NONE
-        };
+	if(!DGL->activate(platState.windowSize.x, platState.windowSize.y,platState.desktopBitsPixel,true))
+	{
+		adprintf("problem with setting device");
+	}
+	adprintf("Device Initialized");
 
-    EGLint w, h, dummy, format;
-    EGLint numConfigs;
-    EGLConfig config;
-    EGLSurface surface;
-    EGLContext context;
-
-    EGLDisplay display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-
-    eglInitialize(display, 0, 0);
-
-    /* Here, the application chooses the configuration it desires. In this
-     * sample, we have a very simplified selection process, where we pick
-     * the first EGLConfig that matches our criteria */
-    eglChooseConfig(display, attribs, &config, 1, &numConfigs);
-
-    /* EGL_NATIVE_VISUAL_ID is an attribute of the EGLConfig that is
-     * guaranteed to be accepted by ANativeWindow_setBuffersGeometry().
-     * As soon as we picked a EGLConfig, we can safely reconfigure the
-     * ANativeWindow buffers to match, using EGL_NATIVE_VISUAL_ID. */
-    eglGetConfigAttrib(display, config, EGL_NATIVE_VISUAL_ID, &format);
-
-    ANativeWindow_setBuffersGeometry(engine->app->window, 0, 0, format);
-
-    surface = eglCreateWindowSurface(display, config, engine->app->window, NULL);
-    context = eglCreateContext(display, config, EGL_NO_CONTEXT, ctx_attribs);
-
-    if (eglMakeCurrent(display, surface, surface, context) == EGL_FALSE) {
-    	adprintf("Unable to eglMakeCurrent");
-        return -1;
-    }
-
-    eglQuerySurface(display, surface, EGL_WIDTH, &w);
-    eglQuerySurface(display, surface, EGL_HEIGHT, &h);
-
-    engine->display = display;
-    engine->context = context;
-    engine->surface = surface;
-    engine->width = w;
-    engine->height = h;
-    engine->state.angle = 0;
-
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
-
-    engine->animating = 1;
-
-    glViewport(0, 0, engine->width, engine->height);
+	DGL->DisableState(DGLRSDepthTest);
+	DGL->DisableState(DGLRSCullFace);
+	RectI size = RectI(0,0,engine->width, engine->height);
+	DGL->SetViewport(size);
 
     if (SetupCompleted == false)
     {
@@ -1137,9 +1093,9 @@ static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
             if (engine->app->window != NULL) {
 
                 engine_init_display(engine);
-
+                RectI size = RectI(0,0,engine->width, engine->height);
                 if (bSuspended == true) {
-					glViewport(0, 0, engine->width, engine->height);
+					DGL->SetViewport(size);
 					Game->textureResurrect();
 					bSuspended = false;
 				}

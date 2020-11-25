@@ -22,8 +22,8 @@
 
 
 #include "platformAndroid/platformAndroid.h"
-#include "platform/platformVideo.h"
-#include "platformAndroid/AndroidOGLVideo.h"
+#include "graphics/dgl.h"
+#include "graphics/gl/dglglDevice.h"
 #include "platformAndroid/AndroidConsole.h"
 #include "platform/platformInput.h"
 #include "game/gameInterface.h"
@@ -128,17 +128,12 @@ void Platform::init()
     Con::addVariable("pref::Android::fadeWindows", TypeBool, &platState.fadeWindows);
 
     // create the opengl display device
-    DisplayDevice *dev = NULL;
-    Con::printf("Video Init:");
-    Video::init();
-    dev = OpenGLDevice::create();
-    if (dev)
-        Con::printf("   Accelerated OpenGL display device detected.");
-    else
-        Con::printf("   Accelerated OpenGL display device not detected.");
-
-    // and now we can install the device.
-    Video::installDevice(dev);
+    Con::printf("DGLDevice Init:");
+    DGLDevice::init();
+    if(!DGLDevice::installDevice(DGLGLDevice::create()))
+    {
+        Con::printf("Platform: Install Device Failed");
+    }
     Con::printf("");
 }
 
@@ -146,7 +141,7 @@ void Platform::init()
 void Platform::shutdown()
 {
     setMouseLock(false);
-    Video::destroy();
+    DGLDevice::destroy();
     Input::destroy();
     AndroidConsole::destroy();
 }
@@ -191,19 +186,10 @@ void Platform::initWindow(const Point2I &initialSize, const char *name)
     
     fullScreen = true;
     //
-    DisplayDevice::init();
-    
-    // this will create a rendering context & window
-    bool ok = Video::setDevice("OpenGL", platState.windowSize.x, platState.windowSize.y, bpp, fullScreen);
-    if (!ok)
+    if(!DGL->setDevice("OpenGL",platState.windowSize.x,platState.windowSize.y,bpp,fullScreen))
     {
-        AssertFatal( false, "Could not find a compatible display device!" );
+        Con::printf("Platform:Set Device failed");
     }
-    
-    //Luma:	Clear frame buffer to BLACK to start with
-    //NOTE:	This should probably be set by the user to be the color closest to Default.png in order to minimize any popping effect... $pref:: anyone? Are $pref::s even valid at this point in the Init process?
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
 }
 
 //--------------------------------------

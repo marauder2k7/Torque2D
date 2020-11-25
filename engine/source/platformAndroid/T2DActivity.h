@@ -21,10 +21,9 @@
 //-----------------------------------------------------------------------------
 #ifndef T2DACTIVITY_H
 #define T2DACTIVITY_H
-#include "platformAndroid/AndroidGL2ES.h"
 #include "graphics/DynamicTexture.h"
 #include <errno.h>
-#include <EGL/egl.h>
+#include <glad/glad_egl.h>
 //#include <android/sensor.h>
 #include <android/log.h>
 #include <android_native_app_glue.h>
@@ -87,9 +86,9 @@ private:
 	S32 backingWidth;
 	S32 backingHeight;
     
-    GLuint _vertexBuffer;
-    GLuint _indexBuffer;
-    GLuint _vertexArray;
+    U32 _vertexBuffer;
+    U32 _indexBuffer;
+    U32 _vertexArray;
     
     bool isLayedOut;
     

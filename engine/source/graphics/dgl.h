@@ -27,12 +27,11 @@
 #include "graphics/dglAdapter.h"
 #endif // !_DGLADAPTER_H_
 
-
 #ifndef _PLATFORM_H_
 #include "platform/platform.h"
 #endif
 
-/*class TextureObject;
+class TextureObject;
 class GFont;
 class MatrixF;
 class RectI;
@@ -40,7 +39,8 @@ class ColorI;
 class ColorF;
 class Point2I;
 class Point2F;
-class Point3F;*/
+class Point3F;
+
  enum GFlipConstants
  {
     GFlip_None = 0,

@@ -27,7 +27,6 @@
 #include "math/mMath.h"
 #include "platformAndroid/AndroidEvents.h"
 
-#include "platformAndroid/AndroidOGLVideo.h"
 #include "platformAndroid/T2DActivity.h"
 
 // Mich Note: Do not try to spend too much time analyzing this class.

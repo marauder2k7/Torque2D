@@ -25,7 +25,7 @@
 #include "platform/platformInput.h"
 #include "game/gameInterface.h"
 #include "platform/threads/thread.h"
-#include "platform/platformVideo.h"
+#include "graphics/dgl.h"
 #include <pthread.h>
 
 #include "platformAndroid/AndroidUtil.h"

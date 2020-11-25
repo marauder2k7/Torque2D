@@ -198,8 +198,9 @@ public:
 
    void onPreRender();
    void onRender(Point2I offset, const RectI &updateRect);
-   RectI GuiScrollCtrl::applyScrollBarSpacing(Point2I offset, Point2I extent);
-   GuiControlState GuiScrollCtrl::getRegionCurrentState(GuiScrollCtrl::Region region);
+   // CTRL: Android seems to hate namespace in declaration
+   RectI applyScrollBarSpacing(Point2I offset, Point2I extent);
+   GuiControlState getRegionCurrentState(GuiScrollCtrl::Region region);
    void renderBorderedRectWithArrow(RectI& bounds, GuiControlProfile* profile, GuiControlState state, GuiDirection direction);
    void renderVScrollBar(const Point2I& offset);
    void renderHScrollBar(const Point2I& offset);

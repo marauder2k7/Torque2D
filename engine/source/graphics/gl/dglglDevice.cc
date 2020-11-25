@@ -91,6 +91,7 @@ void DGLGLDevice::initGLstate()
 
    Con::printf("  Extended Capabilities:");
    // Capabilities
+
    if (gglHasExtension(EXT_texture_filter_anisotropic))
    {
       Con::printf("  Anistropic Filtering");
@@ -162,7 +163,7 @@ void DGLGLDevice::initGLstate()
    }
 #endif
 
-   PlatformGL::setVSync(smDisableVSync ? 0 : 1);
+   //PlatformGL::setVSync(smDisableVSync ? 0 : 1);
 
    //OpenGL 3 need a binded VAO for render
    //GLuint vao;

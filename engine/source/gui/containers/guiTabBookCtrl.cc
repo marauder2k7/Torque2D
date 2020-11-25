@@ -124,7 +124,7 @@ void GuiTabBookCtrl::onChildRemoved( GuiControl* child )
 
 void GuiTabBookCtrl::onChildAdded( GuiControl *child )
 {
-   GuiTabPageCtrl *page = dynamic_cast<GuiTabPageCtrl*>(child);
+   GuiTabPageCtrl* page = static_cast<GuiTabPageCtrl*>(child);
    if( !page )
    {
       Con::warnf("GuiTabBookCtrl::onChildAdded - attempting to add NON GuiTabPageCtrl as child page");
@@ -205,7 +205,7 @@ void GuiTabBookCtrl::addNewPage()
 {
    char textbuf[1024];
 
-   GuiTabPageCtrl * page = new GuiTabPageCtrl();
+   GuiTabPageCtrl *page;
 
    page->setField("profile", "GuiTabPageProfile");
 
