@@ -75,11 +75,7 @@ typedef double             F64;     ///< Compiler independent 64-bit float
 // size_t is needed to overload new
 // size_t tends to be OS and compiler specific and may need to
 // be if/def'ed in the future
-#ifdef _WIN64
-typedef unsigned long long  dsize_t;
-#else
 typedef unsigned int  dsize_t;
-#endif // _WIN64
 
 typedef const char* StringTableEntry;
 
@@ -88,8 +84,8 @@ typedef const char* StringTableEntry;
   */
 struct FileTime
 {
-   U32 v1;
-   U32 v2;
+    U32 v1;
+    U32 v2;
 };
 
 //------------------------------------------------------------------------------

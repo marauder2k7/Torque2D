@@ -40,37 +40,6 @@ void loadGlExtensions(void *context)
 
 //------------------------------------------------------------------------------
 
-void STDCALL glDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
-   const GLchar *message, const void *userParam)
-{
-   // JTH [11/24/2016]: This is a temporary fix so that we do not get spammed for redundant fbo changes.
-   // This only happens on Intel cards. This should be looked into sometime in the near future.
-   char* api = "API_ID_REDUNDANT_FBO";
-   if (!dStrnicmp(message, api, dStrlen(api)))
-      return;
-   if (severity == GL_DEBUG_SEVERITY_HIGH)
-      Con::errorf("OPENGL: %s", message);
-   else if (severity == GL_DEBUG_SEVERITY_MEDIUM)
-      Con::warnf("OPENGL: %s", message);
-   else if (severity == GL_DEBUG_SEVERITY_LOW)
-      Con::printf("OPENGL: %s", message);
-}
-
-//------------------------------------------------------------------------------
-
-void STDCALL glAmdDebugCallback(GLuint id, GLenum category, GLenum severity, GLsizei length,
-   const GLchar* message, GLvoid* userParam)
-{
-   if (severity == GL_DEBUG_SEVERITY_HIGH)
-      Con::errorf("AMDOPENGL: %s", message);
-   else if (severity == GL_DEBUG_SEVERITY_MEDIUM)
-      Con::warnf("AMDOPENGL: %s", message);
-   else if (severity == GL_DEBUG_SEVERITY_LOW)
-      Con::printf("AMDOPENGL: %s", message);
-}
-
-//------------------------------------------------------------------------------
-
 DGLGLDevice::DGLGLDevice() :
    mMaxShaderTextures(2),
    mContext(NULL)
@@ -137,31 +106,6 @@ void DGLGLDevice::initGLstate()
       Con::printf("  Texture Clamping");
       smEdgeClamp = true;
    }
-
-
-#if TORQUE_DEBUG
-   if (gglHasExtension(ARB_debug_output))
-   {
-      glEnable(GL_DEBUG_OUTPUT);
-      glDebugMessageCallbackARB(glDebugCallback, NULL);
-      glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-      GLuint unusedIds = 0;
-      glDebugMessageControlARB(GL_DONT_CARE,
-         GL_DONT_CARE,
-         GL_DONT_CARE,
-         0,
-         &unusedIds,
-         GL_TRUE);
-   }
-   else if (gglHasExtension(AMD_debug_output))
-   {
-      glEnable(GL_DEBUG_OUTPUT);
-      glDebugMessageCallbackAMD(glAmdDebugCallback, NULL);
-      //glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-      GLuint unusedIds = 0;
-      glDebugMessageEnableAMD(GL_DONT_CARE, GL_DONT_CARE, 0, &unusedIds, GL_TRUE);
-   }
-#endif
 
    PlatformGL::setVSync(smDisableVSync ? 0 : 1);
 

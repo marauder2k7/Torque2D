@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2013 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -27,10 +27,9 @@
 #define FN_CDECL     ///< Calling convention
 
 // size_t is needed to overload new
-// size_t tends to be OS and compiler specific and may need to 
+// size_t tends to be OS and compiler specific and may need to
 // be if/def'ed in the future
-#include <stddef.h>
-typedef size_t   dsize_t;
+typedef unsigned int  dsize_t;
 
 
 /** Platform dependent file date-time structure.  The defination of this structure

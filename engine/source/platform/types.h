@@ -89,13 +89,6 @@ static const F32 F32_MAX = F32(3.402823466e+38F);                 ///< Constant 
 #  error "Unknown Compiler"
 #endif
 
-/// Integral type matching the host's memory address width.
-#ifdef TORQUE_CPU_X64
-typedef U64 MEM_ADDRESS;
-#else
-typedef U32 MEM_ADDRESS;
-#endif
-
 //--------------------------------------
 // Enable Asserts in all debug builds -- AFTER compiler types include.
 #if defined(TORQUE_DEBUG)
@@ -126,27 +119,18 @@ inline U32 endianSwap(const U32 in_swap)
               ((in_swap << 24) & 0xff000000));
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-//------------------------------------------------FOURCC------------------------------------------------//
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//-------------------------------------- Use this instead of Win32 FOURCC()
+//                                        macro...
+//
+#define makeFourCCTag(ch0, ch1, ch2, ch3)    \
+   (((U32(ch0) & 0xFF) << 0)  |             \
+    ((U32(ch1) & 0xFF) << 8)  |             \
+    ((U32(ch2) & 0xFF) << 16) |             \
+    ((U32(ch3) & 0xFF) << 24) )
 
-#if defined(TORQUE_BIG_ENDIAN)
-#define makeFourCCTag(c0,c1,c2,c3) ((U32) ((((U32)((U8)(c0)))<<24) + (((U32)((U8)(c1)))<<16) + (((U32)((U8)(c2)))<<8) + ((((U32)((U8)(c3))))))
-#else
-#ifdef TORQUE_LITTLE_ENDIAN
-#define makeFourCCTag(c3,c2,c1,c0) ((U32) ((((U32)((U8)(c0)))<<24) + (((U32)((U8)(c1)))<<16) + (((U32)((U8)(c2)))<<8) + (((U32)((U8)(c3))))))
-#else
-#error BYTE_ORDER not defined
-#endif
-#endif
+#define makeFourCCString(ch0, ch1, ch2, ch3) { ch0, ch1, ch2, ch3 }
 
 #define BIT(x) (1 << (x))                       ///< Returns value with bit x set (2^x)
-
-#if defined(TORQUE_OS_WIN)
-#define STDCALL __stdcall
-#else
-#define STDCALL
-#endif                    ///< Returns value with bit x set (2^x)
 
 #ifndef Offset
 /// Offset macro:

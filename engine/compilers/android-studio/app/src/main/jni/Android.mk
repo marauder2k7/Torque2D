@@ -20,6 +20,34 @@ LOCAL_SHORT_COMMANDS  := true
 MY_LOCAL_PATH := $(call my-dir)
 
 LOCAL_PATH := $(MY_LOCAL_PATH)
+
+# Glad Library
+include $(CLEAR_VARS)
+TARGET_ARCH_ABI     ?=armeabi-v7a
+LOCAL_LDLIBS        := -llog
+LOCAL_MODULE        := glad
+LOCAL_ARM_MODE      := arm
+GLAD_DIR            := ../../../../../../lib/glad
+MODULE              := glad
+ifeq ("$(BINDIR)","")
+    BINDIR       := $(abspath $(LOCAL_PATH)/$(TARGET_ARCH_ABI)/objs/ )
+else
+    BINDIR       := $(abspath $(BINDIR) )
+endif
+
+LOCAL_CFLAGS        +=  -I$(LOCAL_PATH)/$(GLAD_DIR)              \
+                        -I$(LOCAL_PATH)/$(GLAD_DIR)/include      \
+
+LOCAL_LDLIBS        +=  -W1,--build-id -Bsymbolic -shared -lEGL
+
+LOCAL_SRC_FILES :=  \
+                    $(GLAD_DIR)/src/glad.c          \
+                    $(GLAD_DIR)/src/glad_egl.c      \
+
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/../../../../../../lib/glad/include
+
+include $(BUILD_SHARED_LIBRARY)
+
 # OpenAL Soft library must be a shared library since license is LGPLv3
 include $(CLEAR_VARS)
 TARGET_ARCH_ABI     ?=armeabi-v7a
@@ -117,9 +145,6 @@ include $(CLEAR_VARS)
 LOCAL_MODULE    := torque2d
 LOCAL_C_INCLUDES := $(LOCAL_PATH) \
 					$(LOCAL_PATH)/../../../../../../lib/ljpeg \
-					$(LOCAL_PATH)/../../../../../../lib/glad \
-					$(LOCAL_PATH)/../../../../../../lib/glad/include \
-					$(LOCAL_PATH)/../../../../../../lib/glad/src \
 					$(LOCAL_PATH)/../../../../../../lib/lpng \
 					$(LOCAL_PATH)/../../../../../../lib/libogg \
 					$(LOCAL_PATH)/../../../../../../lib/libogg/include \
@@ -274,8 +299,6 @@ LOCAL_SRC_FILES :=  ../../../../../../lib/ljpeg/jcapimin.c \
                     ../../../../../../lib/libvorbis/synthesis.c \
                     ../../../../../../lib/libvorbis/vorbisfile.c \
                     ../../../../../../lib/libvorbis/window.c \
-                    ../../../../../../lib/glad/src/glad.c \
-                    ../../../../../../lib/glad/src/glad_egl.c \
 					../../../../../../source/2d/assets/AnimationAsset.cc \
 					../../../../../../source/2d/assets/FontAsset.cc \
 					../../../../../../source/2d/assets/ImageAsset.cc \
@@ -703,7 +726,7 @@ else
 endif
 LOCAL_LDLIBS    := -llog -landroid -lEGL -lGLESv2 -lz -lOpenSLES -L$(BINDIR)
 LOCAL_STATIC_LIBRARIES := freetype-prebuilt
-LOCAL_SHARED_LIBRARIES := openal
+LOCAL_SHARED_LIBRARIES := glad openal
 
 ifeq ($(TARGET_ARCH_ABI),$(filter $(TARGET_ARCH_ABI), arm64-v8a))
     LOCAL_CFLAGS := -DHAVE_NEON=1

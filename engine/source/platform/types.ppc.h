@@ -36,7 +36,7 @@ typedef unsigned long  dsize_t;
   * will likely be different for each OS platform.
   * On the PPC is a 64-bit structure for storing the date/time for a file
   */
-  
+
 // 64-bit structure for storing the date/time for a file
 // The date and time, specified in seconds since the unix epoch.
 // NOTE: currently, this is only 32-bits in value, so the upper 32 are all zeroes.

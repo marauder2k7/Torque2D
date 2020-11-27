@@ -34,7 +34,7 @@
 //  will wind up including this file, we can affect compilation most effectively
 //  from this location.
 //
-#define PLATFORM_BIG_ENDIAN 
+#define PLATFORM_BIG_ENDIAN
 
 #define FN_CDECL
 

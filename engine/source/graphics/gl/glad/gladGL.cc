@@ -55,19 +55,9 @@ namespace GLAD
 
     void gglPerformBinds()
    {
-       if(!gladLoadEGL())
+       if(!gladLoadGL())
        {
            AssertFatal(false,"Failed to load GLAD!");
-       }
-
-       static const char *NAMES[] = {"libGLESv2.so", "libEGL.so"};
-
-       global_egl_handle = open_handle(NAMES, sizeof(NAMES) / sizeof(NAMES[0]));
-       if (global_egl_handle)
-       {
-           adprintf("We have one of the libs");
-           gladLoadGLES2Loader((GLADloadproc) load_with_egl);
-           close_handle(global_egl_handle);
        }
 
    }
