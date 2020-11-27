@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 
+#include <platform/platformGL.h>
 #include "platformAndroid/platformAndroid.h"
 #include "graphics/dgl.h"
 #include "graphics/gl/dglglDevice.h"
@@ -36,6 +37,8 @@
 
 #include "platformAndroid/platformGL.h"
 
+#include "platform/platformGL.h"
+
 bool getStatusBarHidden();
 bool setStatusBarHidden(bool);
 void setStatusBarType(S32);
@@ -44,27 +47,30 @@ void setStatusBarType(S32);
 #pragma mark ---- PlatState ----
 AndroidPlatState platState;
 
+void PlatformGL::setVSync(const int i)
+{
+    eglSwapInterval(platState.engine->display, i);
+}
+
 AndroidPlatState::AndroidPlatState()
 {
+    captureDisplay  = true;
+    fadeWindows     = true;
+    backgrounded    = false;
+    minimized       = false;
 
+    quit            = false;
 
-    captureDisplay = true;
-    fadeWindows = true;
-    backgrounded = false;
-    minimized = false;
-
-    quit = false;
-
-    portrait = true;//-Mat Android is in portrait mode by default
+    portrait        = true;//-Mat Android is in portrait mode by default
 
 
     // start with something reasonable.
     desktopBitsPixel = ANDROID_DEFAULT_RESOLUTION_BIT_DEPTH;
-    desktopWidth = ANDROID_DEFAULT_RESOLUTION_X;
-    desktopHeight = ANDROID_DEFAULT_RESOLUTION_Y;
-    fullscreen = true;
+    desktopWidth    = ANDROID_DEFAULT_RESOLUTION_X;
+    desktopHeight   = ANDROID_DEFAULT_RESOLUTION_Y;
+    fullscreen      = true;
 
-    osVersion = 0;
+    osVersion       = 0;
 
     dStrcpy(appWindowTitle, "Android Torque Game Engine");
 
@@ -130,10 +136,6 @@ void Platform::init()
     // create the opengl display device
     Con::printf("DGLDevice Init:");
     DGLDevice::init();
-    if(!DGLDevice::installDevice(DGLGLDevice::create()))
-    {
-        Con::printf("Platform: Install Device Failed");
-    }
     Con::printf("");
 }
 
@@ -185,7 +187,7 @@ void Platform::initWindow(const Point2I &initialSize, const char *name)
     }
     
     fullScreen = true;
-    //
+
     if(!DGL->setDevice("OpenGL",platState.windowSize.x,platState.windowSize.y,bpp,fullScreen))
     {
         Con::printf("Platform:Set Device failed");

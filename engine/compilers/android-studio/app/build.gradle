@@ -62,7 +62,7 @@ android {
     }
     productFlavors {
     }
-    ndkVersion '21.3.6528147'
+    ndkVersion '20.0.5594570'
 }
 
 dependencies {

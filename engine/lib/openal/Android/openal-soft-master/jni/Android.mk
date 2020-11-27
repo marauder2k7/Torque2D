@@ -8,7 +8,7 @@ ANALYZE      ?= no
 ANALYZE_OUTPUT?=/dev/null
 
 include $(CLEAR_VARS)
-TARGET_ARCH_ABI  ?=arm64-v8a
+TARGET_ARCH_ABI  := armeabi-v7a
 LOCAL_LDLIBS     := -llog
 LOCAL_MODULE     := openal
 LOCAL_ARM_MODE   := arm
@@ -23,7 +23,7 @@ else
     BINDIR       := $(abspath $(BINDIR) )
 endif
 
-ANDROID_NDK_ROOT=/Developer/DestinyCloudFist/android-ndk-r8b
+ANDROID_NDK_ROOT=/Users/tnewell/androidDev/android-ndk-r9
 
 LOCAL_CFLAGS    +=  -I$(ROOTDIR)/$(OPENAL_DIR) \
                     -I$(ROOTDIR)/$(OPENAL_DIR)/include \
@@ -81,12 +81,9 @@ LOCAL_SRC_FILES :=  \
                     $(OPENAL_DIR)/Alc/audiotrack.c           \
 
 
-# If building for versions after FROYO
-ifeq ($(POST_FROYO), yes)
   LOCAL_CFLAGS +=   -DPOST_FROYO -I$(ANDROID_NDK_ROOT)/platforms/android-9/arch-arm/usr/include/
   LOCAL_LDLIBS += -ldl -L$(ANDROID_NDK_ROOT)/platforms/android-9/arch-arm/usr/lib/
   LOCAL_SRC_FILES += $(OPENAL_DIR)/Alc/opensles.c
-endif
 
 
 

@@ -743,6 +743,8 @@ static int engine_init_display(struct engine* engine) {
 	}
 	adprintf("Device Initialized");
 
+	DGL->enumerateVideoModes();
+
 	DGL->DisableState(DGLRSDepthTest);
 	DGL->DisableState(DGLRSCullFace);
 	RectI size = RectI(0,0,engine->width, engine->height);

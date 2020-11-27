@@ -211,6 +211,16 @@ DGLDevice* DGLGLDevice::create()
         return NULL;
     }
 
+    if(!gladLoadGLES1Loader((GLADloadproc)eglGetProcAddress))
+    {
+        adprintf("Failed to init gles1 proc");
+    }
+
+    if(!gladLoadGLES2Loader((GLADloadproc)eglGetProcAddress))
+    {
+        adprintf("Failed to init gles1 proc");
+    }
+
     eglQuerySurface(display, surface, EGL_WIDTH, &w);
     eglQuerySurface(display, surface, EGL_HEIGHT, &h);
 
@@ -220,8 +230,6 @@ DGLDevice* DGLGLDevice::create()
     platState.engine->width = w;
     platState.engine->height = h;
     platState.engine->state.angle = 0;
-
-    loadGlCore();
 
     platState.engine->animating = 1;
 
