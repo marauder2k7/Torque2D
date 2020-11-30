@@ -143,7 +143,8 @@ void GuiArrayCtrl::onRender(Point2I offset, const RectI &updateRect)
    RectI headerClip;
    RectI clipRect = DGL->GetClipRect();
 
-   Point2I parentOffset = parent->localToGlobalCoord(Point2I(0, 0));
+   // variable is never used
+   //Point2I parentOffset = parent->localToGlobalCoord(Point2I(0, 0));
 
    //save the original for clipping the row headers
    RectI origClipRect = clipRect;

@@ -123,7 +123,8 @@ ConsoleMethodWithDocs(Scene, getPositionIterations, ConsoleInt, 2, 2, ())
 ConsoleMethodWithDocs(Scene, add, ConsoleVoid, 3, 3, (sceneObject))
 {
     // Find the specified object.
-    SceneObject* pSceneObject = dynamic_cast<SceneObject*>(Sim::findObject(argv[2]));
+    SceneObject* pSceneObject = nullAsType<SceneObject*>();
+    pSceneObject = dynamic_cast<SceneObject*>(Sim::findObject(argv[2]));
 
     // Did we find the object?
     if ( !pSceneObject )
@@ -146,7 +147,8 @@ ConsoleMethodWithDocs(Scene, add, ConsoleVoid, 3, 3, (sceneObject))
 ConsoleMethodWithDocs(Scene, remove, ConsoleVoid, 3, 3, (sceneObject))
 {
     // Find the specified object.
-    SceneObject* pSceneObject = dynamic_cast<SceneObject*>(Sim::findObject(argv[2]));
+    SceneObject* pSceneObject = nullAsType<SceneObject*>();
+    pSceneObject = dynamic_cast<SceneObject*>(Sim::findObject(argv[2]));
 
     // Did we find the object?
     if ( !pSceneObject )

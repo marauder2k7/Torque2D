@@ -426,7 +426,8 @@ long VorbisStreamSource::oggRead(char *buffer,int length,
                                  int bigendianp,int *bitstream)
 {
    long bytesRead = 0;
-   long totalBytes = 0;
+   // variable is never used
+   //long totalBytes = 0;
    long offset = 0;
    long bytesToRead = 0;
 

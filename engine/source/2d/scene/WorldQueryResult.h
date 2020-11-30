@@ -64,11 +64,11 @@ struct WorldQueryResult
     {
     }
 
+    SceneObject*    mpSceneObject;
+    U32             mShapeIndex;
     b2Vec2          mPoint;
     b2Vec2          mNormal;
     F32             mFraction;
-    SceneObject*    mpSceneObject;
-    U32             mShapeIndex;
 };
 
 ///-----------------------------------------------------------------------------

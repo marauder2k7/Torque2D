@@ -27,6 +27,8 @@
 #include "console/consoleBaseType.h"
 #endif
 
+template<typename T> inline const T nullAsType(){return nullptr;}
+
 #ifndef Offset
 #if defined(TORQUE_COMPILER_GCC) && (__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 1))
 #define Offset(m,T) ((int)(&((T *)1)->m) - 1)

@@ -37,37 +37,37 @@ struct SpriteBatchQueryResult
 {
     SpriteBatchQueryResult() :
         mpSpriteBatchItem( NULL ),
-        mShapeIndex( 0 ),
         mPoint( 0.0f, 0.0f ),
         mNormal( 0.0f, 0.0f ),
-        mFraction( 0.0f )
+        mFraction( 0.0f ),
+        mShapeIndex(0)
     {
     }
 
     /// Initialize a non-ray-cast result.
     SpriteBatchQueryResult( SpriteBatchItem* mpSpriteBatchItem ) :
         mpSpriteBatchItem( mpSpriteBatchItem ),
-        mShapeIndex( 0 ),
         mPoint( 0.0f, 0.0f ),
         mNormal( 0.0f, 0.0f ),
-        mFraction( 0.0f )
+        mFraction( 0.0f ),
+        mShapeIndex(0)
     {
     }
 
     /// Initialize a ray-cast result.    
     SpriteBatchQueryResult( SpriteBatchItem* mpSpriteBatchItem, const b2Vec2& point, const b2Vec2& normal, const F32 fraction, const U32 shapeIndex ) :
         mpSpriteBatchItem( mpSpriteBatchItem ),
-        mShapeIndex( shapeIndex ),
-        mPoint( point ),
-        mNormal( normal ),
-        mFraction( fraction )
+        mPoint(point),
+        mNormal(normal),
+        mFraction(fraction),
+        mShapeIndex( shapeIndex )
     {
     }
 
+    SpriteBatchItem* mpSpriteBatchItem;
     b2Vec2          mPoint;
     b2Vec2          mNormal;
     F32             mFraction;
-    SpriteBatchItem* mpSpriteBatchItem;
     U32             mShapeIndex;
 };
 

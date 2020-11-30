@@ -77,7 +77,8 @@ ConsoleMethodWithDocs(SceneWindow, setScene, ConsoleVoid, 2, 3, (Scene))
     }
 
     // Find Scene Object.
-    Scene* pScene = (Scene*)(Sim::findObject(argv[2]));
+    Scene* pScene = nullAsType<Scene*>();
+    pScene = (Scene*)(Sim::findObject(argv[2]));
 
     // Validate Object.
     if ( !pScene )

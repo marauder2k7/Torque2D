@@ -223,23 +223,14 @@ bool DGLDevice::setDevice(const char * renderName, U32 width, U32 height, U32 bp
       //if (sgOriginalGamma != -1.0 || getGammaCorrection(sgOriginalGamma))
          //setGammaCorrection(sgOriginalGamma + sgGammaCorrection);
       Con::evaluate("resetCanvas();");
+
+      return true;
    }
-}
-
-void DGLDevice::GetFrustum(F64 *left, F64 *right, F64 *bottom, F64 *top, F64 *nearPlane, F64 *farPlane)
-{
-   *left = frustLeft;
-   *right = frustRight;
-   *bottom = frustBottom;
-   *top = frustTop;
-   *nearPlane = frustNear;
-   *farPlane = frustFar;
-}
-
-void DGLDevice::GetViewport(RectI* outViewport)
-{
-   AssertFatal(outViewport != NULL, "Error, bad point in GetViewport");
-   *outViewport = viewPort;
+   else
+   {
+      // we need a result
+      return false;
+   }
 }
 
 //--------------------------------------------------------------------------

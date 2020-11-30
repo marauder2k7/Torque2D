@@ -33,9 +33,10 @@ class SceneObjectRotateToEvent : public SimEvent
 {
 public:
     SceneObjectRotateToEvent( const F32 targetAngle, const bool autoStop, const bool warpToTarget ) :
-        mAutoStop( autoStop ),
-        mWarpToTarget( warpToTarget ),
-        mTargetAngle( targetAngle ) {}
+       mTargetAngle(targetAngle),
+       mAutoStop( autoStop ),
+       mWarpToTarget(warpToTarget){}
+
     virtual ~SceneObjectRotateToEvent() {};
 
     virtual void process(SimObject *object)

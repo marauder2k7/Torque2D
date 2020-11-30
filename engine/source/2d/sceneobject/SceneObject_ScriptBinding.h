@@ -4504,7 +4504,8 @@ ConsoleMethodWithDocs(SceneObject, playSound, ConsoleInt, 3, 4, ())
     }
 
     Vector2 pos = object->getPosition();
-    Vector2 vel = object->getLinearVelocity();
+    //unused 
+    //Vector2 vel = object->getLinearVelocity();
     Point3F realpos;
     Point3F velocity;
 

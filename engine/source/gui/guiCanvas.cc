@@ -45,14 +45,15 @@ GuiCanvas *Canvas = NULL;
 
 GuiCanvas::GuiCanvas()
 {
-#ifdef TORQUE_OS_IOS
-   mBounds.set(0, 0, IOS_DEFAULT_RESOLUTION_X, IOS_DEFAULT_RESOLUTION_Y);
-#elif TORQUE_OS_ANDROID
+   //android doesnt like being in the middle here ?
+#ifdef TORQUE_OS_ANDROID
    mBounds.set(0, 0, _AndroidGetScreenWidth(), _AndroidGetScreenHeight());
+#elif TORQUE_OS_IOS
+   mBounds.set(0, 0, IOS_DEFAULT_RESOLUTION_X, IOS_DEFAULT_RESOLUTION_Y);
 #else
    mBounds.set(0, 0, MIN_RESOLUTION_X, MIN_RESOLUTION_Y);
 #endif
-    
+   
    mAwake = true;
    mPixelsPerMickey = 1.0f;
 
@@ -111,8 +112,10 @@ GuiCanvas::~GuiCanvas()
 
 bool GuiCanvas::onAdd()
 {
-
+   setCursor(dynamic_cast<GuiCursor*>(Sim::findObject("DefaultCursor")));
    bool parentRet = Parent::onAdd();
+
+
    return parentRet;
 }
 
@@ -1185,13 +1188,11 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
 {
    PROFILE_START(CanvasPreRender);
 
-#if !defined TORQUE_OS_IOS && !defined TORQUE_OS_ANDROID && !defined TORQUE_OS_EMSCRIPTEN
-    
    if(mRenderFront)
       DGL->DrawBuffer(DGLFront);
    else
       DGL->DrawBuffer(DGLBack);
-#endif
+
    // Make sure the root control is the size of the canvas.
    Point2I size = Platform::getWindowSize();
 
@@ -1208,7 +1209,9 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
 
    //preRender (recursive) all controls
    preRender();
+
    PROFILE_END();
+
    if(preRenderOnly)
       return;
 
@@ -1230,9 +1233,9 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
    GuiCursor *mouseCursor = NULL;
    bool cursorVisible = true;
 
-   if(bool(mMouseCapturedControl))
+   if (bool(mMouseCapturedControl))
       mMouseCapturedControl->getCursor(mouseCursor, cursorVisible, mLastEvent);
-   else if(bool(mMouseControl))
+   else if (bool(mMouseControl))
       mMouseControl->getCursor(mouseCursor, cursorVisible, mLastEvent);
 
    Point2I cursorPos((S32)cursorPt.x, (S32)cursorPt.y);
@@ -1258,6 +1261,8 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
     lastCursorON = cursorVisible;
     lastCursor = mouseCursor;
     lastCursorPt = cursorPos;
+
+    resetUpdateRegions();
 
    RectI updateUnion;
    buildUpdateUnion(&updateUnion);
@@ -1350,9 +1355,7 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
 
    PROFILE_END();
 
-
-   if( bufferSwap )
-      swapBuffers();
+   swapBuffers();
     
 //#if defined(TORQUE_OS_WIN32)
 //   PROFILE_START(glFinish);

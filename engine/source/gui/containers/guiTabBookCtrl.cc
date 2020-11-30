@@ -205,14 +205,13 @@ void GuiTabBookCtrl::addNewPage()
 {
    char textbuf[1024];
 
-   GuiTabPageCtrl *page;
-
+   GuiTabPageCtrl* page = new GuiTabPageCtrl();
    page->setField("profile", "GuiTabPageProfile");
 
    dSprintf(textbuf, sizeof(textbuf), "TabBookPage%d_%d", getId(), page->getId());
    page->registerObject(textbuf);
 
-   this->addObject( page );
+   addObject( page );
 }
 
 void GuiTabBookCtrl::resize(const Point2I &newPosition, const Point2I &newExtent)

@@ -141,8 +141,8 @@ bool GBitmap::readMSBmp(Stream& stream)
 
 bool GBitmap::writeMSBmp(Stream& io_rStream) const
 {
-
-   RGBQUAD           rgb[256];
+   // variable is never used
+   //RGBQUAD           rgb[256];
    BITMAPINFOHEADER  bi;
    BITMAPFILEHEADER  bf;
 
@@ -162,7 +162,6 @@ bool GBitmap::writeMSBmp(Stream& io_rStream) const
       bi.biBitCount = 8;
       bi.biCompression = BI_RGB;
       bi.biClrUsed = 256;
-      AssertFatal(pPalette != NULL, "Error, must have a palette");
    }
 
    U32 bytesPP = bi.biBitCount >> 3;

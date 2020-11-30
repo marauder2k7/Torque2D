@@ -133,7 +133,7 @@ protected:
 
 public:
    ZipStatFilter() : mCD(NULL), mStream(NULL) {}
-   ZipStatFilter(CentralDir *cd) : mCD(cd), mStream(NULL) {}
+   ZipStatFilter(CentralDir *cd) : mStream(NULL), mCD(cd) {}
    virtual ~ZipStatFilter()
    {
       detachStream();

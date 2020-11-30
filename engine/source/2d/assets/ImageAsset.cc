@@ -168,11 +168,10 @@ ImageAsset::ImageAsset() :  mImageFile(StringTable->EmptyString),
                             mCellOffsetY(0),
                             mCellStrideX(0),
                             mCellStrideY(0),
-                            mCellCountX(0),
-                            mCellCountY(0),
                             mCellWidth(0),
                             mCellHeight(0),
-
+                            mCellCountX(0),
+                            mCellCountY(0),
                             mImageTextureHandle(NULL)
 {
     // Set Vector Associations.

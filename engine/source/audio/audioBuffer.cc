@@ -448,7 +448,8 @@ bool AudioBuffer::readOgg(ResourceObject *obj)
 	char   *data = NULL;
 	ALsizei size = 0;
 	ALsizei freq = 22050;
-	ALboolean loop = AL_FALSE;
+   // variable is never used
+   //ALboolean loop = AL_FALSE;
 	int current_section = 0;
 
 #if defined(TORQUE_BIG_ENDIAN)
@@ -499,7 +500,7 @@ bool AudioBuffer::readOgg(ResourceObject *obj)
 	data = new char[size];
 	if (data)
 	{
-		long ret = oggRead(&vf, data, size, endian, &current_section);
+		oggRead(&vf, data, size, endian, &current_section);
 	}
 
 	/* cleanup */
@@ -522,7 +523,8 @@ bool AudioBuffer::readOgg(ResourceObject *obj)
 long AudioBuffer::oggRead(OggVorbis_File* vf, char *buffer, int length, int bigendianp, int *bitstream)
 {
 	long bytesRead = 0;
-	long totalBytes = 0;
+   // variable is never used
+	//long totalBytes = 0;
 	long offset = 0;
 	long bytesToRead = 0;
 

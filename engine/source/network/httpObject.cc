@@ -140,16 +140,16 @@ void HTTPObject::expandPath(char *dest, const char *path, U32 destSize)
          asciiEscapeTable[i] = false;
       for(;i <= 0xFF; i++)
          asciiEscapeTable[i] = true;
-      asciiEscapeTable['\"'] = true;
-      asciiEscapeTable['_'] = true;
-      asciiEscapeTable['\''] = true;
-      asciiEscapeTable['#'] = true;
-      asciiEscapeTable['$'] = true;
-      asciiEscapeTable['%'] = true;
-      asciiEscapeTable['&'] = true;
-      asciiEscapeTable['+'] = true;
-      asciiEscapeTable['-'] = true;
-      asciiEscapeTable['~'] = true;
+      asciiEscapeTable[static_cast<U32>('\"')] = true;
+      asciiEscapeTable[static_cast<U32>('_')] = true;
+      asciiEscapeTable[static_cast<U32>('\'')] = true;
+      asciiEscapeTable[static_cast<U32>('#')] = true;
+      asciiEscapeTable[static_cast<U32>('$')] = true;
+      asciiEscapeTable[static_cast<U32>('%')] = true;
+      asciiEscapeTable[static_cast<U32>('&')] = true;
+      asciiEscapeTable[static_cast<U32>('+')] = true;
+      asciiEscapeTable[static_cast<U32>('-')] = true;
+      asciiEscapeTable[static_cast<U32>('~')] = true;
    }
 
    U32 destIndex = 0;
@@ -157,7 +157,7 @@ void HTTPObject::expandPath(char *dest, const char *path, U32 destSize)
    while(path[srcIndex] && destIndex < destSize - 3)
    {
       char c = path[srcIndex++];
-      if(asciiEscapeTable[c])
+      if(asciiEscapeTable[static_cast<U32>(c)])
       {
          dest[destIndex++] = '%';
          dest[destIndex++] = getHex((c >> 4) & 0xF);

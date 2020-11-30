@@ -224,7 +224,7 @@ class Point3F;
     // TEXTURE FUNCTIONS
     // Pass these off to the api's.
     //------------------------------------------------------------------------------------------
-    virtual void AreTexturesLoaded(S32 size, const U32* addr, bool isLoad) = 0;
+    virtual void AreTexturesLoaded(S32 size, const U32 &addr, bool &isLoad) = 0;
     virtual void LoadTexture(U32 n, U32 &glName) = 0;
     virtual void DeleteTextures(U32 n, const U32* glName) = 0;
     virtual void SetTextureParam(DGLTextureParam param, const DGLTextureFilter filter) = 0;
@@ -251,23 +251,19 @@ class Point3F;
     // CAMERA FUNCTIONS
     // Pass these off to the api's.
     //------------------------------------------------------------------------------------------
-    // Variables 
-    F64    frustLeft, frustRight, frustBottom, frustTop, frustNear, frustFar;
-    RectI  viewPort;
+    // Variables
     F32    pixelScale;
     F32    worldToScreenScale;
-    bool   isOrtho;
     RectI  sgCurrentClipRect;
-
     /// Get the pixel scale
     F32 GetPixelScale() { return pixelScale; }
     F32 GetWorldToScreenScale() { return worldToScreenScale; }
     F32 ProjectRadius(F32 dist, F32 radius) { return (radius / dist) * worldToScreenScale; }
     virtual void SetViewport(const RectI &aViewPort) = 0;
-    void GetViewport(RectI* outViewport);
+    virtual void GetViewport(RectI* outViewport) = 0;
     virtual void SetFrustum(F64 left, F64 right, F64 bottom, F64 top, F64 nearDist, F64 farDist, bool ortho = false) = 0;
-    void GetFrustum(F64 *left, F64 *right, F64 *bottom, F64 *top, F64 *nearDist, F64 *farDist);
-    bool IsOrtho() { return isOrtho; }
+    virtual void GetFrustum(F64 &left, F64 &right, F64 &bottom, F64 &top, F64 &nearDist, F64 &farDist) = 0;
+    virtual bool IsOrtho() = 0;
     virtual void SetClipRect(const RectI &clipRect) = 0;
     const RectI& GetClipRect() { return sgCurrentClipRect; }
     /// @}

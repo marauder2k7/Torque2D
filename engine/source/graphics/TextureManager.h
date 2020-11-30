@@ -118,7 +118,7 @@ private:
     static GBitmap* loadBitmap(const char *textureName, bool recurse = true, bool nocompression = false);
     static GBitmap* createPowerOfTwoBitmap( GBitmap* pBitmap );
     static U16* create16BitBitmap( GBitmap *pDL, U8 *in_source8, DGLFormat alpha_info, DGLFormat *GLformat, U32 width, U32 height );
-    static void getSourceDestByteFormat(GBitmap *pBitmap, DGLFormat *sourceFormat);
+    static void getSourceDestByteFormat(GBitmap *pBitmap, DGLFormat *sourceFormat, U32* texelSize);
     static F32 getResidentFraction( void );
 };
 

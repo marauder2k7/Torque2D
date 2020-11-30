@@ -23,10 +23,10 @@
 #define T2DACTIVITY_H
 #include "graphics/DynamicTexture.h"
 #include <errno.h>
-#include <glad/glad_egl.h>
+#include <EGL/egl.h>
 //#include <android/sensor.h>
 #include <android/log.h>
-#include <android_native_app_glue.h>
+#include "android_native_app_glue.h"
 #include <android/asset_manager.h>
 #include <android/sensor.h>
 #include <android/configuration.h>

@@ -50,7 +50,7 @@ namespace Hash
 	   char c;
 	   while((c = *str++) != 0) {
 		  ret <<= 1;
-		  ret ^= sgtHashTable[c];
+		  ret ^= sgtHashTable[static_cast<U8>(c)];
 	   }
 	   return ret;
    }

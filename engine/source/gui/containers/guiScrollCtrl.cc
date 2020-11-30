@@ -437,7 +437,8 @@ void GuiScrollCtrl::scrollTo(S32 x, S32 y)
       return;
 
     // keep scroll start state
-    Point2I startPoint = Point2I(0,0);
+   // variable is never used
+    //Point2I startPoint = Point2I(0,0);
 
    setUpdate();
    if (x > mChildExt.x - mContentExt.x)

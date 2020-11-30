@@ -41,7 +41,6 @@
 
 //-------------------------------------- Forward decls.
 class Stream;
-class GPalette;
 class RectI;
 
 extern ResourceInstance* constructBitmapBMP(Stream& stream);
@@ -108,10 +107,6 @@ class GBitmap: public ResourceInstance
    bool        getColor(const U32 x, const U32 y, ColorI& rColor) const;
    bool        setColor(const U32 x, const U32 y, ColorI& rColor);
 
-   /// Note that on set palette, the bitmap deletes its palette.
-   GPalette const* getPalette() const;
-   void            setPalette(GPalette* in_pPalette);
-
    //-------------------------------------- Internal data/operators
    static U32 sBitmapIdSource;
 
@@ -128,14 +123,9 @@ class GBitmap: public ResourceInstance
 
    U32 numMipLevels;
    U32 mipLevelOffsets[c_maxMipLevels];
-
+   bool mForce16Bit;//-Mat some paletted images will always be 16bit
    bool hasTransparency;
 
-   bool mForce16Bit;//-Mat some paletted images will always be 16bit
-   GPalette* pPalette;      ///< Note that this palette pointer is ALWAYS
-                            ///  owned by the bitmap, and will be
-                            ///  deleted on exit, or written out on a
-                            ///  write.
 
    //-------------------------------------- Input/Output interface
   public:

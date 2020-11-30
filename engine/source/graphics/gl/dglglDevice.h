@@ -97,7 +97,7 @@ public:
    //-------------------------------------------------------------------------------
    // TEXTURE
    //-------------------------------------------------------------------------------
-   virtual void AreTexturesLoaded(S32 size, const U32* addr, bool isLoad);
+   virtual void AreTexturesLoaded(S32 size, const U32 &addr, bool &isLoad);
    virtual void LoadTexture(U32 n, U32 &glName);
    virtual void BindTexture(U32 glName);
    virtual void DeleteTextures(U32 n, const U32* glName);
@@ -110,8 +110,10 @@ public:
    //-------------------------------------------------------------------------------
    virtual void SetClipRect(const RectI &clipRect);
    virtual void SetFrustum(F64 left, F64 right, F64 bottom, F64 top, F64 nearPlane, F64 farPlane, bool ortho);
-   virtual void GetFrustum(F64 *left, F64 *right, F64 *bottom, F64 *top, F64 *nearPlane, F64 *farPlane);
+   virtual void GetFrustum(F64 &left, F64 &right, F64 &bottom, F64 &top, F64 &nearDist, F64 &farDist);
    virtual void SetViewport(const RectI &aViewPort);
+   virtual void GetViewport(RectI* outViewport);
+    virtual bool IsOrtho();
 
    //------------------------------------------------------------------------------
    // Draw

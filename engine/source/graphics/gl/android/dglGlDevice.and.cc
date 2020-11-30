@@ -2,8 +2,6 @@
 #include "platformAndroid/platformAndroid.h"
 #include "platformAndroid/platformGL.h"
 #include "game/gameInterface.h"
-#include "platformAndroid/T2DActivity.h"
-
 
 extern void loadGlCore();
 extern void loadGlExtensions(void* context);
@@ -156,14 +154,16 @@ bool DGLGLDevice::activate(U32 width, U32 height, U32 bpp, bool fullScreen)
         Con::setVariable("$pref::Video::windowedRes", buf);
     }
 
+    initGLstate();
+
     adprintf("DGLGLDevice::Activate finished");
 
-    initGLstate();
     return true;
 }
 
 DGLDevice* DGLGLDevice::create()
 {
+
     DGLGLDevice *newOGLDevice = new DGLGLDevice();
     return (DGLDevice*)newOGLDevice;
 }

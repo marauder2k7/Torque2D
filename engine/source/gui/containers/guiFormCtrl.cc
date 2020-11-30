@@ -246,7 +246,8 @@ void GuiFormCtrl::onRender(Point2I offset, const RectI &updateRect)
       renderText(boundsRect.point, boundsRect.extent, "[none]", mProfile);
    }
 
-   S32 textWidth = 0;
+   // variable is never used
+   //S32 textWidth = 0;
 
    // Draw our little bar, too
    if(mProfile->mBitmapArrayRects.size() >= 5)

@@ -1,5 +1,5 @@
 #include "platform/platform.h"
-#include "graphics/gl/dglGLDevice.h"
+#include "graphics/gl/dglglDevice.h"
 #include "platform/platformGL.h"
 
 #include "graphics/gl/glEnumTranslate.h"
@@ -107,6 +107,7 @@ void DGLGLDevice::initGLstate()
       smEdgeClamp = true;
    }
 
+   Con::printf("Set Vsync");
    PlatformGL::setVSync(smDisableVSync ? 0 : 1);
 
    //OpenGL 3 need a binded VAO for render
@@ -318,6 +319,10 @@ void DGLGLDevice::SetClipRect(const RectI &clipRect)
 
 }
 
+static F64 frustLeft = 0, frustRight = 1, frustBottom, frustTop, frustNear, frustFar;
+static RectI viewPort;
+static bool isOrtho;
+
 void DGLGLDevice::SetFrustum(F64 left, F64 right, F64 bottom, F64 top, F64 nearPlane, F64 farPlane, bool ortho)
 {
    // this converts from a coord system looking down the pos-y axis
@@ -348,14 +353,14 @@ void DGLGLDevice::SetFrustum(F64 left, F64 right, F64 bottom, F64 top, F64 nearP
    glMultMatrixf(darkToOGLCoord);
 }
 
-void DGLGLDevice::GetFrustum(F64 *left, F64 *right, F64 *bottom, F64 *top, F64 *nearPlane, F64 *farPlane)
+void DGLGLDevice::GetFrustum(F64 &left, F64 &right, F64 &bottom, F64 &top, F64 &nearPlane, F64 &farPlane)
 {
-   *left = frustLeft;
-   *right = frustRight;
-   *bottom = frustBottom;
-   *top = frustTop;
-   *nearPlane = frustNear;
-   *farPlane = frustFar;
+   left        = frustLeft;
+   right       = frustRight;
+   bottom      = frustBottom;
+   top         = frustTop;
+   nearPlane   = frustNear;
+   farPlane    = frustFar;
 }
 
 void DGLGLDevice::SetViewport(const RectI &aViewPort)
@@ -369,6 +374,17 @@ void DGLGLDevice::SetViewport(const RectI &aViewPort)
       viewPort.extent.x, viewPort.extent.y);
    pixelScale = viewPort.extent.x / (F32)MIN_RESOLUTION_X;
    worldToScreenScale = F32((frustNear * viewPort.extent.x) / (frustRight - frustLeft));
+}
+
+void DGLGLDevice::GetViewport(RectI* outViewport)
+{
+   AssertFatal(outViewport != NULL, "Error, bad point in GetViewport");
+   *outViewport = viewPort;
+}
+
+bool DGLGLDevice::IsOrtho()
+{
+   return isOrtho;
 }
 
 //------------------------------------------------------------------------------
@@ -632,9 +648,9 @@ void DGLGLDevice::DrawBuffer(DGLPolyMode poly)
 // TEXTURE
 //------------------------------------------------------------------------------
 
-void DGLGLDevice::AreTexturesLoaded(S32 size, const U32* addr, bool isLoad)
+void DGLGLDevice::AreTexturesLoaded(S32 size, const U32 &addr, bool &isLoad)
 {
-   glAreTexturesResident(size, addr, (GLboolean*)isLoad);
+   glAreTexturesResident(size, &addr, (GLboolean *)&isLoad);
 
 }
 

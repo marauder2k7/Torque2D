@@ -727,7 +727,7 @@ void SpineObject::prepareSpineForRender()
 		F32 *vertices = VertexBuffer; // It will be redirected to a different buffer if clipping is performed.
 		int	verticesCount = 0;
 		spColor* attachmentColor = NULL;
-		string attachmentName;
+		StringTableEntry attachmentName;
 
 		if (attachment->type == SP_ATTACHMENT_REGION) {
 			auto regionAttachment = (spRegionAttachment*)attachment;
@@ -954,7 +954,7 @@ void SpineObject::prepareSpineForRender()
 		pSprite->setExplicitVertices(ev);
 
 		pSprite->setTriangleRun(true);
-		pSprite->setImage(assetId, attachmentName.c_str());
+		pSprite->setImage(assetId, attachmentName);
 
 		spSkeletonClipping_clipEnd(mSkeletonClipping.get(), slot);
 

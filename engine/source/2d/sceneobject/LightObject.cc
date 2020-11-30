@@ -115,9 +115,10 @@ void LightObject::sceneRender(const SceneRenderState * sceneRenderState, const S
          }
       }
    }
-   ///  \ | /
-   /// -  +  -
-   ///  / | \
+   /*    \ | /
+        -  +  -
+         / | \
+   */
 
    U32 lightSeg = getLightSegments();
    F32 segAng = 360.0f / lightSeg;

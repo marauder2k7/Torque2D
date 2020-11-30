@@ -1614,7 +1614,7 @@ static void handleGameMasterInfoRequest( const NetAddress* address, U32 key, U8 
       {
          out->write( U32( dAtoi( temp ) ) );
          temp = dStrtok( NULL, "\t" );
-         temp8++;
+         //temp8++;
       }
 
       for ( ; temp8 < playerCount; temp8++ )

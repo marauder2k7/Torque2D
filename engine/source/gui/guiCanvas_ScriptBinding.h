@@ -60,7 +60,7 @@ ConsoleMethodWithDocs( GuiCanvas, setContent, ConsoleVoid, 3, 3, ( handle ))
 */
 ConsoleMethodWithDocs( GuiCanvas, pushDialog, ConsoleVoid, 3, 4, ( handle [ , layer ] ))
 {
-   GuiControl *gui;
+   GuiControl *gui = nullAsType<GuiControl*>();
 
    if (!	Sim::findObject(argv[2], gui))
    {

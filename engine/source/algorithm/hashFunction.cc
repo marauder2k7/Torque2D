@@ -104,7 +104,7 @@ acceptable.  Do NOT use for cryptographic purposes.
 --------------------------------------------------------------------
 */
 
-U32 hash(register U8 *k, register U32 length, register U32 initval)
+U32 hash(U8 *k,U32 length,U32 initval)
 {
     // Debug Profiling.
     PROFILE_SCOPE(HashFunction);

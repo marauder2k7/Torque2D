@@ -136,6 +136,11 @@ void Platform::init()
     // create the opengl display device
     Con::printf("DGLDevice Init:");
     DGLDevice::init();
+    if(!DGLDevice::installDevice(DGLGLDevice::create()))
+    {
+        Con::printf("Failed to install device");
+    }
+
     Con::printf("");
 }
 
@@ -157,8 +162,9 @@ bool gStatusBarHidden = true;
 //------------------------------------------------------------------------------
 void Platform::initWindow(const Point2I &initialSize, const char *name)
 {
-    S32 resolutionWidth = ANDROID_DEFAULT_RESOLUTION_X;
-    S32 resolutionHeight = ANDROID_DEFAULT_RESOLUTION_Y;
+   // variable is never used
+    //S32 resolutionWidth = ANDROID_DEFAULT_RESOLUTION_X;
+    //S32 resolutionHeight = ANDROID_DEFAULT_RESOLUTION_Y;
 
     dSprintf(platState.appWindowTitle, sizeof(platState.appWindowTitle), name);
 

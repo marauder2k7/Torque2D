@@ -375,7 +375,7 @@ void TextureManager::freeTexture( TextureObject* pTextureObject )
 
 //---------------------------------------------------------------------------------------------------------------------
 
-void TextureManager::getSourceDestByteFormat(GBitmap *pBitmap, DGLFormat *sourceFormat )
+void TextureManager::getSourceDestByteFormat(GBitmap *pBitmap, DGLFormat *sourceFormat, U32* texelSize)
 {
     U32 byteSize = 1;
     switch (pBitmap->getFormat())
@@ -414,15 +414,18 @@ void TextureManager::getSourceDestByteFormat(GBitmap *pBitmap, DGLFormat *source
         break;
     case DGLFormatA4L4:
         *sourceFormat = DGLFormatA4L4;
+        byteSize = 2;
         break;
     case DGLFormatR8G8B8:
         *sourceFormat = DGLFormatR8G8B8;
         break;
+    case DGLFormatR5G6B5:
+        *sourceFormat = DGLFormatR5G6B5;
+        byteSize = 2;
+        break;
     case DGLFormatR8G8B8A8:
         *sourceFormat = DGLFormatR8G8B8A8;
         break;
-    
-
     case DGLFormatR5G5B5A1:
     case DGLFormatR5G5B5X1:
 #if defined(TORQUE_BIG_ENDIAN)
@@ -430,8 +433,11 @@ void TextureManager::getSourceDestByteFormat(GBitmap *pBitmap, DGLFormat *source
 #else
         *sourceFormat = DGLFormatR5G5B5A1;
 #endif
+        byteSize = 1;
         break;
-    };
+    }
+
+    *texelSize = byteSize;
 
     if (TextureManager::mForce16BitTexture)
     {
@@ -440,6 +446,7 @@ void TextureManager::getSourceDestByteFormat(GBitmap *pBitmap, DGLFormat *source
             if (*sourceFormat == sg16BitMappings[i].wanted)
             {
                 *sourceFormat = sg16BitMappings[i].forced;
+                *texelSize = 2;
                 return;
             }
         }
@@ -518,6 +525,7 @@ void TextureManager::refresh( TextureObject* pTextureObject )
 
     // Fetch source/dest formats.
     DGLFormat sourceFormat;
+    U32 texelSize;
    
 #if defined(TORQUE_OS_EMSCRIPTEN)
     if (pSourceBitmap->getFormat() == GBitmap::Alpha)
@@ -531,7 +539,7 @@ void TextureManager::refresh( TextureObject* pTextureObject )
     else
 #endif
     {
-        getSourceDestByteFormat(pSourceBitmap, &sourceFormat);
+        getSourceDestByteFormat(pSourceBitmap, &sourceFormat, &texelSize);
     }
 
 #if defined(TORQUE_OS_IOS)
@@ -678,13 +686,14 @@ void TextureManager::createGLName( TextureObject* pTextureObject )
     DGL->LoadTexture(1, pTextureObject->mGLTextureName);
     // Fetch source/dest formats.
     DGLFormat sourceFormat;
-    getSourceDestByteFormat(pTextureObject->mpBitmap, &sourceFormat);
+    U32 texelSize;
+    getSourceDestByteFormat(pTextureObject->mpBitmap, &sourceFormat, &texelSize);
 
     // Adjust metrics.
     mTextureResidentCount++;
-    pTextureObject->mTextureResidentSize = pTextureObject->mTextureWidth * pTextureObject->mTextureHeight;
+    pTextureObject->mTextureResidentSize = pTextureObject->mTextureWidth * pTextureObject->mTextureHeight * texelSize;
     mTextureResidentSize += pTextureObject->mTextureResidentSize;
-    pTextureObject->mTextureResidentWasteSize = ((pTextureObject->mTextureWidth * pTextureObject->mTextureHeight)-(pTextureObject->mBitmapWidth * pTextureObject->mBitmapHeight));
+    pTextureObject->mTextureResidentWasteSize = ((pTextureObject->mTextureWidth * pTextureObject->mTextureHeight)-(pTextureObject->mBitmapWidth * pTextureObject->mBitmapHeight)) * texelSize;
     mTextureResidentWasteSize += pTextureObject->mTextureResidentWasteSize;
 
     // Refresh the texture.
@@ -880,7 +889,7 @@ void TextureManager::dumpMetrics( void )
         if ( pProbe->mGLTextureName != 0 )
         {
             textureResidentCount++;
-            DGL->AreTexturesLoaded( 1, &pProbe->mGLTextureName, &isTextureResident );
+            DGL->AreTexturesLoaded( 1, pProbe->mGLTextureName, isTextureResident );
         }
 
         textureResidentSize += pProbe->mTextureResidentSize;
@@ -951,7 +960,7 @@ F32 TextureManager::getResidentFraction()
     Vector<bool> isResident;
     isResident.setSize(names.size());
 
-    DGL->AreTexturesLoaded(names.size(), names.address(), isResident.address());
+    DGL->AreTexturesLoaded(names.size(), *names.address(), *isResident.address());
     for (U32 i = 0; i < (U32)names.size(); i++)
         if (isResident[i] == true)
             resident++;

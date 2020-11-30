@@ -44,7 +44,7 @@ double lastSystemTime = 0;
 
 #define USE_DEPTH_BUFFER 0
 
-extern int _AndroidRunTorqueMain(engine *eng);
+extern int _AndroidRunTorqueMain(struct engine *eng);
 extern bool createMouseMoveEvent(S32 i, S32 x, S32 y, S32 lastX, S32 lastY);
 extern bool createMouseDownEvent(S32 touchNumber, S32 x, S32 y, U32 numTouches);
 extern bool createMouseUpEvent(S32 touchNumber, S32 x, S32 y, S32 lastX, S32 lastY, U32 numTouches); //EFM
@@ -76,7 +76,7 @@ void toggleSplashScreen(bool show)
 {
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 
 	JavaVM* lJavaVM = platState.engine->app->activity->vm;
 	JNIEnv* lJNIEnv = platState.engine->app->activity->env;
@@ -112,7 +112,7 @@ void ChangeVolume(bool up) {
 
     // Attaches the current thread to the JVM.
     jint lResult;
-    jint lFlags = 0;
+    //jint lFlags = 0;
     JavaVM* lJavaVM = platState.engine->app->activity->vm;
     JNIEnv* lJNIEnv = platState.engine->app->activity->env;
 
@@ -412,7 +412,7 @@ void displayKeyboard(bool pShow) {
         jmethodID MethodShowSoftInput = lJNIEnv->GetMethodID(
             ClassInputMethodManager, "showSoftInput",
             "(Landroid/view/View;I)Z");
-        jboolean lResult = lJNIEnv->CallBooleanMethod(
+        lJNIEnv->CallBooleanMethod(
             lInputMethodManager, MethodShowSoftInput,
             lDecorView, lFlags);
     } else {
@@ -428,7 +428,7 @@ void displayKeyboard(bool pShow) {
         jmethodID MethodHideSoftInput = lJNIEnv->GetMethodID(
             ClassInputMethodManager, "hideSoftInputFromWindow",
             "(Landroid/os/IBinder;I)Z");
-        jboolean lRes = lJNIEnv->CallBooleanMethod(
+        lJNIEnv->CallBooleanMethod(
             lInputMethodManager, MethodHideSoftInput,
             lBinder, lFlags);
     }
@@ -530,7 +530,6 @@ static int32_t engine_handle_input(struct android_app* app, AInputEvent* event) 
 
     	int action = AKeyEvent_getAction(event);
     	int key_val = AKeyEvent_getKeyCode(event);
-    	int metastate = AKeyEvent_getMetaState(event);
 
 		switch(action)
 		{
@@ -601,12 +600,12 @@ char* _AndroidLoadFile(const char* fn, U32 *size) {
 	start_pos = filepath.find(find);
 	while (start_pos != std::string::npos)
 	{
-		size_t begin_pos = filepath.rfind("/", start_pos-1);
+		size_t begin_pos = filepath.rfind('/', start_pos-1);
 		filepath.replace(begin_pos, (start_pos - begin_pos - 1) + find.length(), "");
 		start_pos = filepath.find(find);
 
 	}
-	if (filepath.find("/") == 0)
+	if (filepath.find('/') == 0)
 	{
 		strcpy(fileName, filepath.substr(1).c_str());
 		fileName[filepath.size()-1] = '\0';
@@ -654,7 +653,7 @@ void _AndroidGetDeviceIPAddress(char* address) {
 
 	 // Attaches the current thread to the JVM.
 	 jint lResult;
-	 jint lFlags = 0;
+	 //jint lFlags = 0;
 	 JavaVM* lJavaVM = platState.engine->app->activity->vm;
 	 JNIEnv* lJNIEnv = platState.engine->app->activity->env;
 
@@ -740,11 +739,6 @@ static int engine_init_display(struct engine* engine) {
 			EGL_NONE
 	};
 
-	static const EGLint ctx_attribs[] = {
-			EGL_CONTEXT_CLIENT_VERSION, 1,
-			EGL_NONE
-	};
-
 	EGLint w, h, dummy, format;
 	EGLint numConfigs;
 	EGLConfig config;
@@ -756,37 +750,32 @@ static int engine_init_display(struct engine* engine) {
 	eglInitialize(display, 0, 0);
 
 	/* Here, the application chooses the configuration it desires. In this
-     * sample, we have a very simplified selection process, where we pick
-     * the first EGLConfig that matches our criteria */
+      * sample, we have a very simplified selection process, where we pick
+      * the first EGLConfig that matches our criteria */
 	eglChooseConfig(display, attribs, &config, 1, &numConfigs);
 
 	/* EGL_NATIVE_VISUAL_ID is an attribute of the EGLConfig that is
-     * guaranteed to be accepted by ANativeWindow_setBuffersGeometry().
-     * As soon as we picked a EGLConfig, we can safely reconfigure the
-     * ANativeWindow buffers to match, using EGL_NATIVE_VISUAL_ID. */
+      * guaranteed to be accepted by ANativeWindow_setBuffersGeometry().
+      * As soon as we picked a EGLConfig, we can safely reconfigure the
+      * ANativeWindow buffers to match, using EGL_NATIVE_VISUAL_ID. */
 	eglGetConfigAttrib(display, config, EGL_NATIVE_VISUAL_ID, &format);
 
-	ANativeWindow_setBuffersGeometry(engine->app->window, 0, 0, format);
+	ANativeWindow_setBuffersGeometry(platState.engine->app->window, 0, 0, format);
 
-	surface = eglCreateWindowSurface(display, config, engine->app->window, NULL);
-	context = eglCreateContext(display, config, EGL_NO_CONTEXT, ctx_attribs);
+	surface = eglCreateWindowSurface(display, config, platState.engine->app->window, NULL);
+	context = eglCreateContext(display, config, NULL, NULL);
 
 	if (eglMakeCurrent(display, surface, surface, context) == EGL_FALSE) {
 		adprintf("Unable to eglMakeCurrent");
 		return NULL;
 	}
 
-	if(!gladLoadEGL())
-	{
-		adprintf("failed to init egl");
-	}
-
-	if(!gladLoadGLES1Loader((GLADloadproc)eglGetProcAddress))
+	if (!gladLoadGLES1Loader((GLADloadproc)eglGetProcAddress))
 	{
 		adprintf("Failed to init gles1 proc");
 	}
 
-	if(!gladLoadGLES2Loader((GLADloadproc)eglGetProcAddress))
+	if (!gladLoadGLES2Loader((GLADloadproc)eglGetProcAddress))
 	{
 		adprintf("Failed to init gles1 proc");
 	}
@@ -794,27 +783,19 @@ static int engine_init_display(struct engine* engine) {
 	eglQuerySurface(display, surface, EGL_WIDTH, &w);
 	eglQuerySurface(display, surface, EGL_HEIGHT, &h);
 
-	engine->display = display;
-	engine->context = context;
-	engine->surface = surface;
-	engine->width = w;
-	engine->height = h;
-	engine->state.angle = 0;
+	platState.engine->display = display;
+	platState.engine->context = context;
+	platState.engine->surface = surface;
+	platState.engine->width = w;
+	platState.engine->height = h;
+	platState.engine->state.angle = 0;
 
-	engine->animating = 1;
-	adprintf("Install Device");
-	bool ok = DGLDevice::installDevice(DGLGLDevice::create());
-	if(!ok)
-	{
-		adprintf("Install Device faled");
-	}
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
 
-	DGL->enumerateVideoModes();
+	platState.engine->animating = 1;
 
-	DGL->DisableState(DGLRSDepthTest);
-	DGL->DisableState(DGLRSCullFace);
-	RectI size = RectI(0,0,engine->width, engine->height);
-	DGL->SetViewport(size);
+	glViewport(0,0,engine->width,engine->height);
 
     if (SetupCompleted == false)
     {
@@ -941,7 +922,7 @@ void keepScreenOn() {
 
     // Attaches the current thread to the JVM.
     jint lResult;
-    jint lFlags = 0;
+    //jint lFlags = 0;
     JavaVM* lJavaVM = platState.engine->app->activity->vm;
     JNIEnv* lJNIEnv = platState.engine->app->activity->env;
 
@@ -986,7 +967,7 @@ void T2DActivity::loadCacheDir() {
 
     // Attaches the current thread to the JVM.
     jint lResult;
-    jint lFlags = 0;
+    //jint lFlags = 0;
     JavaVM* lJavaVM = platState.engine->app->activity->vm;
     JNIEnv* lJNIEnv = platState.engine->app->activity->env;
 
@@ -1025,7 +1006,7 @@ void T2DActivity::enumerateFonts() {
 
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 	JavaVM* lJavaVM = platState.engine->app->activity->vm;
 	JNIEnv* lJNIEnv = platState.engine->app->activity->env;
 
@@ -1061,7 +1042,7 @@ void T2DActivity::dumpFontList() {
 
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 	JavaVM* lJavaVM = platState.engine->app->activity->vm;
 	JNIEnv* lJNIEnv = platState.engine->app->activity->env;
 
@@ -1097,7 +1078,7 @@ void T2DActivity::getFontPath(const char* fontName, char* fontPath) {
 
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 	JavaVM* lJavaVM = platState.engine->app->activity->vm;
 	JNIEnv* lJNIEnv = platState.engine->app->activity->env;
 
@@ -1333,7 +1314,7 @@ bool android_DumpDirectoriesExtra(Vector<StringTableEntry> &directoryVector)
 {
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 	JavaVM* lJavaVM = engine.app->activity->vm;
 	JNIEnv* lJNIEnv = engine.app->activity->env;
 
@@ -1401,7 +1382,7 @@ bool android_DumpDirectories(const char *basePath, const char *path, Vector<Stri
 {
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 	JavaVM* lJavaVM = engine.app->activity->vm;
 	JNIEnv* lJNIEnv = engine.app->activity->env;
 
@@ -1491,7 +1472,7 @@ bool android_DumpPathExtra(Vector<Platform::FileInfo>& fileVector)
 {
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 	JavaVM* lJavaVM = engine.app->activity->vm;
 	JNIEnv* lJNIEnv = engine.app->activity->env;
 
@@ -1640,7 +1621,7 @@ bool android_DumpPath(const char* dir, Vector<Platform::FileInfo>& fileVector, U
 
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 	JavaVM* lJavaVM = engine.app->activity->vm;
 	JNIEnv* lJNIEnv = engine.app->activity->env;
 
@@ -1737,7 +1718,7 @@ void android_InitDirList(const char* dir)
 {
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 
 	JavaVM* lJavaVM = engine.app->activity->vm;
 	JNIEnv* lJNIEnv = engine.app->activity->env;
@@ -1778,7 +1759,7 @@ void android_GetNextDir(const char* pdir, char *dir)
 {
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 
 	JavaVM* lJavaVM = engine.app->activity->vm;
 	JNIEnv* lJNIEnv = engine.app->activity->env;
@@ -1829,7 +1810,7 @@ void android_GetNextFile(const char* pdir, char *file)
 {
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 
 	JavaVM* lJavaVM = engine.app->activity->vm;
 	JNIEnv* lJNIEnv = engine.app->activity->env;
@@ -1880,7 +1861,7 @@ bool android_IsFile(const char* path)
 {
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 
 	JavaVM* lJavaVM = engine.app->activity->vm;
 	JNIEnv* lJNIEnv = engine.app->activity->env;
@@ -1932,7 +1913,7 @@ bool android_IsDir(const char* path)
 {
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 
 	JavaVM* lJavaVM = engine.app->activity->vm;
 	JNIEnv* lJNIEnv = engine.app->activity->env;
@@ -2053,7 +2034,7 @@ bool Platform::openWebBrowser(const char *webAddress)
 {
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 
 	JavaVM* lJavaVM = engine.app->activity->vm;
 	JNIEnv* lJNIEnv = engine.app->activity->env;
@@ -2094,7 +2075,7 @@ void android_AlertOK(const char *title, const char *message)
 {
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 
 	JavaVM* lJavaVM = engine.app->activity->vm;
 	JNIEnv* lJNIEnv = engine.app->activity->env;
@@ -2135,7 +2116,7 @@ int android_checkAlert()
 {
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 
 	JavaVM* lJavaVM = engine.app->activity->vm;
 	JNIEnv* lJNIEnv = engine.app->activity->env;
@@ -2177,7 +2158,7 @@ void android_AlertOKCancel(const char *title, const char *message)
 {
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 
 	JavaVM* lJavaVM = engine.app->activity->vm;
 	JNIEnv* lJNIEnv = engine.app->activity->env;
@@ -2219,7 +2200,7 @@ void android_AlertRetry(const char *title, const char *message)
 {
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 
 	JavaVM* lJavaVM = engine.app->activity->vm;
 	JNIEnv* lJNIEnv = engine.app->activity->env;
@@ -2261,7 +2242,7 @@ void android_AlertYesNo(const char *title, const char *message)
 {
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 
 	JavaVM* lJavaVM = engine.app->activity->vm;
 	JNIEnv* lJNIEnv = engine.app->activity->env;
@@ -2303,7 +2284,7 @@ void android_LoadMusicTrack( const char *mFilename )
 {
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 
 	JavaVM* lJavaVM = engine.app->activity->vm;
 	JNIEnv* lJNIEnv = engine.app->activity->env;
@@ -2343,7 +2324,7 @@ void android_UnLoadMusicTrack()
 {
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 
 	JavaVM* lJavaVM = engine.app->activity->vm;
 	JNIEnv* lJNIEnv = engine.app->activity->env;
@@ -2381,7 +2362,7 @@ bool android_isMusicTrackPlaying()
 {
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 
 	JavaVM* lJavaVM = engine.app->activity->vm;
 	JNIEnv* lJNIEnv = engine.app->activity->env;
@@ -2423,7 +2404,7 @@ void android_StartMusicTrack()
 {
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 
 	JavaVM* lJavaVM = engine.app->activity->vm;
 	JNIEnv* lJNIEnv = engine.app->activity->env;
@@ -2461,7 +2442,7 @@ void android_StopMusicTrack()
 {
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 
 	JavaVM* lJavaVM = engine.app->activity->vm;
 	JNIEnv* lJNIEnv = engine.app->activity->env;
@@ -2499,7 +2480,7 @@ void android_setMusicTrackVolume(F32 volume)
 {
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 
 	JavaVM* lJavaVM = engine.app->activity->vm;
 	JNIEnv* lJNIEnv = engine.app->activity->env;
@@ -2536,10 +2517,10 @@ void android_setMusicTrackVolume(F32 volume)
 ConsoleFunction(doDeviceVibrate, void, 1, 1, "Makes the device do a quick vibration. Only works on devices with vibration functionality.")
 {
 	// Vibrate for 500 milliseconds
-	long vibrateTimeMS = 500L;
+	long vibrateTimeMS = 500;
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 
 	JavaVM* lJavaVM = platState.engine->app->activity->vm;
 	JNIEnv* lJNIEnv = platState.engine->app->activity->env;
@@ -2651,7 +2632,7 @@ void T2DActivity::loadInternalDir(){
 
     // Attaches the current thread to the JVM.
     jint lResult;
-    jint lFlags = 0;
+    //jint lFlags = 0;
     JavaVM* lJavaVM = platState.engine->app->activity->vm;
     JNIEnv* lJNIEnv = platState.engine->app->activity->env;
 
@@ -2690,7 +2671,7 @@ char* _AndroidLoadInternalFile(const char* fn, U32 *size)
 {
 	// Attaches the current thread to the JVM.
 	jint lResult;
-	jint lFlags = 0;
+	//jint lFlags = 0;
 
 	JavaVM* lJavaVM = engine.app->activity->vm;
 	JNIEnv* lJNIEnv = engine.app->activity->env;

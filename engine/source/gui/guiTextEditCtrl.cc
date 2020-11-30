@@ -1173,6 +1173,7 @@ void GuiTextEditCtrl::drawText( const RectI &drawRect, GuiControlState currentSt
 {
    StringBuffer textBuffer;
    Point2I drawPoint = drawRect.point;
+   Point2I paddingLeftTop, paddingRightBottom;
 
    // Just a little sanity.
    if(mCursorPos > (S32)mTextBuffer.length()) 
@@ -1192,6 +1193,9 @@ void GuiTextEditCtrl::drawText( const RectI &drawRect, GuiControlState currentSt
       textBuffer.set(&mTextBuffer);
    }
 
+   paddingLeftTop.set((mProfile->mTextOffset.x != 0 ? mProfile->mTextOffset.x : 3), mProfile->mTextOffset.y);
+   paddingRightBottom = paddingLeftTop;
+
    // Center vertically:
    drawPoint.y += ( ( drawRect.extent.y - mFont->getHeight() ) / 2 );
 
@@ -1204,11 +1208,14 @@ void GuiTextEditCtrl::drawText( const RectI &drawRect, GuiControlState currentSt
       switch( mProfile->mAlignment )
       {
       case GuiControlProfile::RightAlign:
-         drawPoint.x += ( drawRect.extent.x - textWidth );
+         drawPoint.x += ( drawRect.extent.x - textWidth - paddingRightBottom.x );
          break;
       case GuiControlProfile::CenterAlign:
          drawPoint.x += ( ( drawRect.extent.x - textWidth ) / 2 );
          break;
+      default:
+      case GuiControlProfile::LeftAlign:
+         drawPoint.x += paddingLeftTop.x;
       }
    }
 
@@ -1223,7 +1230,7 @@ void GuiTextEditCtrl::drawText( const RectI &drawRect, GuiControlState currentSt
       mTextOffsetReset = false;
    }
 
-   if ( drawRect.extent.x > textWidth )
+   if ( drawRect.extent.x - paddingLeftTop.x > textWidth )
       mTextOffset.x = drawPoint.x;
    else
    {
@@ -1267,14 +1274,14 @@ void GuiTextEditCtrl::drawText( const RectI &drawRect, GuiControlState currentSt
          else
             mTextOffset.x -= skipForward;
       }
-      else if( mTextOffset.x + cursorOffset < drawRect.point.x)
+      else if( mTextOffset.x + cursorOffset < drawRect.point.x + paddingLeftTop.x)
       {
          // Cursor somewhere before the textcontrol
          // skip backward roughly 25% of the total width (if possible)
          S32 skipBackward = drawRect.extent.x / 4;
 
          if ( cursorOffset - skipBackward < 0 )
-            mTextOffset.x = drawRect.point.x;
+            mTextOffset.x = drawRect.point.x + paddingLeftTop.x;
          else
             mTextOffset.x += skipBackward;
       }

@@ -32,19 +32,19 @@
 //-----------------------------------------------------------------------------
 
 BatchRender::BatchRender() :
-    mTriangleCount( 0 ),
-    mVertexCount( 0 ),
-    mTextureCoordCount( 0 ),
-    mIndexCount( 0 ),
-    mColorCount( 0 ),
     NoColor( -1.0f, -1.0f, -1.0f ),
-    mStrictOrderMode( false ),
-    mpDebugStats( NULL ),
+    mTriangleCount(0),
+    mVertexCount(0),
+    mTextureCoordCount(0),
+    mIndexCount(0),
+    mColorCount(0),
     mBlendMode( true ),
     mSrcBlendFactor(DGLBlendSrcAlpha),
     mDstBlendFactor(DGLBlendInvSrcAlpha),
     mBlendColor( ColorF(1.0f,1.0f,1.0f,1.0f) ),
     mAlphaTestMode( -1.0f ),
+    mStrictOrderMode(false),
+    mpDebugStats(NULL),
     mWireframeMode( false ),
     mBatchEnabled( true )
 {

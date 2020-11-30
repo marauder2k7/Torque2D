@@ -87,8 +87,8 @@ public:
 
 private:
    struct Node {
-      Node* mNext;
       Pair mPair;
+      Node* mNext;
       Node(): mNext(0) {}
       Node(Pair p,Node* n): mPair(p),mNext(n) {}
    };

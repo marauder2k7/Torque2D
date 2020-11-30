@@ -229,7 +229,8 @@ namespace PlatformNetState
          return Net::UnknownError;
       }
 #else
-      int theError = errno;
+      // variable is never used
+      //int theError = errno;
       if (errno == EAGAIN)
          return Net::WouldBlock;
       if (errno == 0)
@@ -247,11 +248,11 @@ namespace PlatformNetState
       // which are required for LAN queries (PC->Xbox connectivity).  The wire protocol still
       // uses the VDP packet structure, though.
       S32 protocol = IPPROTO_UDP;
-      bool useVDP = false;
+      //bool useVDP = false;
 #ifdef TORQUE_DISABLE_PC_CONNECTIVITY
       // Xbox uses a VDP (voice/data protocol) socket for networking
       protocol = IPPROTO_VDP;
-      useVDP = true;
+      //useVDP = true;
 #endif
 
       return protocol;

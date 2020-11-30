@@ -46,20 +46,16 @@ GBitmap::GBitmap()
    byteSize(0),
    width(0),
    height(0),
-   numMipLevels(0),
    bytesPerPixel(0),
-   pPalette(NULL),
+   numMipLevels(0),
    mForce16Bit(false),
    hasTransparency(false)
 {
-   for (U32 i = 0; i < c_maxMipLevels; i++)
-      mipLevelOffsets[i] = 0xffffffff;
+   std::fill_n(mipLevelOffsets, c_maxMipLevels, 0xffffffff);
 }
 
 GBitmap::GBitmap(const GBitmap& rCopy)
 {
-
-   pPalette = NULL;
 
    internalFormat = rCopy.internalFormat;
 
@@ -86,7 +82,6 @@ GBitmap::GBitmap(const U32  in_width,
                  const DGLFormat in_format)
  : pBits(NULL),
    byteSize(0),
-   pPalette(NULL),
    mForce16Bit(false)
 {
    for (U32 i = 0; i < c_maxMipLevels; i++)
@@ -116,16 +111,10 @@ void GBitmap::deleteImage()
    height       = 0;
    numMipLevels = 0;
 
-   SAFE_DELETE(pPalette);
 }
 
 
 //--------------------------------------------------------------------------
-void GBitmap::setPalette(GPalette* in_pPalette)
-{
-   SAFE_DELETE(pPalette);
-   pPalette = in_pPalette;
-}
 
 void GBitmap::copyRect(const GBitmap *src, const RectI &srcRect, const Point2I &dstPt)
 {

@@ -32,7 +32,7 @@ S32 gLastStart = 0;
 
 bool appIsRunning = true;
 
-int _AndroidRunTorqueMain(engine *eng)
+int _AndroidRunTorqueMain(struct engine *eng)
 {
     platState.firstThreadId = ThreadManager::getCurrentThreadId();
     

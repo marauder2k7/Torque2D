@@ -28,7 +28,7 @@
 //-----------------------------------------------------------------------------
 // Modified from this Stack Overflow answer: http://stackoverflow.com/a/28619226/289956
 //-----------------------------------------------------------------------------
-
+// Removed std:: from namespace of round. 
 class NormalDistributionGenerator
 {
    std::mt19937 generator;
@@ -37,13 +37,13 @@ class NormalDistributionGenerator
    S32 max;
 public:
    NormalDistributionGenerator(S32 min, S32 max) :
-      distribution(std::round((min + max) / 2), std::round((max - min) / 6)), min(min), max(max)
+      distribution(round((min + max) / 2), round((max - min) / 6)), min(min), max(max)
    {
       generator.seed(Platform::getRealMilliseconds());
    }
 
    NormalDistributionGenerator(S32 min, S32 max, S32 mean) :
-      distribution(mean, std::round((max - min) / 6)), min(min), max(max)
+      distribution(mean, round((max - min) / 6)), min(min), max(max)
    {
       generator.seed(Platform::getRealMilliseconds());
    }
@@ -56,7 +56,7 @@ public:
 
    S32 operator ()() {
       while (true) {
-         S32 number = (S32)std::round(this->distribution(generator));
+         S32 number = (S32)round(this->distribution(generator));
          if (number >= this->min && number <= this->max)
             return number;
       }

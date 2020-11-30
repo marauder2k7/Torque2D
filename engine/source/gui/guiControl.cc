@@ -1664,14 +1664,19 @@ void GuiControl::renderText(Point2I offset, Point2I extent, const char *text, Gu
 		start.y = startOffset.x;
 		rotation = -90.0f;
 	}
+   else
+   {
+      // need a default when if statement is false
+      start += startOffset;
+      rotation = 0.0f;
+   }
 
    DGL->DrawText( font, start + offset + profile->mTextOffset, text, profile->mFontColors, 9, rotation );
 }
 
 void GuiControl::getCursor(GuiCursor *&cursor, bool &showCursor, const GuiEvent &lastGuiEvent)
 {
-   lastGuiEvent;
-
+    TORQUE_UNUSED(lastGuiEvent);
    if(GuiControl::smCursorChanged != -1 && !isMouseLocked())
    {
       // We've already changed the cursor, 

@@ -120,11 +120,11 @@ public:
 
 	// Use CopyTo() if need to replicate.
 	SpineObject(const SpineObject&) = delete;
-	SpineObject& SpineObject::operator=(const SpineObject&) = delete;
+	SpineObject& operator=(const SpineObject&) = delete;
 
 	// Add 'move' support if/when needed.
 	SpineObject(SpineObject&& other) = delete;
-	SpineObject& SpineObject::operator=(SpineObject&&) = delete;
+	SpineObject& operator=(SpineObject&&) = delete;
 
 	virtual void copyTo(SimObject* object);
 
@@ -186,8 +186,8 @@ public:
 	bool setMix(const char* pFromName, const char* pToName, const F32 mixDuration);
 
 	// Events
-	void SpineObject::enableEventCallbacks(void);
-	void SpineObject::disableEventCallbacks(void);
+	void enableEventCallbacks(void);
+	void disableEventCallbacks(void);
 
 	// Collision Support
 	const SpineCollisionProxy* getCollisionProxy(
@@ -228,7 +228,7 @@ protected:
 	static const char* getVertexEffectTypeDescription(const VertexEffect vertexEffectType);
 
 	// Internal management
-	void SpineObject::resetState();
+	void resetState();
 
 	virtual void OnRegisterScene(Scene *scene);
 	virtual void OnUnregisterScene(Scene *scene);

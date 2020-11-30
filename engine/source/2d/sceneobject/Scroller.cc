@@ -332,11 +332,11 @@ void Scroller::sceneRender( const SceneRenderState* pSceneRenderState, const Sce
     DGL->SetClipPlane(DGLRSClipPlane0, left);
 
     if (maxClip > 1)
-       DGL->SetClipPlane(DGLRSClipPlane1, left);
+       DGL->SetClipPlane(DGLRSClipPlane1, right);
     if (maxClip > 2)
-       DGL->SetClipPlane(DGLRSClipPlane2, left);
+       DGL->SetClipPlane(DGLRSClipPlane2, top);
     if (maxClip > 3)
-       DGL->SetClipPlane(DGLRSClipPlane3, left);
+       DGL->SetClipPlane(DGLRSClipPlane3, bottom);
 
     DGL->EnableState(DGLRSClipPlane0);
     if (maxClip > 1)

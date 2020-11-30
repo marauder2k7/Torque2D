@@ -194,9 +194,7 @@ static void process_input(struct android_app* app, struct android_poll_source* s
 
         if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_KEY) {
 
-            int action = AKeyEvent_getAction(event);
             int key_val = AKeyEvent_getKeyCode(event);
-            int metastate = AKeyEvent_getMetaState(event);
 
             if (key_val == AKEYCODE_BACK) {
 

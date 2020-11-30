@@ -93,7 +93,8 @@ void renderBorderedRect(RectI &bounds, GuiControlProfile *profile, GuiControlSta
 void renderBorderedCircle(Point2I &center, S32 radius, GuiControlProfile *profile, GuiControlState state)
 {
 	//Get the border profiles
-	GuiBorderProfile *borderProfile = profile->mBorderDefault;
+   // we dont need the border profile here as the profile is already being passed.
+	//GuiBorderProfile *borderProfile = profile->mBorderDefault;
 
 	//Get the colors
 	ColorI fillColor = profile->getFillColor(state);

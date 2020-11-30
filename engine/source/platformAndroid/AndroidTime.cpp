@@ -64,9 +64,11 @@ U32 Platform::getTime()
 }   
 
 static double absolute_to_seconds;
-static double seconds_to_absolute;
+// variable is never used
+//static double seconds_to_absolute;
 static double absolute_to_millis;
-static double millis_to_absolute;
+// variable is never used
+//static double millis_to_absolute;
 
 /// Gets the time in milliseconds since some epoch. In this case, system start time.
 /// Storing milisec in a U32 overflows every 49.71 days

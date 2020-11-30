@@ -80,6 +80,20 @@ private:
     /// Cameras.
     CameraView mCameraCurrent, mCameraSource, mCameraTarget;
 
+    /// Misc.
+    Scene*              mpScene;
+    S32                 mLastRenderTime;
+    bool                mLockMouse;
+    bool                mWindowDirty;
+
+    /// Render Masks.
+    U32                 mRenderLayerMask;
+    U32                 mRenderGroupMask;
+
+    /// Background color.
+    ColorF                      mBackgroundColor;
+    bool                        mUseBackgroundColor;
+
     // Camera Interpolation.
     Vector<CameraView>  mCameraQueue;
     S32                 mMaxQueueItems;
@@ -93,10 +107,6 @@ private:
     /// Tick Properties.
     Point2F             mPreTickPosition;
     Point2F             mPostTickPosition;
-
-    /// Background color.
-    ColorF                      mBackgroundColor;
-    bool                        mUseBackgroundColor;
 
     /// Camera Attachment.
     bool                mCameraMounted;
@@ -119,12 +129,6 @@ private:
     F32                 mShakeRamp;
     Vector2             mCameraShakeOffset;
 
-    /// Misc.
-    Scene*              mpScene;
-    S32                 mLastRenderTime;
-    bool                mLockMouse;
-    bool                mWindowDirty;
-
     // Input Events.
     bool                mUseWindowInputEvents;
     bool                mUseObjectInputEvents;
@@ -136,10 +140,6 @@ private:
     typeSceneObjectVector mInputEventLeaving;
     SimSet              mInputEventWatching;
     SimSet              mInputListeners;
-
-    /// Render Masks.
-    U32                 mRenderLayerMask;
-    U32                 mRenderGroupMask;
 
     //Audio Listener
     bool                mProcessAudioListener;
