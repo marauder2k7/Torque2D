@@ -735,9 +735,15 @@ static int engine_init_display(struct engine* engine) {
 			EGL_RED_SIZE, 8,
 			//EGL_ALPHA_SIZE, 8,
 			//EGL_DEPTH_SIZE, 24,
-			EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
+			EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
 			EGL_NONE
 	};
+
+    EGLint AttribList[] =
+            {
+                    EGL_CONTEXT_CLIENT_VERSION, 2,
+                    EGL_NONE
+            };
 
 	EGLint w, h, dummy, format;
 	EGLint numConfigs;
@@ -763,16 +769,11 @@ static int engine_init_display(struct engine* engine) {
 	ANativeWindow_setBuffersGeometry(platState.engine->app->window, 0, 0, format);
 
 	surface = eglCreateWindowSurface(display, config, platState.engine->app->window, NULL);
-	context = eglCreateContext(display, config, NULL, NULL);
+	context = eglCreateContext(display, config, NULL, AttribList);
 
 	if (eglMakeCurrent(display, surface, surface, context) == EGL_FALSE) {
 		adprintf("Unable to eglMakeCurrent");
 		return NULL;
-	}
-
-	if (!gladLoadGLES1Loader((GLADloadproc)eglGetProcAddress))
-	{
-		adprintf("Failed to init gles1 proc");
 	}
 
 	if (!gladLoadGLES2Loader((GLADloadproc)eglGetProcAddress))
@@ -790,8 +791,8 @@ static int engine_init_display(struct engine* engine) {
 	platState.engine->height = h;
 	platState.engine->state.angle = 0;
 
+	glEnable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
 
 	platState.engine->animating = 1;
 

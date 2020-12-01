@@ -37,8 +37,6 @@
 
 #include "dglMac_ScriptBinding.h"
 #include "dgl_ScriptBinding.h"
-#include <vector>
-
 Vector<DGLDevice*> DGLDevice::smDeviceList;
 DGLDevice * DGLDevice::smCurrentDevice = NULL;
 bool DGLDevice::smCritical = false;
@@ -137,73 +135,20 @@ bool DGLDevice::setDevice(const char * renderName, U32 width, U32 height, U32 bp
       Con::warnf(ConsoleLogEntry::General, "\"%s\" display device not found!", renderName);
       return false;
    }
-   
+
    // Change the display device:
    if (smDeviceList[deviceIndex] == NULL)
       return false;
 
 
-   if (smCurrentDevice && smCurrentDevice != smDeviceList[deviceIndex])
-   {
-      Con::printf("Deactivating the previous display device...");
-      Game->textureKill();
-      smNeedResurrect = true;
-      smCurrentDevice->shutdown();
-   }
-   if (iOpenGL != -1 && !bAllowOpengl)
-   {
-      // change to D3D, delete OpenGL in the recursive call
-      if (bOpenglRender)
-      {
-         U32 w, h, d;
 
-         if (fullScreen)
-            dSscanf(Con::getVariable("$pref::Video::resolution"), "%d %d %d", &w, &h, &d);
-         else
-            dSscanf(Con::getVariable("$pref::Video::windowedRes"), "%d %d %d", &w, &h, &d);
-
-         return setDevice("D3D", w, h, d, fullScreen);
-      }
-      else
-      {
-         delete smDeviceList[iOpenGL];
-         smDeviceList.erase(iOpenGL);
-      }
-   }
-   else if (iD3D != -1 && !bAllowD3D)
-   {
-      // change to OpenGL, delete D3D in the recursive call
-      if (bD3DRender)
-      {
-         U32 w, h, d;
-         if (fullScreen)
-            dSscanf(Con::getVariable("$pref::Video::resolution"), "%d %d %d", &w, &h, &d);
-         else
-            dSscanf(Con::getVariable("$pref::Video::windowedRes"), "%d %d %d", &w, &h, &d);
-
-         return setDevice("OpenGL", w, h, d, fullScreen);
-      }
-      else
-      {
-         delete smDeviceList[iD3D];
-         smDeviceList.erase(iD3D);
-      }
-   }
-   else if (iD3D != -1 && bOpenglRender &&
-      !Con::getBoolVariable("$pref::Video::preferOpenGL") &&
-      !Con::getBoolVariable("$pref::Video::appliedPref"))
-   {
-      U32 w, h, d;
-      if (fullScreen)
-         dSscanf(Con::getVariable("$pref::Video::resolution"), "%d %d %d", &w, &h, &d);
-      else
-         dSscanf(Con::getVariable("$pref::Video::windowedRes"), "%d %d %d", &w, &h, &d);
-      Con::setBoolVariable("$pref::Video::appliedPref", true);
-
-      return setDevice("D3D", w, h, d, fullScreen);
-   }
+   U32 w, h, d;
+   if (fullScreen)
+      dSscanf(Con::getVariable("$pref::Video::resolution"), "%d %d %d", &w, &h, &d);
    else
-      Con::setBoolVariable("$pref::Video::appliedPref", true);
+      dSscanf(Con::getVariable("$pref::Video::windowedRes"), "%d %d %d", &w, &h, &d);
+
+   Con::setBoolVariable("$pref::Video::appliedPref", true);
 
    Con::printf("Activating the %s display device...", renderName);
    smCurrentDevice = smDeviceList[deviceIndex];
@@ -1159,7 +1104,7 @@ void DGLDevice::DrawCircle(const Point2I &center, const F32 radius, const ColorI
 
    SetColorI(color.red, color.green, color.blue, color.alpha);
 
-   vector<F32> verts;
+   Vector<F32> verts;
    for (int ii = 0; ii < num_segments; ii++)
    {
       verts.push_back(F32(x + center.x));
@@ -1174,7 +1119,7 @@ void DGLDevice::DrawCircle(const Point2I &center, const F32 radius, const ColorI
    verts.push_back(F32(verts[1]));
 
    EnableClientState(DGLCSVertexArray);
-   SetVertexPoint(2, 0, verts.data());
+   SetVertexPoint(2, 0, verts.address());
    DrawArrays(DGLLineLoop, 0, num_segments + 1);
    DisableClientState(DGLCSVertexArray);
 
@@ -1198,7 +1143,7 @@ void DGLDevice::DrawCircleFill(const Point2I &center, const F32 radius, const Co
 
    SetColorI(color.red, color.green, color.blue, color.alpha);
 
-   vector<F32> verts;
+   Vector<F32> verts;
    verts.push_back(F32(center.x));
    verts.push_back(F32(center.y));
    for (int ii = 0; ii < num_segments; ii++)
@@ -1215,7 +1160,7 @@ void DGLDevice::DrawCircleFill(const Point2I &center, const F32 radius, const Co
    verts.push_back(F32(verts[3]));
 
    EnableClientState(DGLCSVertexArray);
-   SetVertexPoint(2, 0, verts.data());
+   SetVertexPoint(2, 0, verts.address());
    DrawArrays(DGLTriangleFan, 0, num_segments + 1);
    DisableClientState(DGLCSVertexArray);
 
