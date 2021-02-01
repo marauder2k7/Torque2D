@@ -38,11 +38,10 @@ endif
 LOCAL_CFLAGS        +=  -I$(LOCAL_PATH)/$(GLAD_DIR)              \
                         -I$(LOCAL_PATH)/$(GLAD_DIR)/include      \
 
-LOCAL_LDLIBS        +=  -W1,--build-id -Bsymbolic -shared -lEGL
+LOCAL_LDLIBS        +=  -W1,--build-id -Bsymbolic -shared
 
 LOCAL_SRC_FILES :=  \
                     $(GLAD_DIR)/src/glad.c          \
-                    $(GLAD_DIR)/src/glad_egl.c      \
 
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/../../../../../../lib/glad/include
 
@@ -702,6 +701,7 @@ LOCAL_SRC_FILES :=  ../../../../../../lib/ljpeg/jcapimin.c \
 					../../../../../../source/gui/containers/guiRolloutCtrl.cc \
 					../../../../../../source/gui/containers/guiScrollCtrl.cc \
 					../../../../../../source/gui/containers/guiTabBookCtrl.cc \
+					../../../../../../source/gui/containers/guiTabPageCtrl.cc \
 					../../../../../../source/gui/containers/guiWindowCtrl.cc \
 					../../../../../../source/gui/editor/guiControlListPopup.cc \
 					../../../../../../source/gui/editor/guiDebugger.cc \
@@ -719,12 +719,12 @@ LOCAL_SRC_FILES :=  ../../../../../../lib/ljpeg/jcapimin.c \
 
 ifeq ($(APP_OPTIM),debug)
 	LOCAL_CFLAGS := -DENABLE_CONSOLE_MSGS -D__ANDROID__ -DTORQUE_DEBUG -DTORQUE_OS_ANDROID -DGL_GLEXT_PROTOTYPES -O0 -fsigned-char
-	LOCAL_CPPFLAGS := -std=gnu++11 -frtti $(LOCAL_CFLAGS)
+	LOCAL_CPPFLAGS := -std=gnu++11 -frtti -O0 $(LOCAL_CFLAGS)
 else
 	LOCAL_CFLAGS := -DENABLE_CONSOLE_MSGS -D__ANDROID__ -DTORQUE_OS_ANDROID -DGL_GLEXT_PROTOTYPES -O3 -fsigned-char
 	LOCAL_CPPFLAGS := -std=gnu++11 -frtti $(LOCAL_CFLAGS)
 endif
-LOCAL_LDLIBS    := -llog -landroid -lEGL -lGLESv2 -lz -lOpenSLES -L$(BINDIR)
+LOCAL_LDLIBS    := -llog -landroid -lEGL -lz -lOpenSLES -L$(BINDIR)
 LOCAL_STATIC_LIBRARIES := freetype-prebuilt
 LOCAL_SHARED_LIBRARIES := glad openal
 

@@ -1262,7 +1262,13 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
     lastCursor = mouseCursor;
     lastCursorPt = cursorPos;
 
+    DGL->SetViewport(screenRect);
+
     resetUpdateRegions();
+
+    DGL->setWorldMatrix(MatrixF::Identity);
+    DGL->setViewMatrix(MatrixF::Identity);
+    DGL->setProjectionMatrix(MatrixF::Identity);
 
    RectI updateUnion;
    buildUpdateUnion(&updateUnion);
@@ -1305,7 +1311,8 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
                hoverPositionSet = mMouseControl->renderTooltip(hoverPosition);
             }
 
-         } else
+         } 
+         else
          {
             if(hoverPositionSet)
             {
@@ -1317,7 +1324,6 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
          }
       }
       //end tooltip
-
       DGL->SetClipRect(updateUnion);
 
       //temp draw the mouse
@@ -1336,12 +1342,7 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
           DGL->DrawArrays(DGLLineLoop, 0, 4);
       }
        
-      //DEBUG
-      //draw the help ctrl
-      //if (helpCtrl)
-      //{
-      //   helpCtrl->render(srf);
-      //}
+      DGL->ClearBitmapModulation();
 
       if (cursorON && mouseCursor && mShowCursor)
       {

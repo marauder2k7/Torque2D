@@ -6,9 +6,9 @@
    #include "gladWGL.h"
 #endif // TORQUE_OS_WIN32
 
-
 namespace GLAD
 {
+
     void gglPerformBinds()
    {
        if(!gladLoadGL())
@@ -17,6 +17,7 @@ namespace GLAD
        }
 
    }
+
 
    void gglPerformExtensionBinds(void *context)
    {

@@ -156,6 +156,7 @@ public:
    VectorF getUpVector() const;
 
    MatrixF&  mul(const MatrixF &a);                    ///< M * a -> M
+   MatrixF & mulL(const MatrixF & a);                  ///< a * M -> M
    MatrixF&  mul(const MatrixF &a, const MatrixF &b);  ///< a * b -> M
 
    // Scalar multiplies
@@ -175,6 +176,9 @@ public:
    F32& operator ()(S32 row, S32 col) { return m[idx(col,row)]; }
 
    void dumpMatrix(const char *caption=NULL) const;
+
+   // Static identity matrix
+   const static MatrixF Identity;
 } 
 #if defined(__VEC__)
 __attribute__ ((aligned (16)))
@@ -317,6 +321,14 @@ inline MatrixF& MatrixF::mul( const MatrixF &a )
 {  // M * a -> M
    MatrixF tempThis(*this);
    m_matF_x_matF(tempThis, a, *this);
+   return (*this);
+}
+
+inline MatrixF& MatrixF::mulL(const MatrixF &a)
+{
+   // a * M -> M
+   MatrixF tempThis(*this);
+   m_matF_x_matF(a, tempThis, *this);
    return (*this);
 }
 

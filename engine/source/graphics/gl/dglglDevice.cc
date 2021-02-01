@@ -296,71 +296,26 @@ void DGLGLDevice::GetTransformState(S32* mvDepth,
 // CAMERA
 //------------------------------------------------------------------------------
 
+RectI  sgCurrentClipRect;
+
+const RectI& DGLGLDevice::GetClipRect()
+{
+   return sgCurrentClipRect;
+}
+
 void DGLGLDevice::SetClipRect(const RectI &clipRect)
 {
-   glMatrixMode(GL_PROJECTION);
-   glLoadIdentity();
 
-   U32 screenHeight = Platform::getWindowSize().y;
-   glOrtho(clipRect.point.x, clipRect.point.x + clipRect.extent.x,
-           clipRect.extent.y, 0,
-           0, 1);
+   Point2I size = Platform::getWindowSize();
 
-   glTranslatef(0.0f, (F32)-clipRect.point.y, 0.0f);
+   MatrixF mTempMatrix(true);
+   setViewMatrix(mTempMatrix);
+   setWorldMatrix(mTempMatrix);
 
-   SetModelViewMatrix();
-   //glMatrixMode(GL_MODELVIEW);
-   glLoadIdentity();
-
-   glViewport(clipRect.point.x, screenHeight - (clipRect.point.y + clipRect.extent.y),
-              clipRect.extent.x, clipRect.extent.y);
+   glViewport(clipRect.point.x, size.y - (clipRect.point.y + clipRect.extent.y), clipRect.extent.x, clipRect.extent.y);
 
    sgCurrentClipRect = clipRect;
 
-}
-
-static F64 frustLeft = 0, frustRight = 1, frustBottom, frustTop, frustNear, frustFar;
-static RectI viewPort;
-static bool isOrtho;
-
-void DGLGLDevice::SetFrustum(F64 left, F64 right, F64 bottom, F64 top, F64 nearPlane, F64 farPlane, bool ortho)
-{
-   // this converts from a coord system looking down the pos-y axis
-   // to ogl's down neg z axis.
-   // it's stored in OGL matrix form
-   static F32 darkToOGLCoord[16] = { 1, 0,  0, 0,
-                                     0, 0, -1, 0,
-                                     0, 1,  0, 0,
-                                     0, 0,  0, 1 };
-
-   frustLeft = left;
-   frustRight = right;
-   frustBottom = bottom;
-   frustTop = top;
-   frustNear = nearPlane;
-   frustFar = farPlane;
-   isOrtho = ortho;
-   if (ortho)
-   {
-      glOrtho(left, right, bottom, top, nearPlane, farPlane);
-      worldToScreenScale = F32(viewPort.extent.x / (frustRight - frustLeft));
-   }
-   else
-   {
-      glFrustum(left, right, bottom, top, nearPlane, farPlane);
-      worldToScreenScale = F32((frustNear * viewPort.extent.x) / frustRight - frustLeft);
-   }
-   glMultMatrixf(darkToOGLCoord);
-}
-
-void DGLGLDevice::GetFrustum(F64 &left, F64 &right, F64 &bottom, F64 &top, F64 &nearPlane, F64 &farPlane)
-{
-   left        = frustLeft;
-   right       = frustRight;
-   bottom      = frustBottom;
-   top         = frustTop;
-   nearPlane   = frustNear;
-   farPlane    = frustFar;
 }
 
 void DGLGLDevice::SetViewport(const RectI &aViewPort)
@@ -373,18 +328,13 @@ void DGLGLDevice::SetViewport(const RectI &aViewPort)
    glViewport(viewPort.point.x, screenHeight - (viewPort.point.y + viewPort.extent.y),
       viewPort.extent.x, viewPort.extent.y);
    pixelScale = viewPort.extent.x / (F32)MIN_RESOLUTION_X;
-   worldToScreenScale = F32((frustNear * viewPort.extent.x) / (frustRight - frustLeft));
+   worldToScreenScale = F32((mFrustum.getNearPlane() * viewPort.extent.x) / (mFrustum.getRight() - mFrustum.getLeft()));
 }
 
 void DGLGLDevice::GetViewport(RectI* outViewport)
 {
    AssertFatal(outViewport != NULL, "Error, bad point in GetViewport");
    *outViewport = viewPort;
-}
-
-bool DGLGLDevice::IsOrtho()
-{
-   return isOrtho;
 }
 
 //------------------------------------------------------------------------------
@@ -415,7 +365,7 @@ void DGLGLDevice::DrawArrays(DGLPrimitiveType type, U32 first, U32 count)
 
 void DGLGLDevice::setMatrix(DGLMatrixType type)
 {
-   glMatrixMode(DGLGLMatrixMode[type]);
+    glMatrixMode(DGLGLMatrixMode[type]);
 }
 
 void DGLGLDevice::LoadMatrix(const MatrixF *m)
@@ -430,11 +380,6 @@ void DGLGLDevice::LoadMatrix(const MatrixF *m)
 void DGLGLDevice::SetModelViewMatrix()
 {
    glMatrixMode(GL_MODELVIEW);
-}
-
-void DGLGLDevice::SetProjMatrix()
-{
-   glMatrixMode(GL_PROJECTION);
 }
 
 void DGLGLDevice::MultMatrix(const MatrixF *m)
@@ -468,12 +413,6 @@ void DGLGLDevice::MultMatrix(const MatrixF *m)
 void DGLGLDevice::GetModelview(MatrixF *m)
 {
    glGetFloatv(GL_MODELVIEW_MATRIX, *m);
-   m->transpose();
-}
-
-void DGLGLDevice::GetProjection(MatrixF *m)
-{
-   glGetFloatv(GL_PROJECTION_MATRIX, *m);
    m->transpose();
 }
 
@@ -529,11 +468,6 @@ void DGLGLDevice::setBlendFunc(DGLBlend sFactor, DGLBlend dFactor)
 void DGLGLDevice::setAlphaFunc(DGLCompare cmp, F32 testMode)
 {
    glAlphaFunc(DGLGLCompare[cmp], testMode);
-}
-
-void DGLGLDevice::SetOrthoState(F32 wMin, F32 wMax, F32 hMin, F32 hMax, F32 mNear, U32 mFar)
-{
-   glOrtho(wMin, wMax, hMin, hMax, mNear, mFar);
 }
 
 void DGLGLDevice::SetVertexPoint(U32 size, U32 stride, const void * pointer)

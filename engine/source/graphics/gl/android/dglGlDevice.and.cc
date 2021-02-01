@@ -49,7 +49,52 @@ void DGLGLDevice::shutdown()
 void DGLGLDevice::swapBuffers()
 {
     adprintf("swap buffer");
-    eglSwapBuffers(platState.engine->display, platState.engine->surface);
+    bool b = eglSwapBuffers(platState.engine->display, platState.engine->surface);
+    if(!b)
+    {
+        EGLint err = eglGetError();
+        if(err == EGL_BAD_SURFACE)
+        {
+            adprintf("swap buffer bad surface");
+            EGLDisplay display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+            eglInitialize(platState.engine->display,0,0);
+
+            const EGLint attribs[] = { EGL_RENDERABLE_TYPE,
+                                       EGL_OPENGL_ES2_BIT, //Request opengl ES2.0
+                                       EGL_SURFACE_TYPE, EGL_WINDOW_BIT, EGL_BLUE_SIZE, 8, EGL_GREEN_SIZE, 8,
+                                       EGL_RED_SIZE, 8, EGL_DEPTH_SIZE, 24, EGL_NONE };
+            EGLint w, h;
+            EGLint num_configs;
+            EGLConfig config;
+            EGLSurface surface;
+            eglChooseConfig( platState.engine->display, attribs, &config, 1, &num_configs );
+            surface = eglCreateWindowSurface( platState.engine->display, config, platState.engine->app->window, NULL );
+
+            eglQuerySurface(display, surface, EGL_WIDTH, &w);
+            eglQuerySurface(display, surface, EGL_HEIGHT, &h);
+
+            platState.engine->display = display;
+            platState.engine->surface = surface;
+            platState.engine->width = w;
+            platState.engine->height = h;
+            platState.engine->config = config;
+
+        }
+        else if( err == EGL_CONTEXT_LOST || err == EGL_BAD_CONTEXT )
+        {
+            adprintf("swap buffer bad context");
+            const EGLint context_attribs[] = { EGL_CONTEXT_CLIENT_VERSION, 2, //Request opengl ES2.0
+                                               EGL_NONE };
+            eglMakeCurrent(platState.engine->display,EGL_NO_SURFACE,EGL_NO_SURFACE,EGL_NO_CONTEXT);
+
+            EGLContext context = eglCreateContext( platState.engine->display, platState.engine->config, NULL, context_attribs );
+
+            if( eglMakeCurrent( platState.engine->display, platState.engine->surface, platState.engine->surface, context ) == EGL_FALSE )
+            {
+                Con::printf("Unable to make swap context current after error!");
+            }
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -163,7 +208,8 @@ bool DGLGLDevice::activate(U32 width, U32 height, U32 bpp, bool fullScreen)
 
 DGLDevice* DGLGLDevice::create()
 {
+    loadGlCore();
 
     DGLGLDevice *newOGLDevice = new DGLGLDevice();
-    return (DGLDevice*)newOGLDevice;
+    return newOGLDevice;
 }

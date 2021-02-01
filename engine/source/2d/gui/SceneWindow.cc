@@ -1663,9 +1663,8 @@ void SceneWindow::onRender( Point2I offset, const RectI& updateRect )
     //glMatrixMode(GL_PROJECTION);
     //glPushMatrix();
     //glLoadIdentity();
-    DGL->setMatrix(DGLProjection);
-    DGL->PushMatrix();
-    DGL->LoadIdentity();
+
+    DGL->setProjectionMatrix(MatrixF::Identity);
 
     // Set orthographic projection.
     //glOrtho( sceneMin.x, sceneMax.x, sceneMin.y, sceneMax.y, 0.0f, MAX_LAYERS_SUPPORTED );
@@ -1678,7 +1677,6 @@ void SceneWindow::onRender( Point2I offset, const RectI& updateRect )
     DGL->SetModelViewMatrix();
     DGL->PushMatrix();
     DGL->LoadIdentity();
-
 
     // Disable Alpha Test by default
     //glDisable( GL_ALPHA_TEST );    
@@ -1700,6 +1698,8 @@ void SceneWindow::onRender( Point2I offset, const RectI& updateRect )
         Vector2( mCameraCurrent.mSceneWindowScale ),
         &debugStats,
         this );
+
+
 
     // Clear the background color if requested.
     if ( mUseBackgroundColor )
@@ -1734,8 +1734,6 @@ void SceneWindow::onRender( Point2I offset, const RectI& updateRect )
     //glMatrixMode(GL_MODELVIEW);
 
     DGL->SetModelViewMatrix();
-    DGL->PopMatrix();
-    DGL->setMatrix(DGLProjection);
     DGL->PopMatrix();
     DGL->SetModelViewMatrix();
     

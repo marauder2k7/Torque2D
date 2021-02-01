@@ -60,8 +60,12 @@ DGLDevice::DGLDevice()
 {
    VECTOR_SET_ASSOCIATION(mVideoModeList);
    AssertFatal(smCurrentDevice == NULL, "Already a GFXDevice created! Bad!");
+
+   mWorldMatrix.identity();
    mProjectionMatrix.identity();
+   mViewMatrix.identity();
    smCurrentDevice = this;
+
 }
 
 void DGLDevice::init()
@@ -1276,4 +1280,46 @@ const char* DGLDevice::getResolutionList()
    }
 
    return NULL;
+}
+
+void DGLDevice::SetFrustum(F32 left, F32 right, F32 bottom, F32 top, F32 nearDist, F32 farDist, bool ortho)
+{
+
+   mFrustum.set(left, right, bottom, top, nearDist, farDist, ortho);
+
+   if (ortho)
+   {
+      worldToScreenScale = F32(viewPort.extent.x / (right - left));
+   }
+   else
+   {
+      worldToScreenScale = F32((nearDist * viewPort.extent.x) / right - left);
+   }
+
+   MatrixF projection;
+   mFrustum.getProjectionMatrix(&projection);
+   setProjectionMatrix(projection);
+
+}
+
+void DGLDevice::GetFrustum(F32 *left, F32 *right, F32 *bottom, F32 *top, F32 *nearDist, F32 *farDist)
+{
+   
+   if (left)      *left       = mFrustum.getLeft();
+   if (right)     *right      = mFrustum.getRight();
+   if (bottom)    *right      = mFrustum.getBottom();
+   if (top)       *top        = mFrustum.getTop();
+   if (nearDist)  *nearDist   = mFrustum.getNearPlane();
+   if (farDist)   *farDist    = mFrustum.getFarPlane();
+
+}
+
+void DGLDevice::SetOrthoState(F32 left, F32 right, F32 bottom, F32 top, F32 near, U32 far)
+{
+   mFrustum.set(left, right, bottom, top, near, far, true);
+
+   MatrixF proj;
+   mFrustum.getProjectionMatrix(&proj);
+
+   setProjectionMatrix(proj);
 }

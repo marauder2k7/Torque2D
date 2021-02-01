@@ -776,9 +776,9 @@ static int engine_init_display(struct engine* engine) {
 		return NULL;
 	}
 
-	if (!gladLoadGLES2Loader((GLADloadproc)eglGetProcAddress))
+	if(!gladLoadGLES2Loader((GLADloadproc)eglGetProcAddress))
 	{
-		adprintf("Failed to init gles1 proc");
+		adprintf("unable to load GLES2 glad");
 	}
 
 	eglQuerySurface(display, surface, EGL_WIDTH, &w);
@@ -790,6 +790,7 @@ static int engine_init_display(struct engine* engine) {
 	platState.engine->width = w;
 	platState.engine->height = h;
 	platState.engine->state.angle = 0;
+	platState.engine->config = config;
 
 	glEnable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);

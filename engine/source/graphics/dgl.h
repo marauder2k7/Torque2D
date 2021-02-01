@@ -31,6 +31,11 @@
 #include "platform/platform.h"
 #endif
 
+#ifndef _MFRUSTUM_H_
+#include "math/mFrustum.h"
+#endif
+
+
 class TextureObject;
 class GFont;
 class MatrixF;
@@ -67,7 +72,7 @@ class Point3F;
     friend class Point3F;
 
     static Vector<DGLDevice *>   smDeviceList;
-    static DGLDevice*            smCurrentDevice;
+    static DGLDevice *           smCurrentDevice;
     static bool                  smCritical;
 
  protected:
@@ -76,9 +81,15 @@ class Point3F;
     bool                         mFullScreenOnly;
     static DGLVideoMode          smCurrentRes;
     static bool                  smIsFullScreen;
+
+    /// Matrix stuffs. Biggest change from GLES1 - 2 we have to manage these
+    MatrixF mWorldMatrix;
+    MatrixF mViewMatrix;
     MatrixF mProjectionMatrix;
     /// The global vsync state.
     static bool smDisableVSync;
+
+    Frustum mFrustum;
 
  public:
 
@@ -192,7 +203,6 @@ class Point3F;
     virtual void DisableClientState(DGLClientState cs) = 0;
     virtual void setBlendFunc(DGLBlend sFactor, DGLBlend dFactor) = 0;
     virtual void setAlphaFunc(DGLCompare cmp, F32 testMode) = 0;
-    virtual void SetOrthoState(F32 wMin, F32 wMax, F32 hMin, F32 hMax, F32 mNear, U32 mFar) = 0;
     virtual void SetVertexPoint(U32 size, U32 stride, const void *pointer) = 0;
     virtual void SetColorPoint(U32 size, U32 stride, const void * pointer) = 0;
     virtual void SetColorPointU(U32 size, U32 stride, const void * pointer) = 0;
@@ -239,10 +249,15 @@ class Point3F;
     virtual void setMatrix(DGLMatrixType type) = 0;
     virtual void LoadMatrix(const MatrixF *m) = 0;
     virtual void SetModelViewMatrix() = 0;
-    virtual void SetProjMatrix() = 0;
+    void setWorldMatrix(const MatrixF &newWorld);
+    inline const MatrixF &getWorldMatrix() const { return mWorldMatrix; }
+    void setProjectionMatrix(const MatrixF &newProj);
+    inline const MatrixF &getProjectionMatrix() const { return mProjectionMatrix; }
+    void setViewMatrix(const MatrixF &newView);
+    inline const MatrixF &getViewMatrix() const { return mViewMatrix; }
+
     virtual void MultMatrix(const MatrixF *m) = 0;
     virtual void GetModelview(MatrixF *m) = 0;
-    virtual void GetProjection(MatrixF *m) = 0;
     /// @}
     virtual void PopMatrix() = 0;
     virtual void PushMatrix() = 0;
@@ -252,22 +267,22 @@ class Point3F;
     // Pass these off to the api's.
     //------------------------------------------------------------------------------------------
     // Variables
-    F32    pixelScale;
-    F32    worldToScreenScale;
-    RectI  sgCurrentClipRect;
-    /// Get the pixel scale
+    F32 pixelScale;
+    F32 worldToScreenScale;
+    RectI viewPort;
+    bool isOrtho;
+
     F32 GetPixelScale() { return pixelScale; }
     F32 GetWorldToScreenScale() { return worldToScreenScale; }
     F32 ProjectRadius(F32 dist, F32 radius) { return (radius / dist) * worldToScreenScale; }
     virtual void SetViewport(const RectI &aViewPort) = 0;
     virtual void GetViewport(RectI* outViewport) = 0;
-    virtual void SetFrustum(F64 left, F64 right, F64 bottom, F64 top, F64 nearDist, F64 farDist, bool ortho = false) = 0;
-    virtual void GetFrustum(F64 &left, F64 &right, F64 &bottom, F64 &top, F64 &nearDist, F64 &farDist) = 0;
-    virtual bool IsOrtho() = 0;
+    void SetFrustum(F32 left, F32 right, F32 bottom, F32 top, F32 nearDist, F32 farDist, bool ortho = false);
+    void GetFrustum(F32 *left, F32 *right, F32 *bottom, F32 *top, F32 *nearDist, F32 *farDist);
+    void SetOrthoState(F32 left, F32 right, F32 bottom, F32 top, F32 near, U32 far);
+    bool IsOrtho() { return isOrtho; }
     virtual void SetClipRect(const RectI &clipRect) = 0;
-    const RectI& GetClipRect() { return sgCurrentClipRect; }
-    /// @}
-
+    virtual const RectI& GetClipRect() = 0;
 
     bool  PointToScreen(Point3F &point3D, Point3F &screenPoint);
 
@@ -319,6 +334,24 @@ inline bool DGLDevice::isFullScreen()
 {
    return smIsFullScreen;
 }
+
+//------------------------------------------------------------------------------
+// INLINE MATRIX
+//------------------------------------------------------------------------------
+inline void DGLDevice::setWorldMatrix(const MatrixF &newWorld)
+{
+   mWorldMatrix = newWorld;
+}
+
+inline void DGLDevice::setProjectionMatrix(const MatrixF &newProj)
+{
+   mProjectionMatrix = newProj;
+}
+inline void DGLDevice::setViewMatrix(const MatrixF &newView)
+{
+   mViewMatrix = newView;
+}
+
 
 #endif // _H_DGL
 

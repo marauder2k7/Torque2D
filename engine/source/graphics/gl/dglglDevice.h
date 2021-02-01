@@ -55,10 +55,8 @@ public:
    virtual void setMatrix(DGLMatrixType type);
    virtual void LoadMatrix(const MatrixF *m);
    virtual void SetModelViewMatrix();
-   virtual void SetProjMatrix();
    virtual void MultMatrix(const MatrixF *m);
    virtual void GetModelview(MatrixF *m);
-   virtual void GetProjection(MatrixF *m);
    virtual void PopMatrix();
    virtual void PushMatrix();
    virtual void LoadIdentity();
@@ -73,7 +71,6 @@ public:
    virtual void DisableClientState(DGLClientState cs);
    virtual void setBlendFunc(DGLBlend sFactor, DGLBlend dFactor);
    virtual void setAlphaFunc(DGLCompare cmp, F32 testMode);
-   virtual void SetOrthoState(F32 wMin, F32 wMax, F32 hMin, F32 hMax, F32 mNear, U32 mFar);
    virtual void SetVertexPoint(U32 size, U32 stride, const void *pointer);
    virtual void SetColorPoint(U32 size, U32 stride, const void * pointer);
    virtual void SetColorPointU(U32 size, U32 stride, const void * pointer);
@@ -109,11 +106,9 @@ public:
    // CAMERA
    //-------------------------------------------------------------------------------
    virtual void SetClipRect(const RectI &clipRect);
-   virtual void SetFrustum(F64 left, F64 right, F64 bottom, F64 top, F64 nearPlane, F64 farPlane, bool ortho);
-   virtual void GetFrustum(F64 &left, F64 &right, F64 &bottom, F64 &top, F64 &nearDist, F64 &farDist);
+   virtual const RectI& GetClipRect();
    virtual void SetViewport(const RectI &aViewPort);
    virtual void GetViewport(RectI* outViewport);
-    virtual bool IsOrtho();
 
    //------------------------------------------------------------------------------
    // Draw

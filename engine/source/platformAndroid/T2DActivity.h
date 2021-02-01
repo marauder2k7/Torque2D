@@ -74,6 +74,7 @@ struct engine {
     EGLDisplay display;
     EGLSurface surface;
     EGLContext context;
+    EGLConfig config;
     int32_t width;
     int32_t height;
     struct saved_state state;

@@ -1480,6 +1480,9 @@
     <ClCompile Include="..\..\source\graphics\gl\win\dglGlDevice.win.cc">
       <Filter>graphics\gl\win</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\math\mFrustum.cc">
+      <Filter>math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\audio\audio.h">
@@ -3294,6 +3297,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\graphics\dglAdapter.h">
       <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\math\mFrustum.h">
+      <Filter>math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
